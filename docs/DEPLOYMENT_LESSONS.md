@@ -79,12 +79,14 @@ Tras revisar la arquitectura de la aplicación:
 Se completó la migración a la **Solución A (Recomendada)** implementando nombres de tabla cualificados en:
 
 1. **Todas las consultas en `repositories.ts`:**
+
    - `SELECT * FROM the_simpson.characters`
    - `SELECT * FROM the_simpson.episodes`
    - `SELECT * FROM the_simpson.locations`
    - etc.
 
 2. **Todas las operaciones en los archivos `_actions/`:**
+
    - `INSERT INTO the_simpson.character_follows`
    - `DELETE FROM the_simpson.diary_entries`
    - `INSERT INTO the_simpson.quote_collections`
@@ -98,6 +100,7 @@ Se completó la migración a la **Solución A (Recomendada)** implementando nomb
 ### Resultados
 
 ✅ **Todas las páginas funcionales:**
+
 - Página de episodios: carga 50+ episodios correctamente
 - Página de personajes: carga 50+ personajes correctamente
 - Acciones de usuario (diary, collections): funcionan sin errores
