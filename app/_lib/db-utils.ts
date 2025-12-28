@@ -10,6 +10,9 @@ export async function withConnection<T>(
 ): Promise<T> {
   const client = await pool.connect();
   try {
+    // Asegurar que el search_path esté configurado para el esquema the_simpson
+    // Esto es necesario porque los poolers de Neon no soportan search_path en la cadena de conexión
+    await client.query("SET search_path TO the_simpson, public");
     return await fn(client);
   } finally {
     client.release();
