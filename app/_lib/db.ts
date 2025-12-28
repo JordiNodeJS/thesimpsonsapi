@@ -1,14 +1,11 @@
 import { Pool, neonConfig } from "@neondatabase/serverless";
 
 // Enable HTTP connection for better compatibility with serverless environments
-neonConfig.fetchConnection = true;
+neonConfig.poolQueryViaFetch = true;
 
 if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL is missing from environment variables!");
   throw new Error("DATABASE_URL is not defined");
 }
-
-console.log("Database connection initialized with search_path: the_simpson");
 
 // Add search_path to connection string if not present
 let connectionString = process.env.DATABASE_URL;

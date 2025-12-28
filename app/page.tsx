@@ -10,39 +10,40 @@ import SyncButton from "@/app/_components/SyncButton";
 export const dynamic = "force-dynamic";
 
 async function getStats() {
-  const client = await pool.connect();
   try {
-    const charCount = await client.query("SELECT COUNT(*) FROM characters");
-    const epCount = await client.query("SELECT COUNT(*) FROM episodes");
-    const triviaCount = await client.query("SELECT COUNT(*) FROM trivia_facts");
+    const [charCount, epCount, triviaCount] = await Promise.all([
+      pool.query("SELECT COUNT(*) FROM characters"),
+      pool.query("SELECT COUNT(*) FROM episodes"),
+      pool.query("SELECT COUNT(*) FROM trivia_facts"),
+    ]);
     return {
       characters: parseInt(charCount.rows[0].count),
       episodes: parseInt(epCount.rows[0].count),
       trivia: parseInt(triviaCount.rows[0].count),
     };
-  } finally {
-    client.release();
+  } catch (error) {
+    console.error("Error in getStats:", error);
+    throw error;
   }
 }
 
 async function getFeaturedCharacters() {
-  const client = await pool.connect();
   try {
-    const res = await client.query(`
+    const res = await pool.query(`
       SELECT * FROM characters 
       WHERE name IN ('Homer Simpson', 'Marge Simpson', 'Bart Simpson', 'Lisa Simpson', 'Maggie Simpson')
       LIMIT 5
     `);
     return res.rows;
-  } finally {
-    client.release();
+  } catch (error) {
+    console.error("Error in getFeaturedCharacters:", error);
+    throw error;
   }
 }
 
 async function getLatestTrivia() {
-  const client = await pool.connect();
   try {
-    const res = await client.query(`
+    const res = await pool.query(`
       SELECT t.*, u.username 
       FROM trivia_facts t
       JOIN users u ON t.submitted_by_user_id = u.id
@@ -50,8 +51,9 @@ async function getLatestTrivia() {
       LIMIT 3
     `);
     return res.rows;
-  } finally {
-    client.release();
+  } catch (error) {
+    console.error("Error in getLatestTrivia:", error);
+    throw error;
   }
 }
 

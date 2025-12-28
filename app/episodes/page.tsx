@@ -7,16 +7,16 @@ import { Badge } from "@/components/ui/badge";
 export const dynamic = "force-dynamic";
 
 async function getEpisodes() {
-  const client = await pool.connect();
   try {
-    const res = await client.query(`
+    const res = await pool.query(`
       SELECT * FROM episodes 
       ORDER BY season ASC, episode_number ASC 
       LIMIT 50
     `);
     return res.rows;
-  } finally {
-    client.release();
+  } catch (error) {
+    console.error("Error in getEpisodes:", error);
+    throw error;
   }
 }
 

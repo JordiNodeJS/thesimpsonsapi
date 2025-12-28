@@ -7,16 +7,16 @@ import RecentlyViewedList from "@/app/_components/RecentlyViewedList";
 export const dynamic = "force-dynamic";
 
 async function getCharacters() {
-  const client = await pool.connect();
   try {
-    const res = await client.query(`
+    const res = await pool.query(`
       SELECT * FROM characters 
       ORDER BY id ASC 
       LIMIT 50
     `);
     return res.rows;
-  } finally {
-    client.release();
+  } catch (error) {
+    console.error("Error in getCharacters:", error);
+    throw error;
   }
 }
 
@@ -34,7 +34,7 @@ export default async function CharactersPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-6">Springfield Citizens</h1>
-      
+
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-500 mb-6">
           {error}
