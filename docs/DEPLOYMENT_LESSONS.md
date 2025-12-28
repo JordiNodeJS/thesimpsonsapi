@@ -29,17 +29,19 @@ Para consultas "stateless" (sin estado) en Server Components:
 
 - **Solución:** Preferir `pool.query()` sobre `pool.connect()`. Al usar `pool.query()` junto con `poolQueryViaFetch`, el driver realiza una petición HTTP rápida que se cierra inmediatamente después de recibir los datos, eliminando la sobrecarga de gestión de conexiones persistentes.
 
-## 3. Gestión de Esquemas con `search_path`
+## 3. Gestión de Esquemas con `search_path` y HTTP Fetch
 
 ### El Problema
 
-Por defecto, PostgreSQL busca tablas en el esquema `public`. Si los datos están en un esquema personalizado (como `the_simpson`), las consultas fallarán a menos que se especifique el esquema en cada tabla o se configure el "camino de búsqueda".
+El modo HTTP de Neon (`poolQueryViaFetch = true`) es excelente para el rendimiento en Vercel, pero tiene una limitación crítica: **ignora los parámetros de sesión** como `search_path` pasados en la URL de conexión (`options=-c search_path=...`). Esto causaba que, aunque la conexión fuera exitosa, la base de datos no encontrara las tablas en el esquema `the_simpson`.
 
 ### La Lección
 
-Configurar el esquema directamente en la cadena de conexión es la forma más robusta de asegurar que la app siempre encuentre los datos, especialmente en entornos donde las conexiones se crean y destruyen constantemente.
+Cuando se utiliza un esquema personalizado en Neon con el driver HTTP:
 
-- **Solución:** Añadir `?options=-c%20search_path%3Dthe_simpson,public` a la `DATABASE_URL`.
+- **Solución A (Recomendada):** Usar **nombres de tabla cualificados** en las consultas SQL (ej. `SELECT * FROM the_simpson.characters`). Esto elimina la dependencia del `search_path` y permite mantener las ventajas de rendimiento del protocolo HTTP.
+- **Solución B:** Desactivar `poolQueryViaFetch` para forzar el uso de WebSockets, que sí respetan el `search_path` de la URL, aunque con una ligera penalización de rendimiento en entornos serverless.
+- **Solución C:** Configurar el `search_path` de forma permanente a nivel de usuario en la base de datos (`ALTER USER ... SET search_path TO ...`).
 
 ## 4. Resiliencia en Server Components
 
