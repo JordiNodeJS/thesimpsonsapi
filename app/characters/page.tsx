@@ -4,6 +4,8 @@ import CharacterImage from "@/app/_components/CharacterImage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import RecentlyViewedList from "@/app/_components/RecentlyViewedList";
 
+export const dynamic = "force-dynamic";
+
 async function getCharacters() {
   const client = await pool.connect();
   try {

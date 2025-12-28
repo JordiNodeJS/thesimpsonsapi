@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Tv, Users, BookOpen, Star, ArrowRight, Quote } from "lucide-react";
 import SyncButton from "@/app/_components/SyncButton";
 
+export const dynamic = "force-dynamic";
+
 async function getStats() {
   const client = await pool.connect();
   try {

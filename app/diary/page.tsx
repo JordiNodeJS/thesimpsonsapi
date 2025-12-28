@@ -3,6 +3,8 @@ import DiaryForm from "@/app/_components/DiaryForm";
 import { getDiaryEntries, getLocations } from "@/app/_actions/diary";
 import DeleteDiaryEntryButton from "@/app/_components/DeleteDiaryEntryButton";
 
+export const dynamic = "force-dynamic";
+
 async function getCharacters() {
   const client = await pool.connect();
   try {

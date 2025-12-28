@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import CreateCollectionForm from "@/app/_components/CreateCollectionForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function CollectionsPage() {
   const collections = await getCollections();
 
