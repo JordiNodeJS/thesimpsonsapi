@@ -46,7 +46,15 @@ The creation of this project was driven by three core pillars:
 
 ---
 
-## 📦 Installation & Setup
+## � Documentation
+
+- [Architecture Overview](docs/ARCHITECTURE.md)
+- [Deployment Lessons (Vercel & Neon)](docs/DEPLOYMENT_LESSONS.md)
+- [Sprint Plan](docs/SPRINT_PLAN.md)
+
+---
+
+## �📦 Installation & Setup
 
 1.  **Clone the repository:**
 

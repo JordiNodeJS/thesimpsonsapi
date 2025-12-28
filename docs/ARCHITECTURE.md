@@ -15,7 +15,17 @@ The application is built on a **Next.js 16** framework using the **App Router**.
 
 1.  **Sync Layer:** A scheduled job (or admin trigger) fetches `Characters`, `Episodes`, and `Locations` from The Simpsons API and upserts them into the Neon DB to ensure referential integrity for user actions.
 2.  **User Actions:** When a user tracks an episode or logs a diary entry, the data is written directly to Neon via Server Actions.
-3.  **Read Layer:** Pages fetch data directly from Neon (using Prisma, Drizzle, or raw SQL) for the fastest performance.
+3.  **Read Layer:** Pages fetch data directly from Neon (using raw SQL via `@neondatabase/serverless`) for the fastest performance.
+
+### Serverless Connection Strategy
+
+To optimize for Vercel's serverless environment, the application uses:
+
+- **HTTP-based Queries:** Configured via `neonConfig.poolQueryViaFetch = true` to avoid WebSocket overhead.
+- **Stateless Pool:** Using `pool.query()` for one-off requests instead of persistent connections.
+- **Schema Routing:** The `search_path` is defined in the connection string to ensure correct schema resolution (`the_simpson`).
+
+See [Deployment Lessons](DEPLOYMENT_LESSONS.md) for more details.
 
 ## 4. Database Schema (Neon)
 
