@@ -1,16 +1,10 @@
 import { pool } from "@/app/_lib/db";
 import Link from "next/link";
 import CharacterImage from "@/app/_components/CharacterImage";
+import IntroSection from "@/app/_components/IntroSection";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Tv,
-  Users,
-  BookOpen,
-  Star,
-  ArrowRight,
-  Quote,
-} from "lucide-react";
+import { Tv, Users, BookOpen, Star, ArrowRight, Quote } from "lucide-react";
 import SyncButton from "@/app/_components/SyncButton";
 
 async function getStats() {
@@ -66,87 +60,7 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-black overflow-x-hidden">
-      {/* Simpsons Classic Intro Section */}
-      <section className="relative h-[80vh] w-full overflow-hidden bg-[#87CEEB] flex items-center justify-center">
-        {/* Animated Clouds Layer (Background) */}
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute opacity-60"
-              style={{
-                top: `${10 + i * 12}%`,
-                left: `${-20 + (i % 3) * 40}%`,
-                animation: `cloud-drift ${25 + i * 8}s linear infinite`,
-                animationDelay: `${i * -3}s`,
-              }}
-            >
-              <svg width="240" height="140" viewBox="0 0 200 120" fill="white">
-                <circle cx="50" cy="70" r="40" />
-                <circle cx="90" cy="60" r="45" />
-                <circle cx="130" cy="70" r="40" />
-                <circle cx="90" cy="85" r="35" />
-              </svg>
-            </div>
-          ))}
-        </div>
-
-        {/* Zooming Clouds (Foreground - The "Fly Through" effect) */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-20">
-          <div className="w-full h-full animate-[zoom-through_4s_ease-in-out_forwards] opacity-0">
-            <svg
-              className="w-full h-full"
-              viewBox="0 0 1000 1000"
-              preserveAspectRatio="xMidYMid slice"
-            >
-              <filter id="blur-clouds">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="20" />
-              </filter>
-              <g filter="url(#blur-clouds)" fill="white" opacity="1">
-                <circle cx="200" cy="200" r="400" />
-                <circle cx="800" cy="200" r="400" />
-                <circle cx="500" cy="800" r="500" />
-                <circle cx="100" cy="900" r="300" />
-                <circle cx="900" cy="900" r="300" />
-              </g>
-            </svg>
-          </div>
-        </div>
-
-        {/* The Iconic Title */}
-        <div className="relative z-10 text-center px-4 animate-[title-entrance_2s_ease-out_1s_both]">
-          <div className="relative inline-block">
-            {/* Sun in the corner */}
-            <div className="absolute -top-20 -right-20 w-32 h-32 bg-yellow-400 rounded-full blur-2xl opacity-50 animate-pulse" />
-
-            <h1
-              className="text-7xl md:text-9xl font-black italic tracking-tighter uppercase leading-none"
-              style={{
-                color: "#FFD90F",
-                WebkitTextStroke: "4px #0047AB",
-                textShadow: `
-                  0 1px 0 #0047AB,
-                  0 2px 0 #0047AB,
-                  0 3px 0 #0047AB,
-                  0 4px 0 #0047AB,
-                  0 5px 0 #0047AB,
-                  0 6px 0 #0047AB,
-                  8px 8px 20px rgba(0,0,0,0.3)
-                `,
-                transform: "rotate(-3deg) skew(-5deg)",
-              }}
-            >
-              Springfield <br />
-              <span className="text-8xl md:text-[12rem] block mt-4">Life</span>
-            </h1>
-          </div>
-          <div className="mt-12 animate-bounce">
-            <Badge className="bg-yellow-500 text-black border-2 border-blue-800 px-8 py-3 text-xl rounded-full shadow-2xl font-bold">
-              Welcome to the Neighborhood 🍩
-            </Badge>
-          </div>
-        </div>
-      </section>
+      <IntroSection />
 
       {/* Quick Actions */}
       <section className="py-12 px-6 bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800">
