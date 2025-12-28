@@ -17,12 +17,12 @@ export async function toggleFollow(characterId: number) {
 
   if (isCurrentlyFollowing) {
     await execute(
-      `DELETE FROM character_follows WHERE user_id = $1 AND character_id = $2`,
+      `DELETE FROM the_simpson.character_follows WHERE user_id = $1 AND character_id = $2`,
       [user.id, characterId]
     );
   } else {
     await execute(
-      `INSERT INTO character_follows (user_id, character_id) VALUES ($1, $2)`,
+      `INSERT INTO the_simpson.character_follows (user_id, character_id) VALUES ($1, $2)`,
       [user.id, characterId]
     );
   }
@@ -37,7 +37,7 @@ export async function isFollowing(characterId: number) {
 export async function postComment(characterId: number, content: string) {
   const user = await getCurrentUser();
   await execute(
-    `INSERT INTO character_comments (user_id, character_id, content) VALUES ($1, $2, $3)`,
+    `INSERT INTO the_simpson.character_comments (user_id, character_id, content) VALUES ($1, $2, $3)`,
     [user.id, characterId, content]
   );
   revalidatePath(`/characters/${characterId}`);

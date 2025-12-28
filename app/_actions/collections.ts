@@ -11,7 +11,7 @@ import {
 export async function createCollection(name: string, description: string) {
   const user = await getCurrentUser();
   await execute(
-    `INSERT INTO quote_collections (user_id, name, description) VALUES ($1, $2, $3)`,
+    `INSERT INTO the_simpson.quote_collections (user_id, name, description) VALUES ($1, $2, $3)`,
     [user.id, name, description]
   );
   revalidatePath("/collections");
@@ -29,7 +29,7 @@ export async function addQuote(
   episode: string
 ) {
   await execute(
-    `INSERT INTO collection_quotes (collection_id, quote_text, character_name, source_episode) 
+    `INSERT INTO the_simpson.collection_quotes (collection_id, quote_text, character_name, source_episode) 
      VALUES ($1, $2, $3, $4)`,
     [collectionId, text, character, episode]
   );

@@ -1,35 +1,17 @@
 import { pool } from "@/app/_lib/db";
-import type { PoolClient, QueryResultRow } from "@neondatabase/serverless";
+import type { QueryResultRow } from "@neondatabase/serverless";
 
 /**
- * Ejecuta una función con una conexión del pool, liberándola automáticamente.
- * Elimina la repetición del patrón try/finally en server actions.
- */
-export async function withConnection<T>(
-  fn: (client: PoolClient) => Promise<T>
-): Promise<T> {
-  const client = await pool.connect();
-  try {
-    // Asegurar que el search_path esté configurado para el esquema the_simpson
-    // Esto es necesario porque los poolers de Neon no soportan search_path en la cadena de conexión
-    await client.query("SET search_path TO the_simpson, public");
-    return await fn(client);
-  } finally {
-    client.release();
-  }
-}
-
-/**
- * Ejecuta una consulta simple sin necesidad de manejar la conexión.
+ * Ejecuta una consulta simple usando pool.query() directamente.
+ * En modo HTTP (poolQueryViaFetch = true), esto es más eficiente que pool.connect()
+ * ya que realiza una petición HTTP rápida que se cierra inmediatamente.
  */
 export async function query<T extends QueryResultRow = QueryResultRow>(
   sql: string,
   params?: unknown[]
 ): Promise<T[]> {
-  return withConnection(async (client) => {
-    const result = await client.query<T>(sql, params);
-    return result.rows;
-  });
+  const result = await pool.query<T>(sql, params);
+  return result.rows;
 }
 
 /**
@@ -50,8 +32,6 @@ export async function execute(
   sql: string,
   params?: unknown[]
 ): Promise<number> {
-  return withConnection(async (client) => {
-    const result = await client.query(sql, params);
-    return result.rowCount ?? 0;
-  });
+  const result = await pool.query(sql, params);
+  return result.rowCount ?? 0;
 }

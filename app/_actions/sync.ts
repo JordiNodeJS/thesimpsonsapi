@@ -49,7 +49,7 @@ function buildImageUrl(path: string | null | undefined): string | null {
  */
 async function upsertCharacter(char: APICharacter): Promise<void> {
   await execute(
-    `INSERT INTO characters (external_id, name, occupation, image_url)
+    `INSERT INTO the_simpson.characters (external_id, name, occupation, image_url)
      VALUES ($1, $2, $3, $4)
      ON CONFLICT (external_id) DO UPDATE 
      SET name = EXCLUDED.name, 
@@ -64,7 +64,7 @@ async function upsertCharacter(char: APICharacter): Promise<void> {
  */
 async function upsertEpisode(ep: APIEpisode): Promise<void> {
   await execute(
-    `INSERT INTO episodes (external_id, title, season, episode_number, synopsis, image_url)
+    `INSERT INTO the_simpson.episodes (external_id, title, season, episode_number, synopsis, image_url)
      VALUES ($1, $2, $3, $4, $5, $6)
      ON CONFLICT (external_id) DO UPDATE 
      SET title = EXCLUDED.title, 
@@ -88,7 +88,7 @@ async function upsertEpisode(ep: APIEpisode): Promise<void> {
  */
 async function upsertLocation(loc: APILocation): Promise<void> {
   await execute(
-    `INSERT INTO locations (external_id, name)
+    `INSERT INTO the_simpson.locations (external_id, name)
      VALUES ($1, $2)
      ON CONFLICT (external_id) DO UPDATE 
      SET name = EXCLUDED.name`,
