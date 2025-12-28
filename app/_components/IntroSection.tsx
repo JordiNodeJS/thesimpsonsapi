@@ -53,9 +53,10 @@ export default function IntroSection() {
             style={{
               top: `${10 + i * 12}%`,
               left: `${-20 + (i % 3) * 40}%`,
-              animation: isSkipped
-                ? "none"
-                : `cloud-drift ${25 + i * 8}s linear infinite`,
+              animationName: isSkipped ? "none" : "cloud-drift",
+              animationDuration: isSkipped ? "0s" : `${25 + i * 8}s`,
+              animationTimingFunction: "linear",
+              animationIterationCount: "infinite",
               animationDelay: isSkipped ? "0s" : `${i * -3}s`,
             }}
           >

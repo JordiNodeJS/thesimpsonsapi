@@ -10,6 +10,7 @@ interface CharacterImageProps {
   fill?: boolean;
   className?: string;
   priority?: boolean;
+  sizes?: string;
 }
 
 export default function CharacterImage({
@@ -18,6 +19,7 @@ export default function CharacterImage({
   fill,
   className,
   priority,
+  sizes,
 }: CharacterImageProps) {
   const [error, setError] = useState(false);
 
@@ -40,6 +42,12 @@ export default function CharacterImage({
       fill={fill}
       className={className}
       priority={priority}
+      sizes={
+        sizes ||
+        (fill
+          ? "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          : undefined)
+      }
       onError={() => setError(true)}
     />
   );
