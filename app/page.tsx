@@ -21,11 +21,8 @@ async function getStats() {
       episodes: parseInt(epCount.rows[0].count),
       trivia: parseInt(triviaCount.rows[0].count),
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error in getStats:", error);
-    // Log more details for Vercel logs
-    if (error.code) console.error("Error code:", error.code);
-    if (error.message) console.error("Error message:", error.message);
     throw error;
   }
 }
