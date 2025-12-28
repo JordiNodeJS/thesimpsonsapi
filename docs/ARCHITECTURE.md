@@ -1,15 +1,18 @@
 # System Architecture
 
 ## 1. High-Level Overview
+
 The application is built on a **Next.js 16** framework using the **App Router**. It connects to an external **Simpsons API** for static data (synced periodically) and a **Neon PostgreSQL** database for dynamic user data.
 
 ## 2. Tech Stack
+
 - **Frontend:** Next.js 16, React 19, Tailwind CSS 4, shadcn/ui.
 - **Backend:** Next.js Server Actions (for mutations), Route Handlers (for internal APIs).
 - **Database:** Neon (PostgreSQL) via MCP.
 - **External Data:** https://thesimpsonsapi.com/
 
 ## 3. Data Flow
+
 1.  **Sync Layer:** A scheduled job (or admin trigger) fetches `Characters`, `Episodes`, and `Locations` from The Simpsons API and upserts them into the Neon DB to ensure referential integrity for user actions.
 2.  **User Actions:** When a user tracks an episode or logs a diary entry, the data is written directly to Neon via Server Actions.
 3.  **Read Layer:** Pages fetch data directly from Neon (using Prisma, Drizzle, or raw SQL) for the fastest performance.
@@ -17,6 +20,7 @@ The application is built on a **Next.js 16** framework using the **App Router**.
 ## 4. Database Schema (Neon)
 
 ### Core Data (Synced)
+
 ```sql
 CREATE TABLE episodes (
   id SERIAL PRIMARY KEY,
@@ -44,6 +48,7 @@ CREATE TABLE locations (
 ```
 
 ### User Data
+
 ```sql
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -83,6 +88,7 @@ CREATE TABLE character_comments (
 ```
 
 ### Features
+
 ```sql
 CREATE TABLE quote_collections (
   id SERIAL PRIMARY KEY,
@@ -119,6 +125,7 @@ CREATE TABLE diary_entries (
 ```
 
 ## 5. Directory Structure
+
 ```
 app/
   (routes)/
