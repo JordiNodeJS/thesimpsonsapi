@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "thesimpsonsapi.com",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.thesimpsonsapi.com",
+      },
     ],
   },
 };

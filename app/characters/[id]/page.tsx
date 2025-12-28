@@ -1,5 +1,5 @@
 import { pool } from "@/app/_lib/db";
-import Image from "next/image";
+import CharacterImage from "@/app/_components/CharacterImage";
 import { notFound } from "next/navigation";
 import FollowButton from "@/app/_components/FollowButton";
 import CommentSection from "@/app/_components/CommentSection";
@@ -38,15 +38,13 @@ export default async function CharacterDetailPage({
       <div className="grid md:grid-cols-3 gap-8">
         <div className="space-y-6 text-center md:text-left">
           <div className="relative h-[400px] w-full rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-            {character.image_url && (
-              <Image
-                src={character.image_url}
-                alt={character.name}
-                fill
-                className="object-contain p-4"
-                priority
-              />
-            )}
+            <CharacterImage
+              src={character.image_url}
+              alt={character.name}
+              fill
+              className="object-contain p-4"
+              priority
+            />
           </div>
           <div>
             <h1 className="text-4xl font-bold mb-2">{character.name}</h1>

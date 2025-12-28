@@ -51,3 +51,17 @@ export async function getLocations() {
     client.release();
   }
 }
+
+export async function deleteDiaryEntry(id: number) {
+  const user = await getCurrentUser();
+  const client = await pool.connect();
+  try {
+    await client.query(
+      `DELETE FROM diary_entries WHERE id = $1 AND user_id = $2`,
+      [id, user.id]
+    );
+    revalidatePath("/diary");
+  } finally {
+    client.release();
+  }
+}

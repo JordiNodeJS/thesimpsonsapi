@@ -1,6 +1,7 @@
 import { pool } from "@/app/_lib/db";
 import DiaryForm from "@/app/_components/DiaryForm";
 import { getDiaryEntries, getLocations } from "@/app/_actions/diary";
+import DeleteDiaryEntryButton from "@/app/_components/DeleteDiaryEntryButton";
 
 async function getCharacters() {
   const client = await pool.connect();
@@ -42,9 +43,12 @@ export default async function DiaryPage() {
                 <div key={entry.id} className="ml-6 relative">
                   <div className="absolute -left-[31px] top-1 h-4 w-4 rounded-full bg-yellow-400 border-2 border-white dark:border-zinc-950" />
                   <div className="flex flex-col gap-1">
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(entry.entry_date).toLocaleDateString()}
-                    </span>
+                    <div className="flex justify-between items-start">
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(entry.entry_date).toLocaleDateString()}
+                      </span>
+                      <DeleteDiaryEntryButton id={entry.id} />
+                    </div>
                     <h3 className="text-lg font-medium">
                       With{" "}
                       <span className="font-bold text-yellow-600 dark:text-yellow-400">

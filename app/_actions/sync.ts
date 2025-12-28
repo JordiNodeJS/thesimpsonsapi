@@ -63,7 +63,7 @@ export async function syncExternalData() {
           char.name,
           char.occupation,
           char.portrait_path
-            ? `https://thesimpsonsapi.com${char.portrait_path}`
+            ? `https://cdn.thesimpsonsapi.com/500${char.portrait_path}`
             : null,
         ]
       );
@@ -91,7 +91,9 @@ export async function syncExternalData() {
           ep.season,
           ep.episode_number,
           ep.synopsis,
-          ep.image_path ? `https://thesimpsonsapi.com${ep.image_path}` : null,
+          ep.image_path
+            ? `https://cdn.thesimpsonsapi.com/500${ep.image_path}`
+            : null,
         ]
       );
     }

@@ -15,10 +15,15 @@ export default function CreateCollectionForm() {
   const handleSubmit = async () => {
     if (!name) return;
     setLoading(true);
-    await createCollection(name, desc);
-    setName("");
-    setDesc("");
-    setLoading(false);
+    try {
+      await createCollection(name, desc);
+      setName("");
+      setDesc("");
+    } catch (error) {
+      console.error("Action failed:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

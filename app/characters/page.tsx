@@ -1,6 +1,6 @@
 import { pool } from "@/app/_lib/db";
 import Link from "next/link";
-import Image from "next/image";
+import CharacterImage from "@/app/_components/CharacterImage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 async function getCharacters() {
@@ -28,14 +28,12 @@ export default async function CharactersPage() {
           <Link key={char.id} href={`/characters/${char.id}`}>
             <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer overflow-hidden text-center">
               <div className="relative h-48 w-full mt-4">
-                {char.image_url && (
-                  <Image
-                    src={char.image_url}
-                    alt={char.name}
-                    fill
-                    className="object-contain"
-                  />
-                )}
+                <CharacterImage
+                  src={char.image_url}
+                  alt={char.name}
+                  fill
+                  className="object-contain"
+                />
               </div>
               <CardHeader>
                 <CardTitle className="text-lg">{char.name}</CardTitle>
