@@ -1,7 +1,8 @@
 import { Pool, neonConfig } from "@neondatabase/serverless";
 
 // Enable HTTP connection for better compatibility with serverless environments
-neonConfig.poolQueryViaFetch = true;
+// In local development, we disable it to ensure search_path from connection string is respected
+neonConfig.poolQueryViaFetch = process.env.NODE_ENV === "production";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not defined");
