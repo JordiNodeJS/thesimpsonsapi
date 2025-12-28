@@ -9,28 +9,30 @@ export default function IntroSection() {
   const [isSkipped, setIsSkipped] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const handleSkip = () => {
-    setIsSkipped(true);
+  useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.currentTime = 0;
       audioRef.current.volume = 0.5;
       audioRef.current.play().catch((err) => {
         console.log(
-          "Audio play failed. This is normal if the browser blocks autoplay or the URL is invalid.",
+          "Audio autoplay failed. This is common in browsers until the user interacts with the page.",
           err
         );
       });
+    }
+  }, []);
+
+  const handleSkip = () => {
+    setIsSkipped(true);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
     }
   };
 
   return (
     <section className="relative h-[80vh] w-full overflow-hidden bg-[#87CEEB] flex items-center justify-center">
       {/* Audio element for the Simpsons theme/choir */}
-      <audio
-        ref={audioRef}
-        src="https://www.myinstants.com/media/sounds/the-simpsons.mp3"
-        preload="auto"
-      />
+      <audio ref={audioRef} src="/sounds/intro.mp3" preload="auto" />
 
       {/* Skip Button */}
       {!isSkipped && (
