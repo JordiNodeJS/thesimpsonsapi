@@ -1,7 +1,5 @@
-import { pool } from "@/app/_lib/db";
-import { getCollections, createCollection } from "@/app/_actions/collections";
+import { getCollections } from "@/app/_actions/collections";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import CreateCollectionForm from "@/app/_components/CreateCollectionForm";
 

@@ -1,11 +1,12 @@
 "use server";
 
 import { pool } from "@/app/_lib/db";
+import { APICharacter, APIEpisode, APILocation } from "@/app/_lib/types";
 
 const API_BASE = "https://thesimpsonsapi.com/api";
 
-async function fetchAll(endpoint: string) {
-  let allData: any[] = [];
+async function fetchAll<T>(endpoint: string): Promise<T[]> {
+  let allData: T[] = [];
   let page = 1;
   let hasMore = true;
 
@@ -17,7 +18,7 @@ async function fetchAll(endpoint: string) {
       const data = await res.json();
       // The API returns { results: [...] } or { data: [...] } depending on endpoint version?
       // Based on curl, it is 'results' for characters. Let's check both.
-      const items = data.results || data.data || [];
+      const items = (data.results || data.data || []) as T[];
 
       if (items && Array.isArray(items) && items.length > 0) {
         allData = [...allData, ...items];
@@ -45,7 +46,7 @@ export async function syncExternalData() {
 
     // 1. Characters
     // Note: The API endpoint is /characters
-    const characters = await fetchAll("characters");
+    const characters = await fetchAll<APICharacter>("characters");
     console.log(`Fetched ${characters.length} characters`);
 
     for (const char of characters) {
@@ -70,7 +71,7 @@ export async function syncExternalData() {
     }
 
     // 2. Episodes
-    const episodes = await fetchAll("episodes");
+    const episodes = await fetchAll<APIEpisode>("episodes");
     console.log(`Fetched ${episodes.length} episodes`);
 
     for (const ep of episodes) {
@@ -99,7 +100,7 @@ export async function syncExternalData() {
     }
 
     // 3. Locations
-    const locations = await fetchAll("locations");
+    const locations = await fetchAll<APILocation>("locations");
     console.log(`Fetched ${locations.length} locations`);
 
     for (const loc of locations) {

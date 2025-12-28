@@ -6,6 +6,7 @@ import CommentSection from "@/app/_components/CommentSection";
 import TriviaSection from "@/app/_components/TriviaSection";
 import { isFollowing, getComments } from "@/app/_actions/social";
 import { getTrivia } from "@/app/_actions/trivia";
+import RecentlyViewedTracker from "@/app/_components/RecentlyViewedTracker";
 
 async function getCharacter(id: string) {
   const client = await pool.connect();
@@ -35,6 +36,13 @@ export default async function CharacterDetailPage({
 
   return (
     <div className="container mx-auto py-8 px-4">
+      <RecentlyViewedTracker
+        character={{
+          id: character.id,
+          name: character.name,
+          image: character.image_url,
+        }}
+      />
       <div className="grid md:grid-cols-3 gap-8">
         <div className="space-y-6 text-center md:text-left">
           <div className="relative h-[400px] w-full rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800">

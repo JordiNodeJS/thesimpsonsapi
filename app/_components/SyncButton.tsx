@@ -20,7 +20,8 @@ export default function SyncButton() {
       } else {
         setStatus("Sync failed. Check console.");
       }
-    } catch (e) {
+    } catch (error) {
+      console.error(error);
       setStatus("Error invoking sync.");
     } finally {
       setLoading(false);

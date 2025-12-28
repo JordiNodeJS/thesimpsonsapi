@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Star } from "lucide-react";
+import { EpisodeProgress } from "@/app/_lib/types";
 
 export default function EpisodeTracker({
   episodeId,
   initialProgress,
 }: {
   episodeId: number;
-  initialProgress: any;
+  initialProgress: EpisodeProgress | null;
 }) {
   const [rating, setRating] = useState(initialProgress?.rating || 0);
   const [notes, setNotes] = useState(initialProgress?.notes || "");
