@@ -5,13 +5,14 @@ import { postComment } from "@/app/_actions/social";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Comment } from "@/app/_lib/types";
 
 export default function CommentSection({
   characterId,
   comments,
 }: {
   characterId: number;
-  comments: any[];
+  comments: Comment[];
 }) {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);

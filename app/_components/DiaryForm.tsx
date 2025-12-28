@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createDiaryEntry } from "@/app/_actions/diary";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,24 +12,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Character, Location } from "@/app/_lib/types";
+import { useLocalStorage } from "@/app/_lib/hooks";
 
 export default function DiaryForm({
   characters,
   locations,
 }: {
-  characters: any[];
-  locations: any[];
+  characters: Character[];
+  locations: Location[];
 }) {
-  const [charId, setCharId] = useState("");
-  const [locId, setLocId] = useState("");
-  const [desc, setDesc] = useState("");
+  const [draft, setDraft] = useLocalStorage("diary-draft", {
+    charId: "",
+    locId: "",
+    desc: "",
+  });
+
+  const [charId, setCharId] = useState(draft.charId);
+  const [locId, setLocId] = useState(draft.locId);
+  const [desc, setDesc] = useState(draft.desc);
   const [loading, setLoading] = useState(false);
+
+  // Update draft in localStorage when fields change
+  useEffect(() => {
+    setDraft({ charId, locId, desc });
+  }, [charId, locId, desc, setDraft]);
 
   const handleSubmit = async () => {
     if (!charId || !locId || !desc) return;
     setLoading(true);
     await createDiaryEntry(parseInt(charId), parseInt(locId), desc);
     setDesc("");
+    setCharId("");
+    setLocId("");
+    setDraft({ charId: "", locId: "", desc: "" });
     setLoading(false);
   };
 
@@ -40,7 +56,7 @@ export default function DiaryForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Who were you with?</Label>
-          <Select onValueChange={setCharId}>
+          <Select value={charId} onValueChange={setCharId}>
             <SelectTrigger>
               <SelectValue placeholder="Select Character" />
             </SelectTrigger>
@@ -56,7 +72,7 @@ export default function DiaryForm({
 
         <div className="space-y-2">
           <Label>Where were you?</Label>
-          <Select onValueChange={setLocId}>
+          <Select value={locId} onValueChange={setLocId}>
             <SelectTrigger>
               <SelectValue placeholder="Select Location" />
             </SelectTrigger>

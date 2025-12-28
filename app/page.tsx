@@ -1,8 +1,6 @@
 import { pool } from "@/app/_lib/db";
 import Link from "next/link";
-import Image from "next/image";
 import CharacterImage from "@/app/_components/CharacterImage";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +9,6 @@ import {
   BookOpen,
   Star,
   ArrowRight,
-  Sparkles,
   Quote,
 } from "lucide-react";
 import SyncButton from "@/app/_components/SyncButton";
@@ -275,7 +272,7 @@ export default async function Home() {
               </div>
               <h3 className="text-xl font-bold">Episode Tracker</h3>
               <p className="text-zinc-600 dark:text-zinc-400">
-                Keep track of every episode you've watched. Rate them, take
+                Keep track of every episode you&apos;ve watched. Rate them, take
                 notes, and never miss a moment of Springfield history.
               </p>
             </div>
@@ -285,7 +282,7 @@ export default async function Home() {
               </div>
               <h3 className="text-xl font-bold">Character Profiles</h3>
               <p className="text-zinc-600 dark:text-zinc-400">
-                Deep dive into the lives of Springfield's finest. Follow
+                Deep dive into the lives of Springfield&apos;s finest. Follow
                 characters to get updates and see what others are saying.
               </p>
             </div>
@@ -324,7 +321,7 @@ export default async function Home() {
                 >
                   <Quote className="absolute top-6 left-6 w-8 h-8 text-yellow-500/20" />
                   <p className="text-xl italic relative z-10 leading-relaxed">
-                    "{trivia.content}"
+                    &quot;{trivia.content}&quot;
                   </p>
                   <div className="mt-6 flex items-center justify-between">
                     <div className="flex items-center gap-2">

@@ -5,6 +5,7 @@ import { submitTrivia } from "@/app/_actions/trivia";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { TriviaFact } from "@/app/_lib/types";
 
 export default function TriviaSection({
   entityType,
@@ -13,7 +14,7 @@ export default function TriviaSection({
 }: {
   entityType: "CHARACTER" | "EPISODE";
   entityId: number;
-  facts: any[];
+  facts: TriviaFact[];
 }) {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ export default function TriviaSection({
             key={fact.id}
             className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900 rounded-lg"
           >
-            <p className="italic text-lg">"{fact.content}"</p>
+            <p className="italic text-lg">&quot;{fact.content}&quot;</p>
             <div className="mt-2 flex justify-end">
               <Badge variant="outline" className="text-xs">
                 Submitted by {fact.username}
