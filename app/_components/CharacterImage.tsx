@@ -5,7 +5,7 @@ import { useState } from "react";
 import { User } from "lucide-react";
 
 interface CharacterImageProps {
-  src: string;
+  src: string | null;
   alt: string;
   fill?: boolean;
   className?: string;

@@ -2,30 +2,35 @@
 
 import { useState } from "react";
 import { submitTrivia } from "@/app/_actions/trivia";
+import { useFormAction } from "@/app/_lib/hooks";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { TriviaFact } from "@/app/_lib/types";
+
+interface TriviaFact {
+  id: number;
+  content: string;
+  username: string;
+}
+
+interface TriviaSectionProps {
+  entityType: "CHARACTER" | "EPISODE";
+  entityId: number;
+  facts: TriviaFact[];
+}
 
 export default function TriviaSection({
   entityType,
   entityId,
   facts,
-}: {
-  entityType: "CHARACTER" | "EPISODE";
-  entityId: number;
-  facts: TriviaFact[];
-}) {
+}: TriviaSectionProps) {
   const [content, setContent] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
+  const { execute, isPending } = useFormAction(async () => {
     if (!content.trim()) return;
-    setLoading(true);
     await submitTrivia(entityType, entityId, content);
     setContent("");
-    setLoading(false);
-  };
+  });
 
   return (
     <div className="space-y-6 mt-8 pt-8 border-t">
@@ -57,8 +62,8 @@ export default function TriviaSection({
             className="min-h-[80px]"
           />
         </div>
-        <Button onClick={handleSubmit} disabled={loading} size="sm">
-          Submit Fact
+        <Button onClick={() => execute()} disabled={isPending} size="sm">
+          {isPending ? "Submitting..." : "Submit Fact"}
         </Button>
       </div>
     </div>

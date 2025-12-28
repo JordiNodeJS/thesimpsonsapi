@@ -1,31 +1,17 @@
-import { pool } from "@/app/_lib/db";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { findAllEpisodes } from "@/app/_lib/repositories";
 
 export const dynamic = "force-dynamic";
 
-async function getEpisodes() {
-  try {
-    const res = await pool.query(`
-      SELECT * FROM episodes 
-      ORDER BY season ASC, episode_number ASC 
-      LIMIT 50
-    `);
-    return res.rows;
-  } catch (error) {
-    console.error("Error in getEpisodes:", error);
-    throw error;
-  }
-}
-
 export default async function EpisodesPage() {
-  let episodes = [];
+  let episodes: Awaited<ReturnType<typeof findAllEpisodes>> = [];
   let error = null;
 
   try {
-    episodes = await getEpisodes();
+    episodes = await findAllEpisodes();
   } catch (e) {
     console.error("Error loading episodes:", e);
     error = "Failed to load episodes. Please try again later.";

@@ -12,42 +12,41 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Character, Location } from "@/app/_lib/types";
-import { useLocalStorage } from "@/app/_lib/hooks";
+import { useLocalStorage, useFormAction } from "@/app/_lib/hooks";
 
-export default function DiaryForm({
-  characters,
-  locations,
-}: {
-  characters: Character[];
-  locations: Location[];
-}) {
-  const [draft, setDraft] = useLocalStorage("diary-draft", {
-    charId: "",
-    locId: "",
-    desc: "",
-  });
+interface DiaryFormProps {
+  characters: Array<{ id: number; name: string }>;
+  locations: Array<{ id: number; name: string }>;
+}
+
+interface Draft {
+  charId: string;
+  locId: string;
+  desc: string;
+}
+
+const EMPTY_DRAFT: Draft = { charId: "", locId: "", desc: "" };
+
+export default function DiaryForm({ characters, locations }: DiaryFormProps) {
+  const [draft, setDraft] = useLocalStorage<Draft>("diary-draft", EMPTY_DRAFT);
 
   const [charId, setCharId] = useState(draft.charId);
   const [locId, setLocId] = useState(draft.locId);
   const [desc, setDesc] = useState(draft.desc);
-  const [loading, setLoading] = useState(false);
 
-  // Update draft in localStorage when fields change
+  // Sync draft to localStorage
   useEffect(() => {
     setDraft({ charId, locId, desc });
   }, [charId, locId, desc, setDraft]);
 
-  const handleSubmit = async () => {
+  const { execute, isPending } = useFormAction(async () => {
     if (!charId || !locId || !desc) return;
-    setLoading(true);
     await createDiaryEntry(parseInt(charId), parseInt(locId), desc);
     setDesc("");
     setCharId("");
     setLocId("");
-    setDraft({ charId: "", locId: "", desc: "" });
-    setLoading(false);
-  };
+    setDraft(EMPTY_DRAFT);
+  });
 
   return (
     <div className="space-y-4 p-6 border rounded-lg bg-white dark:bg-zinc-900 shadow-sm">
@@ -96,8 +95,8 @@ export default function DiaryForm({
         />
       </div>
 
-      <Button onClick={handleSubmit} disabled={loading} className="w-full">
-        {loading ? "Writing in Diary..." : "Save Entry"}
+      <Button onClick={() => execute()} disabled={isPending} className="w-full">
+        {isPending ? "Writing in Diary..." : "Save Entry"}
       </Button>
     </div>
   );

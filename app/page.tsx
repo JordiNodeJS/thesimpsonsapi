@@ -1,4 +1,3 @@
-import { pool } from "@/app/_lib/db";
 import Link from "next/link";
 import CharacterImage from "@/app/_components/CharacterImage";
 import IntroSection from "@/app/_components/IntroSection";
@@ -6,68 +5,25 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tv, Users, BookOpen, Star, ArrowRight, Quote } from "lucide-react";
 import SyncButton from "@/app/_components/SyncButton";
+import {
+  getStats,
+  findFeaturedCharacters,
+  findLatestTrivia,
+} from "@/app/_lib/repositories";
 
 export const dynamic = "force-dynamic";
 
-async function getStats() {
-  try {
-    const [charCount, epCount, triviaCount] = await Promise.all([
-      pool.query("SELECT COUNT(*) FROM the_simpson.characters"),
-      pool.query("SELECT COUNT(*) FROM the_simpson.episodes"),
-      pool.query("SELECT COUNT(*) FROM the_simpson.trivia_facts"),
-    ]);
-    return {
-      characters: parseInt(charCount.rows[0].count),
-      episodes: parseInt(epCount.rows[0].count),
-      trivia: parseInt(triviaCount.rows[0].count),
-    };
-  } catch (error) {
-    console.error("Error in getStats:", error);
-    throw error;
-  }
-}
-
-async function getFeaturedCharacters() {
-  try {
-    const res = await pool.query(`
-      SELECT * FROM the_simpson.characters 
-      WHERE name IN ('Homer Simpson', 'Marge Simpson', 'Bart Simpson', 'Lisa Simpson', 'Maggie Simpson')
-      LIMIT 5
-    `);
-    return res.rows;
-  } catch (error) {
-    console.error("Error in getFeaturedCharacters:", error);
-    throw error;
-  }
-}
-
-async function getLatestTrivia() {
-  try {
-    const res = await pool.query(`
-      SELECT t.*, u.username 
-      FROM the_simpson.trivia_facts t
-      JOIN the_simpson.users u ON t.submitted_by_user_id = u.id
-      ORDER BY t.created_at DESC
-      LIMIT 3
-    `);
-    return res.rows;
-  } catch (error) {
-    console.error("Error in getLatestTrivia:", error);
-    throw error;
-  }
-}
-
 export default async function Home() {
   let stats = { characters: 0, episodes: 0, trivia: 0 };
-  let featuredChars = [];
-  let latestTrivia = [];
+  let featuredChars: Awaited<ReturnType<typeof findFeaturedCharacters>> = [];
+  let latestTrivia: Awaited<ReturnType<typeof findLatestTrivia>> = [];
   let error = null;
 
   try {
     [stats, featuredChars, latestTrivia] = await Promise.all([
       getStats(),
-      getFeaturedCharacters(),
-      getLatestTrivia(),
+      findFeaturedCharacters(),
+      findLatestTrivia(),
     ]);
   } catch (e) {
     console.error("Error loading home page data:", e);
