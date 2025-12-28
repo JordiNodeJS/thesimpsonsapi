@@ -12,9 +12,9 @@ export const dynamic = "force-dynamic";
 async function getStats() {
   try {
     const [charCount, epCount, triviaCount] = await Promise.all([
-      pool.query("SELECT COUNT(*) FROM characters"),
-      pool.query("SELECT COUNT(*) FROM episodes"),
-      pool.query("SELECT COUNT(*) FROM trivia_facts"),
+      pool.query("SELECT COUNT(*) FROM the_simpson.characters"),
+      pool.query("SELECT COUNT(*) FROM the_simpson.episodes"),
+      pool.query("SELECT COUNT(*) FROM the_simpson.trivia_facts"),
     ]);
     return {
       characters: parseInt(charCount.rows[0].count),
@@ -33,7 +33,7 @@ async function getStats() {
 async function getFeaturedCharacters() {
   try {
     const res = await pool.query(`
-      SELECT * FROM characters 
+      SELECT * FROM the_simpson.characters 
       WHERE name IN ('Homer Simpson', 'Marge Simpson', 'Bart Simpson', 'Lisa Simpson', 'Maggie Simpson')
       LIMIT 5
     `);
@@ -48,8 +48,8 @@ async function getLatestTrivia() {
   try {
     const res = await pool.query(`
       SELECT t.*, u.username 
-      FROM trivia_facts t
-      JOIN users u ON t.submitted_by_user_id = u.id
+      FROM the_simpson.trivia_facts t
+      JOIN the_simpson.users u ON t.submitted_by_user_id = u.id
       ORDER BY t.created_at DESC
       LIMIT 3
     `);
