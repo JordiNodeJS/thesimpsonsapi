@@ -1,31 +1,17 @@
-import { pool } from "@/app/_lib/db";
 import Link from "next/link";
 import CharacterImage from "@/app/_components/CharacterImage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import RecentlyViewedList from "@/app/_components/RecentlyViewedList";
+import { findAllCharacters } from "@/app/_lib/repositories";
 
 export const dynamic = "force-dynamic";
 
-async function getCharacters() {
-  try {
-    const res = await pool.query(`
-      SELECT * FROM characters 
-      ORDER BY id ASC 
-      LIMIT 50
-    `);
-    return res.rows;
-  } catch (error) {
-    console.error("Error in getCharacters:", error);
-    throw error;
-  }
-}
-
 export default async function CharactersPage() {
-  let characters = [];
+  let characters: Awaited<ReturnType<typeof findAllCharacters>> = [];
   let error = null;
 
   try {
-    characters = await getCharacters();
+    characters = await findAllCharacters();
   } catch (e) {
     console.error("Error loading characters:", e);
     error = "Failed to load characters. Please try again later.";

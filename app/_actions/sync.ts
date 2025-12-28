@@ -1,12 +1,16 @@
 "use server";
 
-import { pool } from "@/app/_lib/db";
+import { execute } from "@/app/_lib/db-utils";
 import { APICharacter, APIEpisode, APILocation } from "@/app/_lib/types";
 
 const API_BASE = "https://thesimpsonsapi.com/api";
+const CDN_BASE = "https://cdn.thesimpsonsapi.com/500";
 
-async function fetchAll<T>(endpoint: string): Promise<T[]> {
-  let allData: T[] = [];
+/**
+ * Fetches all pages from a paginated API endpoint.
+ */
+async function fetchAllPages<T>(endpoint: string): Promise<T[]> {
+  const allData: T[] = [];
   let page = 1;
   let hasMore = true;
 
@@ -16,18 +20,12 @@ async function fetchAll<T>(endpoint: string): Promise<T[]> {
       if (!res.ok) break;
 
       const data = await res.json();
-      // The API returns { results: [...] } or { data: [...] } depending on endpoint version?
-      // Based on curl, it is 'results' for characters. Let's check both.
       const items = (data.results || data.data || []) as T[];
 
-      if (items && Array.isArray(items) && items.length > 0) {
-        allData = [...allData, ...items];
-
-        if (data.next) {
-          page++;
-        } else {
-          hasMore = false;
-        }
+      if (Array.isArray(items) && items.length > 0) {
+        allData.push(...items);
+        hasMore = Boolean(data.next);
+        page++;
       } else {
         hasMore = false;
       }
@@ -39,81 +37,95 @@ async function fetchAll<T>(endpoint: string): Promise<T[]> {
   return allData;
 }
 
-export async function syncExternalData() {
-  const client = await pool.connect();
+/**
+ * Builds a CDN image URL from an API path.
+ */
+function buildImageUrl(path: string | null | undefined): string | null {
+  return path ? `${CDN_BASE}${path}` : null;
+}
+
+/**
+ * Upserts a character into the database.
+ */
+async function upsertCharacter(char: APICharacter): Promise<void> {
+  await execute(
+    `INSERT INTO characters (external_id, name, occupation, image_url)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (external_id) DO UPDATE 
+     SET name = EXCLUDED.name, 
+         occupation = EXCLUDED.occupation, 
+         image_url = EXCLUDED.image_url`,
+    [char.id, char.name, char.occupation, buildImageUrl(char.portrait_path)]
+  );
+}
+
+/**
+ * Upserts an episode into the database.
+ */
+async function upsertEpisode(ep: APIEpisode): Promise<void> {
+  await execute(
+    `INSERT INTO episodes (external_id, title, season, episode_number, synopsis, image_url)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     ON CONFLICT (external_id) DO UPDATE 
+     SET title = EXCLUDED.title, 
+         season = EXCLUDED.season, 
+         episode_number = EXCLUDED.episode_number, 
+         synopsis = EXCLUDED.synopsis, 
+         image_url = EXCLUDED.image_url`,
+    [
+      ep.id,
+      ep.name,
+      ep.season,
+      ep.episode_number,
+      ep.synopsis,
+      buildImageUrl(ep.image_path),
+    ]
+  );
+}
+
+/**
+ * Upserts a location into the database.
+ */
+async function upsertLocation(loc: APILocation): Promise<void> {
+  await execute(
+    `INSERT INTO locations (external_id, name)
+     VALUES ($1, $2)
+     ON CONFLICT (external_id) DO UPDATE 
+     SET name = EXCLUDED.name`,
+    [loc.id, loc.name]
+  );
+}
+
+export interface SyncResult {
+  success: boolean;
+  counts?: { characters: number; episodes: number; locations: number };
+  error?: unknown;
+}
+
+/**
+ * Syncs all data from the external Simpsons API to the database.
+ */
+export async function syncExternalData(): Promise<SyncResult> {
   try {
     console.log("Starting sync...");
 
-    // 1. Characters
-    // Note: The API endpoint is /characters
-    const characters = await fetchAll<APICharacter>("characters");
-    console.log(`Fetched ${characters.length} characters`);
+    // Fetch all data in parallel
+    const [characters, episodes, locations] = await Promise.all([
+      fetchAllPages<APICharacter>("characters"),
+      fetchAllPages<APIEpisode>("episodes"),
+      fetchAllPages<APILocation>("locations"),
+    ]);
 
-    for (const char of characters) {
-      await client.query(
-        `
-        INSERT INTO characters (external_id, name, occupation, image_url)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT (external_id) DO UPDATE 
-        SET name = EXCLUDED.name, 
-            occupation = EXCLUDED.occupation, 
-            image_url = EXCLUDED.image_url
-      `,
-        [
-          char.id,
-          char.name,
-          char.occupation,
-          char.portrait_path
-            ? `https://cdn.thesimpsonsapi.com/500${char.portrait_path}`
-            : null,
-        ]
-      );
-    }
+    console.log(
+      `Fetched: ${characters.length} characters, ${episodes.length} episodes, ${locations.length} locations`
+    );
 
-    // 2. Episodes
-    const episodes = await fetchAll<APIEpisode>("episodes");
-    console.log(`Fetched ${episodes.length} episodes`);
-
-    for (const ep of episodes) {
-      await client.query(
-        `
-        INSERT INTO episodes (external_id, title, season, episode_number, synopsis, image_url)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (external_id) DO UPDATE 
-        SET title = EXCLUDED.title, 
-            season = EXCLUDED.season, 
-            episode_number = EXCLUDED.episode_number, 
-            synopsis = EXCLUDED.synopsis, 
-            image_url = EXCLUDED.image_url
-      `,
-        [
-          ep.id,
-          ep.name,
-          ep.season,
-          ep.episode_number,
-          ep.synopsis,
-          ep.image_path
-            ? `https://cdn.thesimpsonsapi.com/500${ep.image_path}`
-            : null,
-        ]
-      );
-    }
-
-    // 3. Locations
-    const locations = await fetchAll<APILocation>("locations");
-    console.log(`Fetched ${locations.length} locations`);
-
-    for (const loc of locations) {
-      await client.query(
-        `
-        INSERT INTO locations (external_id, name)
-        VALUES ($1, $2)
-        ON CONFLICT (external_id) DO UPDATE 
-        SET name = EXCLUDED.name
-      `,
-        [loc.id, loc.name]
-      );
-    }
+    // Upsert all records
+    await Promise.all([
+      ...characters.map(upsertCharacter),
+      ...episodes.map(upsertEpisode),
+      ...locations.map(upsertLocation),
+    ]);
 
     console.log("Sync complete!");
     return {
@@ -127,7 +139,5 @@ export async function syncExternalData() {
   } catch (error) {
     console.error("Sync failed:", error);
     return { success: false, error };
-  } finally {
-    client.release();
   }
 }

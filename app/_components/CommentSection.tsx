@@ -2,28 +2,35 @@
 
 import { useState } from "react";
 import { postComment } from "@/app/_actions/social";
+import { useFormAction } from "@/app/_lib/hooks";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Comment } from "@/app/_lib/types";
+
+interface CommentData {
+  id: number;
+  username: string;
+  content: string;
+  created_at: Date;
+}
 
 export default function CommentSection({
   characterId,
   comments,
 }: {
   characterId: number;
-  comments: Comment[];
+  comments: CommentData[];
 }) {
   const [content, setContent] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!content.trim()) return;
-    setLoading(true);
-    await postComment(characterId, content);
-    setContent("");
-    setLoading(false);
-  };
+  const { execute, isPending } = useFormAction(
+    async () => {
+      if (!content.trim()) return;
+      await postComment(characterId, content);
+      setContent("");
+    },
+    { onError: (err) => console.error("Failed to post comment:", err) }
+  );
 
   return (
     <div className="space-y-6">
@@ -35,8 +42,8 @@ export default function CommentSection({
           onChange={(e) => setContent(e.target.value)}
           placeholder="Leave a message for this character..."
         />
-        <Button onClick={handleSubmit} disabled={loading}>
-          Post Comment
+        <Button onClick={() => execute()} disabled={isPending}>
+          {isPending ? "Posting..." : "Post Comment"}
         </Button>
       </div>
 

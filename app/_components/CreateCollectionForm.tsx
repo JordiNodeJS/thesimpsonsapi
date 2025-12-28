@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createCollection } from "@/app/_actions/collections";
+import { useFormAction } from "@/app/_lib/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,21 +11,16 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 export default function CreateCollectionForm() {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!name) return;
-    setLoading(true);
-    try {
+  const { execute, isPending } = useFormAction(
+    async () => {
+      if (!name) return;
       await createCollection(name, desc);
       setName("");
       setDesc("");
-    } catch (error) {
-      console.error("Action failed:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    { onError: (err) => console.error("Failed to create collection:", err) }
+  );
 
   return (
     <Card>
@@ -42,8 +38,12 @@ export default function CreateCollectionForm() {
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
         />
-        <Button onClick={handleSubmit} disabled={loading} className="w-full">
-          Create Collection
+        <Button
+          onClick={() => execute()}
+          disabled={isPending}
+          className="w-full"
+        >
+          {isPending ? "Creating..." : "Create Collection"}
         </Button>
       </CardContent>
     </Card>
