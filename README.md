@@ -4,8 +4,11 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-blue?style=flat&logo=react)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38B2AC?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deploy-black?style=flat&logo=vercel)](https://thesimpsonsapi-nu.vercel.app)
 
 **Springfield Life & Tracker** is a modern, high-performance web application designed for fans of _The Simpsons_. It serves as a comprehensive companion app where users can track their episode progress, follow their favorite characters, and document their own fictional journey in Springfield.
+
+🚀 **Live Demo:** [https://thesimpsonsapi-nu.vercel.app](https://thesimpsonsapi-nu.vercel.app)
 
 Creado por [webcode.es](https://webcode.es)
 

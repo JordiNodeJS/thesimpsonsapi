@@ -8,4 +8,9 @@ export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+// Set search path for all connections in the pool
+pool.on("connect", (client) => {
+  client.query("SET search_path TO the_simpson, public");
+});
+
 export default pool;
