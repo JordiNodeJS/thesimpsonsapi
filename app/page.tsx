@@ -56,13 +56,31 @@ async function getLatestTrivia() {
 }
 
 export default async function Home() {
-  const stats = await getStats();
-  const featuredChars = await getFeaturedCharacters();
-  const latestTrivia = await getLatestTrivia();
+  let stats = { characters: 0, episodes: 0, trivia: 0 };
+  let featuredChars = [];
+  let latestTrivia = [];
+  let error = null;
+
+  try {
+    [stats, featuredChars, latestTrivia] = await Promise.all([
+      getStats(),
+      getFeaturedCharacters(),
+      getLatestTrivia(),
+    ]);
+  } catch (e) {
+    console.error("Error loading home page data:", e);
+    error = "Failed to load some data. Please try again later.";
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-black overflow-x-hidden">
       <IntroSection />
+
+      {error && (
+        <div className="bg-red-500/10 border-y border-red-500/20 py-3 text-center text-red-500 text-sm font-medium">
+          {error}
+        </div>
+      )}
 
       {/* Quick Actions */}
       <section className="py-12 px-6 bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800">
