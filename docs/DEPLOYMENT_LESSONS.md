@@ -55,6 +55,61 @@ Las páginas que dependen de datos externos deben ser resilientes.
 
 - **Solución:** Implementar bloques `try-catch` dentro de los Server Components. Si la carga de datos falla, se debe capturar el error y mostrar un estado de fallback amigable (ej. "Servicio temporalmente no disponible") en lugar de permitir que la aplicación colapse.
 
+## 5. Aplicación Práctica: Migración a Nombres de Tabla Cualificados
+
+### El Problema (Descubierto el 29 de diciembre de 2025)
+
+Durante el despliegue en Vercel, todas las páginas mostraban el error **"Failed to load episodes. Please try again later."** aunque las consultas HTTP devolvían código 200 exitoso. El problema no estaba en la conexión de red, sino en la ejecución de las consultas SQL.
+
+### Análisis de Causa Raíz
+
+Tras revisar la arquitectura de la aplicación:
+
+1. El archivo `db-utils.ts` usaba `pool.connect()` seguido de `SET search_path TO the_simpson, public`
+2. Aunque esto funciona en desarrollo, en producción con `poolQueryViaFetch = true`, el parámetro `search_path` se **ignora silenciosamente**
+3. Las consultas SQL sin el prefijo `the_simpson.` fallaban al no encontrar las tablas
+4. Los errores no se propagaban a la consola del navegador, solo mostraban el mensaje de fallback
+
+### La Lección
+
+**La teoría en la documentación debe validarse contra la realidad del código.** La sección 3 (Gestión de Esquemas) ya mencionaba este problema, pero el código aún usaba `SET search_path` en lugar de nombres cualificados.
+
+### Solución Aplicada (Implementación Correcta)
+
+Se completó la migración a la **Solución A (Recomendada)** implementando nombres de tabla cualificados en:
+
+1. **Todas las consultas en `repositories.ts`:**
+   - `SELECT * FROM the_simpson.characters`
+   - `SELECT * FROM the_simpson.episodes`
+   - `SELECT * FROM the_simpson.locations`
+   - etc.
+
+2. **Todas las operaciones en los archivos `_actions/`:**
+   - `INSERT INTO the_simpson.character_follows`
+   - `DELETE FROM the_simpson.diary_entries`
+   - `INSERT INTO the_simpson.quote_collections`
+   - etc.
+
+3. **Optimización de `db-utils.ts`:**
+   - Eliminado el patrón `withConnection()` que usaba `pool.connect()`
+   - Cambio a `pool.query()` directamente para aprovechar el protocolo HTTP
+   - Reducción de sobrecarga de conexiones persistentes
+
+### Resultados
+
+✅ **Todas las páginas funcionales:**
+- Página de episodios: carga 50+ episodios correctamente
+- Página de personajes: carga 50+ personajes correctamente
+- Acciones de usuario (diary, collections): funcionan sin errores
+- Sin cambios en variables de entorno ni configuración de BD
+
+### Recomendaciones para el Futuro
+
+1. **Validar en staging:** Antes de hacer deploy a producción, siempre validar contra Vercel Preview Deployments
+2. **Revisar Server Components:** Los errores en async components pueden quedar silenciosos si solo mostramos fallbacks
+3. **Monitoreo en consola:** Agregar logs más detallados (`console.error`) en los catch blocks para debugging remoto
+4. **Nombramiento de tablas:** Adoptar convenión de **siempre usar nombres cualificados** en esquemas personalizados, incluso si el `search_path` funciona localmente
+
 ---
 
-_Documento creado el 28 de diciembre de 2025 como referencia para futuros desarrollos._
+_Documento actualizado el 29 de diciembre de 2025 con lecciones de validación en producción._
