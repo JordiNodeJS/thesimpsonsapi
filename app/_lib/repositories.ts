@@ -41,10 +41,10 @@ export async function findFeaturedCharacters(): Promise<DBCharacter[]> {
 }
 
 export async function findCharacterNames(): Promise<
-  Pick<DBCharacter, "id" | "name">[]
+  Pick<DBCharacter, "id" | "name" | "image_url">[]
 > {
-  return query<Pick<DBCharacter, "id" | "name">>(
-    `SELECT id, name FROM ${TABLES.characters} ORDER BY name ASC`
+  return query<Pick<DBCharacter, "id" | "name" | "image_url">>(
+    `SELECT id, name, image_url FROM ${TABLES.characters} ORDER BY name ASC`
   );
 }
 

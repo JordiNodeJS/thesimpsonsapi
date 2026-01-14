@@ -13,9 +13,11 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useLocalStorage, useFormAction } from "@/app/_lib/hooks";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MapPin, User, Loader2 } from "lucide-react";
 
 interface DiaryFormProps {
-  characters: Array<{ id: number; name: string }>;
+  characters: Array<{ id: number; name: string; image_url: string | null }>;
   locations: Array<{ id: number; name: string }>;
 }
 
@@ -47,46 +49,78 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
   });
 
   return (
-    <div className="space-y-4 p-6 border rounded-lg bg-white dark:bg-zinc-900 shadow-sm">
-      <h2 className="text-xl font-semibold">Log a New Memory</h2>
+    <div className="space-y-6 p-6 border rounded-xl bg-card text-card-foreground shadow-sm">
+      <div>
+        <h2 className="text-xl font-bold tracking-tight">Log a New Memory</h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Record your adventures in Springfield.
+        </p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Who were you with?</Label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2.5">
+          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Who were you with?
+          </Label>
           <Select
             value={formState.charId}
             onValueChange={(charId) =>
               setFormState((prev) => ({ ...prev, charId }))
             }
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Select Character" />
+            <SelectTrigger className="h-12 bg-muted/20 border-muted hover:border-primary/50 transition-colors">
+              <SelectValue placeholder="Select a friend..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-[300px]">
               {characters.map((c) => (
-                <SelectItem key={c.id} value={c.id.toString()}>
-                  {c.name}
+                <SelectItem
+                  key={c.id}
+                  value={c.id.toString()}
+                  className="cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-6 w-6 border border-border/50">
+                      <AvatarImage
+                        src={c.image_url || undefined}
+                        alt={c.name}
+                        className="object-contain bg-white"
+                      />
+                      <AvatarFallback className="text-[10px] bg-sky-100 text-sky-700">
+                        {c.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium">{c.name}</span>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label>Where were you?</Label>
+        <div className="space-y-2.5">
+          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Where were you?
+          </Label>
           <Select
             value={formState.locId}
             onValueChange={(locId) =>
               setFormState((prev) => ({ ...prev, locId }))
             }
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Select Location" />
+            <SelectTrigger className="h-12 bg-muted/20 border-muted hover:border-primary/50 transition-colors">
+              <SelectValue placeholder="Pick a location..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-[300px]">
               {locations.map((l) => (
-                <SelectItem key={l.id} value={l.id.toString()}>
-                  {l.name}
+                <SelectItem
+                  key={l.id}
+                  value={l.id.toString()}
+                  className="cursor-pointer"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <span>{l.name}</span>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -94,8 +128,10 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label>What happened?</Label>
+      <div className="space-y-2.5">
+        <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          What happened?
+        </Label>
         <Textarea
           value={formState.desc}
           onChange={(e) =>
@@ -105,8 +141,19 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
         />
       </div>
 
-      <Button onClick={() => execute()} disabled={isPending} className="w-full">
-        {isPending ? "Writing in Diary..." : "Save Entry"}
+      <Button
+        onClick={() => execute()}
+        disabled={isPending}
+        className="w-full h-10 font-medium"
+      >
+        {isPending ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Writing...
+          </>
+        ) : (
+          "Save Entry"
+        )}
       </Button>
     </div>
   );
