@@ -19,6 +19,12 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // Update session every 24 hours
   },
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://thesimpson.webcode.es",
+    process.env.NEXT_PUBLIC_APP_URL || "",
+    process.env.BETTER_AUTH_URL || "",
+  ].filter(Boolean),
 });
 
 /**
