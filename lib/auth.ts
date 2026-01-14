@@ -19,10 +19,6 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // Update session every 24 hours
   },
-  advanced: {
-    // Use custom schema instead of default 'auth' schema
-    databaseSchema: "the_simpson",
-  },
 });
 
 /**
