@@ -70,6 +70,11 @@ validate_value() {
         echo -e "${RED}⚠️  $var_name debe tener al menos 32 caracteres${NC}"
         return 1
       fi
+      # Validar que sea base64 válido (caracteres alfanuméricos, +, /, y = para padding)
+      if ! echo "$value" | grep -qE '^[A-Za-z0-9+/]+=*$'; then
+        echo -e "${RED}⚠️  $var_name parece no ser base64 válido${NC}"
+        return 1
+      fi
       ;;
     *_URL)
       if [[ ! "$value" =~ ^https?:// ]]; then

@@ -28,7 +28,9 @@ export async function proxy(request: NextRequest) {
   const protectedPaths = [
     "/diary",
     "/collections",
+    "/episodes",
     "/episodes/",
+    "/characters",
     "/characters/",
   ];
 
