@@ -1,147 +1,165 @@
-# Guide & Testing Documentation
+# 🍩 Springfield Life - Guía Interactiva
 
-This directory contains comprehensive documentation for **Springfield Life & Tracker**.
+Guía interactiva completa integrada en la aplicación Next.js para ayudar a los usuarios a descubrir todas las características de Springfield Life.
 
-## 📁 Contents
+## 📂 Estructura
 
-### User Guide
-- **[USER_GUIDE.md](USER_GUIDE.md)** - Complete user manual with screenshots and feature explanations
+```
+app/guide/
+├── page.tsx              # Guía principal con 9 pasos interactivos
+├── helper/
+│   └── page.tsx         # Herramienta de posicionamiento de indicadores
+app/_components/
+└── HelpButton.tsx        # Botón flotante de ayuda (disponible en toda la app)
+```
 
-### Screenshots
-All screenshots are located in the `screenshots/` subdirectory:
+## 🎯 Características
 
-1. `01-home-page.png` - Landing page overview
-2. `02-characters-page.png` - Characters browser
-3. `03-character-detail.png` - Individual character profile
-4. `04-episodes-page.png` - Episodes list
-5. `05-episode-detail.png` - Episode tracking interface
-6. `06-collections-page.png` - Quote collections
-7. `07-diary-page.png` - Springfield Diary feature
+### Guía Principal (`/guide`)
 
-## 🔍 Testing Traces
+- ✨ 9 pasos interactivos que cubren todas las funcionalidades
+- 📸 Screenshots reales de la aplicación con indicadores visuales
+- 🎨 Diseño moderno con animaciones y transiciones suaves
+- 📊 Barra de progreso visual
+- ⌨️ Navegación por teclado y puntitos indicadores
+- 📱 Totalmente responsive
 
-Detailed UI/UX testing documentation is located in the `.traces` directory at the project root:
+### Helper Tool (`/guide/helper`)
 
-- **`.traces/00-summary.md`** - Executive summary of all testing
-- **`.traces/01-home-page.md`** - Home page testing results
-- **`.traces/02-characters-page.md`** - Characters page (includes critical hydration error)
-- **`.traces/03-character-detail.md`** - Character detail page
-- **`.traces/04-episodes-page.md`** - Episodes page
-- **`.traces/05-episode-detail.md`** - Episode detail page
+- 🎯 Herramienta interactiva para posicionar indicadores en screenshots
+- 📤 Carga de imágenes con preview
+- 🖱️ Clic para añadir marcadores
+- ↔️ Drag & drop para ajustar posiciones
+- 📋 Generación automática de código HTML
+- 📋 Copy to clipboard automático
 
-## 🚨 Critical Findings
+### Botón de Ayuda Flotante
 
-### Hydration Error on Characters Page
+- 🔘 Disponible en todas las páginas (esquina inferior derecha)
+- 💛 Diseño llamativo con gradiente amarillo Simpson
+- ✨ Animación de pulso para llamar la atención
+- 💬 Tooltip informativo al hacer hover
+- 🔗 Enlace directo a la guía
 
-**Status:** 🔴 Critical - Must fix before production
+## 🚀 Uso
 
-**Location:** `/characters` page  
-**Component:** `app/_components/RecentlyViewedList.tsx` (line 24)
+### Para Usuarios
 
-**Description:**  
-Server-rendered HTML doesn't match client-rendered HTML, causing React to re-render the entire component tree on the client.
+1. **Acceder a la guía:**
 
-**Impact:**
-- Performance degradation
-- Potential UI flashing
-- Poor Core Web Vitals scores
+   - Haz clic en el botón flotante `?` en cualquier página
+   - O navega directamente a `/guide`
 
-**Recommended Fix:**
+2. **Navegar por la guía:**
+
+   - Usa los botones "Anterior" y "Siguiente"
+   - Haz clic en los puntitos para saltar a un paso específico
+   - Presiona ESC para volver a la app
+
+3. **Usar el Helper:**
+   - Ve a `/guide/helper` desde el último paso de la guía
+   - Carga un screenshot
+   - Haz clic para añadir marcadores
+   - Arrastra para ajustar posiciones
+   - Copia el código HTML generado
+
+### Para Desarrolladores
+
+#### Añadir nuevos pasos a la guía:
+
 ```typescript
-// Ensure same structure on server and client
-// Option 1: Make component client-only
-'use client';
-
-// Option 2: Check for browser APIs
-if (typeof window !== 'undefined') {
-  // Browser-only code
+{
+  number: 10,
+  title: "Nueva Característica",
+  description: "Descripción breve",
+  screenshot: "/guide/screenshots/nueva-feature.png",
+  indicators: [
+    { type: "circle", top: 30, left: 50 },
+    { type: "label", top: 60, left: 50, text: "Importante" }
+  ],
+  content: (
+    <div>
+      {/* Contenido del paso */}
+    </div>
+  ),
 }
 ```
 
-**Details:** See `.traces/02-characters-page.md`
+#### Tipos de indicadores disponibles:
 
-## ✅ Testing Summary
+- **`circle`**: Círculo amarillo brillante
+- **`arrow`**: Flecha apuntando hacia abajo
+- **`box`**: Caja con borde discontinuo y texto
+- **`label`**: Etiqueta con fondo degradado y texto
+- **`number`**: Círculo numerado
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Home Page | ✅ PASS | Minor LCP warning |
-| Characters List | ⚠️ FAIL | Hydration error |
-| Character Detail | ✅ PASS | All features working |
-| Episodes List | ✅ PASS | No errors |
-| Episode Detail | ✅ PASS | Tracking features present |
-| Collections | ✅ PASS | Visual check only |
-| Diary | ✅ PASS | Visual check only |
-| Follow Feature | ✅ PASS | Tested and working |
-| Comments | ✅ PASS | Tested and working |
-| Trivia | ⚠️ PARTIAL | UI present, not fully tested |
+## 🎨 Diseño
 
-## 📊 Overall Grade
+- **Colores:** Tema oscuro con acentos amarillos (#FFD90F)
+- **Fuente:** Geist Sans (sistema Next.js)
+- **Animaciones:** Fade-in, slide, pulse, bounce
+- **Responsive:** Breakpoints en 768px y 1024px
 
-**B+** (would be A after fixing hydration issue)
+## 📦 Dependencias
 
-**Strengths:**
-- Consistent design across all pages
-- Working interactive features
-- Good performance (except hydration issue)
-- Clean, accessible UI
-- Comprehensive content
+- Next.js 16
+- React 19
+- Tailwind CSS 4
+- Shadcn UI (Button component)
+- Lucide React (iconos)
 
-**Areas for Improvement:**
-1. Fix characters page hydration error
-2. Add search/filter functionality
-3. Implement pagination for large lists
-4. Add "watched" status indicators
-5. Complete functional testing of all features
+## 🔄 Migración desde HTML
 
-## 🎯 Recommended Next Steps
+Los archivos HTML estáticos originales han sido completamente reemplazados por componentes Next.js:
 
-### Before Production
-1. **Fix hydration error** (CRITICAL)
-2. Add `loading="eager"` to LCP images
-3. Complete functional testing of all features
-4. Cross-browser testing (Firefox, Safari, Edge)
-5. Mobile device testing
-6. Accessibility audit (WCAG AAA)
+- ✅ `guide/index.html` → `app/guide/page.tsx`
+- ✅ `guide/indicator-helper.html` → `app/guide/helper/page.tsx`
 
-### Post-Launch
-1. User authentication system
-2. Search and filtering
-3. Advanced sorting options
-4. Episode recommendations
-5. Social features expansion
+### Ventajas de la migración:
 
-## 📝 How to Use This Guide
+1. **Integración perfecta** con la aplicación Next.js
+2. **Routing automático** con App Router
+3. **Optimización de imágenes** con next/image
+4. **TypeScript** para type safety
+5. **Server Components** donde sea posible
+6. **Mejor SEO** y performance
+7. **Código más mantenible** y modular
 
-**For Users:**
-Read [USER_GUIDE.md](USER_GUIDE.md) to learn how to use the application.
+## 📸 Screenshots
 
-**For Developers:**
-1. Review `.traces/00-summary.md` for testing overview
-2. Check individual trace files for detailed findings
-3. Fix the hydration error before deployment
-4. Use screenshots as reference for expected UI state
+Los screenshots deben estar en `public/guide/screenshots/`:
 
-**For QA/Testers:**
-1. Follow test scenarios in trace files
-2. Verify fixes for reported issues
-3. Expand testing coverage to untested features
-4. Document new findings in trace files
+- `01-home-page.png` - Página principal
+- `02-characters-page.png` - Galería de personajes
+- `03-character-detail.png` - Detalle de personaje
+- `04-episodes-page.png` - Catálogo de episodios
+- `05-episode-detail.png` - Detalle de episodio
+- `06-collections-page.png` - Colecciones
+- `07-diary-page.png` - Diario personal
 
-## 🛠 Testing Tools Used
+## 🛠️ Mantenimiento
 
-- **Chrome DevTools MCP** - Browser automation and inspection
-- **Next.js DevTools** - Framework-specific debugging
-- **Manual Testing** - UI/UX evaluation and interaction testing
+### Actualizar screenshots:
 
-## 📅 Testing Date
+1. Toma nuevos screenshots de las páginas
+2. Guárdalos en `public/guide/screenshots/`
+3. Actualiza las referencias en `app/guide/page.tsx`
+4. Ajusta los indicadores usando `/guide/helper` si es necesario
 
-**Date:** January 14, 2026  
-**Branch:** ui-ux-testing  
-**Tester:** AI Agent (GitHub Copilot)
+### Modificar estilos:
 
----
+Los estilos están en Tailwind CSS inline. Para cambios globales:
 
-**Questions or Issues?**  
-Open an issue on [GitHub](https://github.com/JordiNodeJS/thesimpsonsapi)
+- Edita `app/globals.css` para estilos base
+- Usa las utilidades de Tailwind en los componentes
+- Aprovecha las animaciones de `tailwind.config.ts`
 
-© 2025-2026 Springfield Life. Built for fans, by fans.
+## 🤝 Contribuir
+
+Para añadir nuevo contenido a la guía:
+
+1. Añade el screenshot en `public/guide/screenshots/`
+2. Crea el nuevo paso en `app/guide/page.tsx`
+3. Define los indicadores usando la helper tool
+4. Escribe el contenido descriptivo
+5. Actualiza este README

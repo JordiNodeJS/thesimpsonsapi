@@ -93,6 +93,11 @@
         display: block;
       }
 
+      .screenshot-wrapper {
+        text-align: center;
+        width: 100%;
+      }
+
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -139,23 +144,37 @@
 
       .screenshot-container {
         position: relative;
-        margin: 2rem 0;
+        margin: 2rem auto;
         border-radius: 20px;
-        overflow: hidden;
+        overflow: visible;
         box-shadow: 0 10px 60px rgba(0, 0, 0, 0.5);
         background: #000;
+        display: inline-block;
+        max-width: 100%;
+        width: 100%;
+      }
+
+      /* Wrapper para mantener aspect ratio */
+      .screenshot-aspect-wrapper {
+        position: relative;
+        width: 100%;
+        /* Se calcula dinámicamente con JS basado en la imagen real */
       }
 
       .screenshot {
         width: 100%;
+        height: auto;
         display: block;
         border-radius: 20px;
+        vertical-align: top;
       }
 
       .indicator {
         position: absolute;
         animation: pulse 2s infinite;
         z-index: 10;
+        pointer-events: none;
+        transform-origin: center center;
       }
 
       @keyframes pulse {
@@ -609,56 +628,57 @@
           </p>
         </div>
 
-        <div class="screenshot-container">
-          <img
-            src="screenshots/01-home-page.png"
-            alt="Página de Inicio"
-            class="screenshot"
-          />
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/01-home-page.png"
+              alt="Página de Inicio"
+              class="screenshot"
+            />
 
-          <!-- Indicadores con números de secuencia -->
-          <div class="indicator indicator-number" style="top: 22%; left: 30%">
-            1
-          </div>
-          <div class="indicator indicator-tooltip" style="top: 25%; left: 32%">
-            Haz clic en "Start Tracking" para ir a episodios
-          </div>
+            <!-- Indicadores con números de secuencia -->
+            <div class="indicator indicator-number" style="top: 86%; left: 18%">
+              1
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 82%; left: 10%"
+            >
+              Haz clic en "Start Tracking" para ir a episodios
+            </div>
 
-          <div class="indicator indicator-number" style="top: 22%; right: 30%">
-            2
-          </div>
-          <div class="indicator indicator-tooltip" style="top: 25%; right: 32%">
-            "Meet the Cast" te lleva a todos los personajes
-          </div>
+            <div class="indicator indicator-number" style="top: 86%; left: 48%">
+              2
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 82%; left: 40%"
+            >
+              "Meet the Cast" te lleva a todos los personajes
+            </div>
 
-          <div
-            class="indicator indicator-number"
-            style="top: 38%; left: 50%; transform: translateX(-50%)"
-          >
-            3
-          </div>
-          <div
-            class="indicator indicator-label"
-            style="top: 42%; left: 50%; transform: translateX(-50%)"
-          >
-            📊 Estadísticas en Tiempo Real
-          </div>
+            <div
+              class="indicator indicator-number"
+              style="top: 92%; left: 60%; transform: translateX(-50%)"
+            >
+              3
+            </div>
+            <div
+              class="indicator indicator-label"
+              style="top: 88%; left: 60%; transform: translateX(-50%)"
+            >
+              📊 Estadísticas en Tiempo Real
+            </div>
 
-          <div
-            class="indicator indicator-number"
-            style="top: 58%; left: 50%; transform: translateX(-50%)"
-          >
-            4
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 60%; left: 5%; right: 5%; height: 180px"
-          ></div>
-          <div
-            class="indicator indicator-label"
-            style="top: 56%; left: 50%; transform: translateX(-50%)"
-          >
-            👥 Familia Simpson - Haz clic en cualquier personaje
+            <div
+              class="indicator indicator-number"
+              style="top: 92%; right: 10%"
+            >
+              4
+            </div>
+            <div class="indicator indicator-label" style="top: 88%; right: 5%">
+              👥 Familia Simpson - Haz clic en cualquier personaje
+            </div>
           </div>
         </div>
 
@@ -735,56 +755,51 @@
           </p>
         </div>
 
-        <div class="screenshot-container">
-          <img
-            src="screenshots/02-characters-page.png"
-            alt="Página de Personajes"
-            class="screenshot"
-          />
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/02-characters-page.png"
+              alt="Página de Personajes"
+              class="screenshot"
+            />
 
-          <div class="indicator indicator-number" style="top: 18%; left: 10%">
-            1
-          </div>
-          <div class="indicator indicator-label" style="top: 15%; left: 12%">
-            🔄 Personajes Vistos Recientemente
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 20%; left: 5%; right: 5%; height: 120px"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 42%; left: 5%">
-            Lista horizontal con los últimos personajes que visitaste
-          </div>
+            <div class="indicator indicator-number" style="top: 32%; left: 5%">
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 28%; left: 8%">
+              🔄 Personajes Vistos Recientemente
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 36%; left: 5%">
+              Lista horizontal con los últimos personajes que visitaste
+            </div>
 
-          <div
-            class="indicator indicator-number"
-            style="top: 48%; left: 50%; transform: translateX(-50%)"
-          >
-            2
-          </div>
-          <div
-            class="indicator indicator-label"
-            style="top: 45%; left: 50%; transform: translateX(-50%)"
-          >
-            🎭 Grid de 1,182+ Personajes
-          </div>
+            <div class="indicator indicator-number" style="top: 53%; left: 40%">
+              2
+            </div>
+            <div class="indicator indicator-label" style="top: 49%; left: 45%">
+              🎭 Grid de 1,182+ Personajes
+            </div>
 
-          <div
-            class="indicator indicator-circle"
-            style="top: 54%; left: 18%"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 60%; left: 15%">
-            Haz clic para ver perfil completo
-          </div>
+            <div
+              class="indicator indicator-circle"
+              style="top: 70%; left: 15%"
+            ></div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 76%; left: 10%"
+            >
+              Haz clic para ver perfil completo
+            </div>
 
-          <div
-            class="indicator indicator-circle"
-            style="top: 54%; left: 48%"
-          ></div>
-          <div
-            class="indicator indicator-circle"
-            style="top: 54%; right: 18%"
-          ></div>
+            <div
+              class="indicator indicator-circle"
+              style="top: 70%; left: 50%"
+            ></div>
+            <div
+              class="indicator indicator-circle"
+              style="top: 70%; right: 15%"
+            ></div>
+          </div>
         </div>
 
         <div class="action-list">
@@ -852,71 +867,51 @@
           </p>
         </div>
 
-        <div class="screenshot-container">
-          <img
-            src="screenshots/03-character-detail.png"
-            alt="Perfil de Personaje"
-            class="screenshot"
-          />
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/03-character-detail.png"
+              alt="Perfil de Personaje"
+              class="screenshot"
+            />
 
-          <div class="indicator indicator-number" style="top: 15%; left: 10%">
-            1
-          </div>
-          <div class="indicator indicator-label" style="top: 12%; left: 12%">
-            👤 Imagen y Bio del Personaje
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 18%; left: 5%; right: 55%; height: 200px"
-          ></div>
+            <div class="indicator indicator-number" style="top: 90%; left: 15%">
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 86%; left: 10%">
+              👤 Imagen y Bio del Personaje
+            </div>
 
-          <div class="indicator indicator-number" style="top: 18%; right: 12%">
-            2
-          </div>
-          <div
-            class="indicator indicator-circle"
-            style="top: 22%; right: 15%"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 28%; right: 8%">
-            Haz clic para seguir/dejar de seguir
-          </div>
+            <div class="indicator indicator-number" style="top: 25%; right: 8%">
+              2
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 29%; right: 5%"
+            >
+              Haz clic para seguir/dejar de seguir
+            </div>
 
-          <div
-            class="indicator indicator-number"
-            style="top: 42%; left: 50%; transform: translateX(-50%)"
-          >
-            3
-          </div>
-          <div
-            class="indicator indicator-label"
-            style="top: 39%; left: 50%; transform: translateX(-50%)"
-          >
-            🧠 Trivia del Personaje
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 45%; left: 5%; right: 5%; height: 140px"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 60%; left: 5%">
-            Añade datos curiosos y lee los de otros fans
-          </div>
+            <div class="indicator indicator-number" style="top: 48%; left: 8%">
+              3
+            </div>
+            <div class="indicator indicator-label" style="top: 44%; left: 5%">
+              🧠 Trivia del Personaje
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 52%; left: 5%">
+              Añade datos curiosos y lee los de otros fans
+            </div>
 
-          <div
-            class="indicator indicator-number"
-            style="top: 72%; left: 50%; transform: translateX(-50%)"
-          >
-            4
+            <div
+              class="indicator indicator-number"
+              style="top: 90%; right: 15%"
+            >
+              4
+            </div>
+            <div class="indicator indicator-label" style="top: 86%; right: 10%">
+              💬 Muro de Comentarios Comunitario
+            </div>
           </div>
-          <div
-            class="indicator indicator-label"
-            style="top: 69%; left: 50%; transform: translateX(-50%)"
-          >
-            💬 Muro de Comentarios Comunitario
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 75%; left: 5%; right: 5%; height: 180px"
-          ></div>
         </div>
 
         <div class="action-list">
@@ -989,50 +984,47 @@
           </p>
         </div>
 
-        <div class="screenshot-container">
-          <img
-            src="screenshots/04-episodes-page.png"
-            alt="Lista de Episodios"
-            class="screenshot"
-          />
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/04-episodes-page.png"
+              alt="Lista de Episodios"
+              class="screenshot"
+            />
 
-          <div class="indicator indicator-number" style="top: 25%; left: 5%">
-            1
-          </div>
-          <div class="indicator indicator-label" style="top: 22%; left: 7%">
-            📺 768+ Episodios Disponibles
-          </div>
+            <div class="indicator indicator-number" style="top: 32%; left: 8%">
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 28%; left: 5%">
+              📺 768+ Episodios Disponibles
+            </div>
 
-          <div
-            class="indicator indicator-circle"
-            style="top: 32%; left: 8%"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 38%; left: 10%">
-            Póster grande del episodio
-          </div>
+            <div class="indicator indicator-tooltip" style="top: 36%; left: 5%">
+              Póster grande del episodio
+            </div>
 
-          <div
-            class="indicator indicator-box"
-            style="top: 30%; left: 15%; right: 5%; height: 160px"
-          ></div>
-          <div class="indicator indicator-number" style="top: 28%; right: 10%">
-            2
-          </div>
-          <div class="indicator indicator-tooltip" style="top: 45%; right: 5%">
-            Título, temporada/episodio y sinopsis completa
-          </div>
+            <div class="indicator indicator-number" style="top: 32%; right: 8%">
+              2
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 36%; right: 5%"
+            >
+              Título, temporada/episodio y sinopsis completa
+            </div>
 
-          <div
-            class="indicator indicator-arrow"
-            style="top: 52%; left: 50%; transform: translateX(-50%)"
-          >
-            ↓
-          </div>
-          <div
-            class="indicator indicator-tooltip"
-            style="top: 56%; left: 50%; transform: translateX(-50%)"
-          >
-            Desplázate para ver más episodios
+            <div
+              class="indicator indicator-arrow"
+              style="top: 75%; left: 50%; transform: translateX(-50%)"
+            >
+              ↓
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 80%; left: 50%; transform: translateX(-50%)"
+            >
+              Desplázate para ver más episodios
+            </div>
           </div>
         </div>
 
@@ -1096,64 +1088,58 @@
           </p>
         </div>
 
-        <div class="screenshot-container">
-          <img
-            src="screenshots/05-episode-detail.png"
-            alt="Detalle de Episodio"
-            class="screenshot"
-          />
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/05-episode-detail.png"
+              alt="Detalle de Episodio"
+              class="screenshot"
+            />
 
-          <div
-            class="indicator indicator-number"
-            style="top: 35%; left: 50%; transform: translateX(-50%)"
-          >
-            1
-          </div>
-          <div
-            class="indicator indicator-label"
-            style="top: 32%; left: 50%; transform: translateX(-50%)"
-          >
-            ⭐ Sistema de Calificación (1-5 estrellas)
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 38%; left: 10%; right: 10%; height: 70px"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 48%; left: 10%">
-            Haz clic en cualquier estrella para calificar
-          </div>
+            <div
+              class="indicator indicator-number"
+              style="top: 33%; right: 15%"
+            >
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 29%; right: 10%">
+              ⭐ Califica con Estrellas (1-5)
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 37%; right: 10%"
+            >
+              Haz clic en cualquier estrella para dar tu calificación
+            </div>
 
-          <div
-            class="indicator indicator-number"
-            style="top: 55%; left: 50%; transform: translateX(-50%)"
-          >
-            2
-          </div>
-          <div
-            class="indicator indicator-label"
-            style="top: 52%; left: 50%; transform: translateX(-50%)"
-          >
-            📝 Notas Personales del Episodio
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 58%; left: 10%; right: 10%; height: 110px"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 70%; left: 10%">
-            Escribe tus pensamientos y momentos favoritos
-          </div>
+            <div
+              class="indicator indicator-number"
+              style="top: 48%; right: 15%"
+            >
+              2
+            </div>
+            <div class="indicator indicator-label" style="top: 44%; right: 10%">
+              📝 Añade Tus Notas
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 52%; right: 10%"
+            >
+              "What did you think?" - Escribe tus pensamientos
+            </div>
 
-          <div
-            class="indicator indicator-number"
-            style="top: 75%; left: 50%; transform: translateX(-50%)"
-          >
-            3
-          </div>
-          <div
-            class="indicator indicator-tooltip"
-            style="top: 78%; left: 50%; transform: translateX(-50%)"
-          >
-            Botón "Save Progress" - Guarda tu calificación y notas
+            <div
+              class="indicator indicator-number"
+              style="top: 62%; right: 15%"
+            >
+              3
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 66%; right: 10%"
+            >
+              Botón "Save Progress" para guardar todo
+            </div>
           </div>
         </div>
 
@@ -1230,48 +1216,40 @@
           </p>
         </div>
 
-        <div class="screenshot-container">
-          <img
-            src="screenshots/06-collections-page.png"
-            alt="Colecciones"
-            class="screenshot"
-          />
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/06-collections-page.png"
+              alt="Colecciones"
+              class="screenshot"
+            />
 
-          <div class="indicator indicator-number" style="top: 28%; left: 18%">
-            1
-          </div>
-          <div class="indicator indicator-label" style="top: 25%; left: 20%">
-            🎭 Crear Nueva Colección
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 30%; left: 5%; width: 40%; height: 220px"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 52%; left: 5%">
-            Nombre y descripción personalizados
-          </div>
+            <div class="indicator indicator-number" style="top: 32%; left: 12%">
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 28%; left: 8%">
+              🎭 Crear Nueva Colección
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 52%; left: 5%">
+              Nombre y descripción personalizados
+            </div>
 
-          <div class="indicator indicator-number" style="top: 28%; right: 18%">
-            2
+            <div
+              class="indicator indicator-number"
+              style="top: 32%; right: 12%"
+            >
+              2
+            </div>
+            <div class="indicator indicator-label" style="top: 28%; right: 8%">
+              📜 Colecciones Existentes
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 42%; right: 5%"
+            >
+              Haz clic en "View Quotes" para ver las frases
+            </div>
           </div>
-          <div class="indicator indicator-label" style="top: 25%; right: 20%">
-            📜 Colecciones Existentes
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 30%; right: 5%; width: 45%; height: 100px"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 40%; right: 5%">
-            Haz clic en "View Quotes" para ver las frases
-          </div>
-
-          <div class="indicator indicator-arrow" style="top: 50%; right: 25%">
-            👇
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 52%; right: 5%; width: 45%; height: 100px"
-          ></div>
         </div>
 
         <div class="action-list">
@@ -1335,60 +1313,60 @@
           </p>
         </div>
 
-        <div class="screenshot-container">
-          <img
-            src="screenshots/07-diary-page.png"
-            alt="Diario"
-            class="screenshot"
-          />
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/07-diary-page.png"
+              alt="Diario"
+              class="screenshot"
+            />
 
-          <div class="indicator indicator-number" style="top: 22%; left: 18%">
-            1
-          </div>
-          <div class="indicator indicator-label" style="top: 19%; left: 20%">
-            ✍️ Log a New Memory
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 25%; left: 5%; width: 38%; height: 280px"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 50%; left: 5%">
-            Selecciona personaje, ubicación y escribe qué pasó
-          </div>
+            <div class="indicator indicator-number" style="top: 28%; left: 12%">
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 24%; left: 8%">
+              ✍️ Log a New Memory
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 50%; left: 5%">
+              Selecciona personaje, ubicación y escribe qué pasó
+            </div>
 
-          <div class="indicator indicator-number" style="top: 30%; left: 25%">
-            2
-          </div>
-          <div class="indicator indicator-tooltip" style="top: 33%; left: 5%">
-            👤 ¿Con quién estuviste?
-          </div>
+            <div class="indicator indicator-number" style="top: 36%; left: 15%">
+              2
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 40%; left: 5%">
+              👤 ¿Con quién estuviste?
+            </div>
 
-          <div class="indicator indicator-number" style="top: 42%; left: 25%">
-            3
-          </div>
-          <div class="indicator indicator-tooltip" style="top: 45%; left: 5%">
-            📍 ¿Dónde estuviste?
-          </div>
+            <div class="indicator indicator-number" style="top: 48%; left: 15%">
+              3
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 52%; left: 5%">
+              📍 ¿Dónde estuviste?
+            </div>
 
-          <div class="indicator indicator-number" style="top: 54%; left: 25%">
-            4
-          </div>
-          <div class="indicator indicator-tooltip" style="top: 57%; left: 5%">
-            📝 ¿Qué sucedió?
-          </div>
+            <div class="indicator indicator-number" style="top: 60%; left: 15%">
+              4
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 64%; left: 5%">
+              📝 ¿Qué sucedió?
+            </div>
 
-          <div class="indicator indicator-number" style="top: 22%; right: 18%">
-            5
-          </div>
-          <div class="indicator indicator-label" style="top: 19%; right: 20%">
-            📅 Your Timeline
-          </div>
-          <div
-            class="indicator indicator-box"
-            style="top: 25%; right: 5%; width: 55%; height: 180px"
-          ></div>
-          <div class="indicator indicator-tooltip" style="top: 48%; right: 5%">
-            Historial de tus entradas de diario
+            <div
+              class="indicator indicator-number"
+              style="top: 28%; right: 12%"
+            >
+              5
+            </div>
+            <div class="indicator indicator-label" style="top: 24%; right: 8%">
+              📅 Your Timeline
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 48%; right: 5%"
+            >
+              Historial de tus entradas de diario
+            </div>
           </div>
         </div>
 
@@ -1575,7 +1553,133 @@
     <script>
       let currentStep = 0;
       const totalSteps = 8;
+      let resizeTimer;
+      let indicatorConfigs = new Map();
 
+      /**
+       * Sistema mejorado de posicionamiento de indicadores
+       * Usa coordenadas normalizadas (0-1) basadas en el tamaño REAL de la imagen
+       */
+      function initializeIndicators() {
+        const containers = document.querySelectorAll(".screenshot-container");
+
+        containers.forEach((container, containerIndex) => {
+          const img = container.querySelector(".screenshot");
+          const indicators = container.querySelectorAll(".indicator");
+
+          if (!img || indicators.length === 0) return;
+
+          // Esperar a que la imagen cargue completamente
+          const processIndicators = () => {
+            if (!img.complete || img.naturalWidth === 0) {
+              img.addEventListener("load", processIndicators, { once: true });
+              return;
+            }
+
+            const imgWidth = img.naturalWidth;
+            const imgHeight = img.naturalHeight;
+
+            indicators.forEach((indicator, indicatorIndex) => {
+              const key = `${containerIndex}-${indicatorIndex}`;
+              const style = indicator.getAttribute("style") || "";
+
+              // Convertir porcentajes CSS a coordenadas normalizadas (0-1)
+              const config = {
+                element: indicator,
+                container: container,
+                // Coordenadas normalizadas basadas en los porcentajes actuales
+                x: parsePercentage(style.match(/left:\s*([^;%]+)%/)?.[1]),
+                y: parsePercentage(style.match(/top:\s*([^;%]+)%/)?.[1]),
+                xFromRight: parsePercentage(
+                  style.match(/right:\s*([^;%]+)%/)?.[1]
+                ),
+                yFromBottom: parsePercentage(
+                  style.match(/bottom:\s*([^;%]+)%/)?.[1]
+                ),
+                transform:
+                  style.match(/transform:\s*([^;]+)/)?.[1]?.trim() || "",
+                originalStyle: style,
+              };
+
+              indicatorConfigs.set(key, config);
+            });
+
+            updateIndicatorPositions();
+          };
+
+          processIndicators();
+        });
+      }
+
+      function parsePercentage(value) {
+        if (value === undefined || value === null) return null;
+        const num = parseFloat(value);
+        return isNaN(num) ? null : num / 100; // Convertir a 0-1
+      }
+
+      function updateIndicatorPositions() {
+        indicatorConfigs.forEach((config, key) => {
+          const {
+            element,
+            container,
+            x,
+            y,
+            xFromRight,
+            yFromBottom,
+            transform,
+          } = config;
+          const img = container.querySelector(".screenshot");
+
+          if (!img || !img.complete) return;
+
+          // Obtener dimensiones ACTUALES de la imagen renderizada
+          const rect = img.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+
+          // Construir estilos con las posiciones actualizadas
+          let styles = [];
+
+          if (y !== null) {
+            styles.push(`top: ${y * 100}%`);
+          }
+          if (yFromBottom !== null) {
+            styles.push(`bottom: ${yFromBottom * 100}%`);
+          }
+          if (x !== null) {
+            styles.push(`left: ${x * 100}%`);
+          }
+          if (xFromRight !== null) {
+            styles.push(`right: ${xFromRight * 100}%`);
+          }
+          if (transform) {
+            styles.push(`transform: ${transform}`);
+          }
+
+          element.setAttribute("style", styles.join("; "));
+        });
+      }
+
+      // Recalcular posiciones cuando se redimensiona la ventana
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          updateIndicatorPositions();
+        }, 100); // Debounce de 100ms para respuesta más rápida
+      });
+
+      // Inicializar cuando la página se carga
+      window.addEventListener("load", () => {
+        initializeIndicators();
+      });
+
+      // También inicializar cuando el DOM está listo
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initializeIndicators);
+      } else {
+        initializeIndicators();
+      }
+
+      // Re-inicializar indicadores cuando cambia de paso
       function showStep() {
         // Ocultar todos los pasos
         document.querySelectorAll(".step").forEach((step) => {
@@ -1612,6 +1716,11 @@
 
         // Scroll to top
         window.scrollTo({ top: 0, behavior: "smooth" });
+
+        // Re-inicializar indicadores para el nuevo paso
+        setTimeout(() => {
+          initializeIndicators();
+        }, 150);
       }
 
       function nextStep() {
