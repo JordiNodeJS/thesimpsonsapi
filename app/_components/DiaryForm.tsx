@@ -29,23 +29,21 @@ const EMPTY_DRAFT: Draft = { charId: "", locId: "", desc: "" };
 
 export default function DiaryForm({ characters, locations }: DiaryFormProps) {
   const [draft, setDraft] = useLocalStorage<Draft>("diary-draft", EMPTY_DRAFT);
+  const [formState, setFormState] = useState<Draft>(() => draft);
 
-  const [charId, setCharId] = useState(draft.charId);
-  const [locId, setLocId] = useState(draft.locId);
-  const [desc, setDesc] = useState(draft.desc);
-
-  // Sync draft to localStorage
+  // Sync draft to localStorage when form state changes
   useEffect(() => {
-    setDraft({ charId, locId, desc });
-  }, [charId, locId, desc, setDraft]);
+    setDraft(formState);
+  }, [formState, setDraft]);
 
   const { execute, isPending } = useFormAction(async () => {
-    if (!charId || !locId || !desc) return;
-    await createDiaryEntry(parseInt(charId), parseInt(locId), desc);
-    setDesc("");
-    setCharId("");
-    setLocId("");
-    setDraft(EMPTY_DRAFT);
+    if (!formState.charId || !formState.locId || !formState.desc) return;
+    await createDiaryEntry(
+      parseInt(formState.charId),
+      parseInt(formState.locId),
+      formState.desc
+    );
+    setFormState(EMPTY_DRAFT);
   });
 
   return (
@@ -55,7 +53,12 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Who were you with?</Label>
-          <Select value={charId} onValueChange={setCharId}>
+          <Select
+            value={formState.charId}
+            onValueChange={(charId) =>
+              setFormState((prev) => ({ ...prev, charId }))
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select Character" />
             </SelectTrigger>
@@ -71,7 +74,12 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
 
         <div className="space-y-2">
           <Label>Where were you?</Label>
-          <Select value={locId} onValueChange={setLocId}>
+          <Select
+            value={formState.locId}
+            onValueChange={(locId) =>
+              setFormState((prev) => ({ ...prev, locId }))
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select Location" />
             </SelectTrigger>
@@ -89,8 +97,10 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
       <div className="space-y-2">
         <Label>What happened?</Label>
         <Textarea
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
+          value={formState.desc}
+          onChange={(e) =>
+            setFormState((prev) => ({ ...prev, desc: e.target.value }))
+          }
           placeholder="e.g., Had a Duff beer and watched the game..."
         />
       </div>

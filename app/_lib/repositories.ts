@@ -1,4 +1,5 @@
 import { query, queryOne } from "@/app/_lib/db-utils";
+import { TABLES } from "@/app/_lib/db-schema";
 import type {
   DBCharacter,
   DBEpisode,
@@ -17,7 +18,7 @@ import type {
 
 export async function findAllCharacters(limit = 50): Promise<DBCharacter[]> {
   return query<DBCharacter>(
-    `SELECT * FROM the_simpson.characters ORDER BY id ASC LIMIT $1`,
+    `SELECT * FROM ${TABLES.characters} ORDER BY id ASC LIMIT $1`,
     [limit]
   );
 }
@@ -26,14 +27,14 @@ export async function findCharacterById(
   id: number
 ): Promise<DBCharacter | null> {
   return queryOne<DBCharacter>(
-    `SELECT * FROM the_simpson.characters WHERE id = $1`,
+    `SELECT * FROM ${TABLES.characters} WHERE id = $1`,
     [id]
   );
 }
 
 export async function findFeaturedCharacters(): Promise<DBCharacter[]> {
   return query<DBCharacter>(
-    `SELECT * FROM the_simpson.characters 
+    `SELECT * FROM ${TABLES.characters} 
      WHERE name IN ('Homer Simpson', 'Marge Simpson', 'Bart Simpson', 'Lisa Simpson', 'Maggie Simpson')
      LIMIT 5`
   );
@@ -43,7 +44,7 @@ export async function findCharacterNames(): Promise<
   Pick<DBCharacter, "id" | "name">[]
 > {
   return query<Pick<DBCharacter, "id" | "name">>(
-    `SELECT id, name FROM the_simpson.characters ORDER BY name ASC`
+    `SELECT id, name FROM ${TABLES.characters} ORDER BY name ASC`
   );
 }
 
@@ -53,16 +54,15 @@ export async function findCharacterNames(): Promise<
 
 export async function findAllEpisodes(limit = 50): Promise<DBEpisode[]> {
   return query<DBEpisode>(
-    `SELECT * FROM the_simpson.episodes ORDER BY season ASC, episode_number ASC LIMIT $1`,
+    `SELECT * FROM ${TABLES.episodes} ORDER BY season ASC, episode_number ASC LIMIT $1`,
     [limit]
   );
 }
 
 export async function findEpisodeById(id: number): Promise<DBEpisode | null> {
-  return queryOne<DBEpisode>(
-    `SELECT * FROM the_simpson.episodes WHERE id = $1`,
-    [id]
-  );
+  return queryOne<DBEpisode>(`SELECT * FROM ${TABLES.episodes} WHERE id = $1`, [
+    id,
+  ]);
 }
 
 // ============================================
@@ -71,7 +71,7 @@ export async function findEpisodeById(id: number): Promise<DBEpisode | null> {
 
 export async function findAllLocations(): Promise<DBLocation[]> {
   return query<DBLocation>(
-    `SELECT * FROM the_simpson.locations ORDER BY name ASC`
+    `SELECT * FROM ${TABLES.locations} ORDER BY name ASC`
   );
 }
 
@@ -84,8 +84,8 @@ export async function findCommentsByCharacter(
 ): Promise<DBComment[]> {
   return query<DBComment>(
     `SELECT c.*, u.username 
-     FROM the_simpson.character_comments c 
-     JOIN the_simpson.users u ON c.user_id = u.id 
+     FROM ${TABLES.characterComments} c 
+     JOIN ${TABLES.users} u ON c.user_id = u.id 
      WHERE c.character_id = $1 
      ORDER BY c.created_at DESC`,
     [characterId]
@@ -102,8 +102,8 @@ export async function findTriviaByEntity(
 ): Promise<DBTriviaFact[]> {
   return query<DBTriviaFact>(
     `SELECT t.*, u.username 
-     FROM the_simpson.trivia_facts t
-     JOIN the_simpson.users u ON t.submitted_by_user_id = u.id
+     FROM ${TABLES.triviaFacts} t
+     JOIN ${TABLES.users} u ON t.submitted_by_user_id = u.id
      WHERE related_entity_type = $1 AND related_entity_id = $2
      ORDER BY created_at DESC`,
     [entityType, entityId]
@@ -113,8 +113,8 @@ export async function findTriviaByEntity(
 export async function findLatestTrivia(limit = 3): Promise<DBTriviaFact[]> {
   return query<DBTriviaFact>(
     `SELECT t.*, u.username 
-     FROM the_simpson.trivia_facts t
-     JOIN the_simpson.users u ON t.submitted_by_user_id = u.id
+     FROM ${TABLES.triviaFacts} t
+     JOIN ${TABLES.users} u ON t.submitted_by_user_id = u.id
      ORDER BY t.created_at DESC
      LIMIT $1`,
     [limit]
@@ -130,9 +130,9 @@ export async function findDiaryEntriesByUser(
 ): Promise<DBDiaryEntry[]> {
   return query<DBDiaryEntry>(
     `SELECT d.*, c.name as character_name, l.name as location_name 
-     FROM the_simpson.diary_entries d
-     JOIN the_simpson.characters c ON d.character_id = c.id
-     JOIN the_simpson.locations l ON d.location_id = l.id
+     FROM ${TABLES.diaryEntries} d
+     JOIN ${TABLES.characters} c ON d.character_id = c.id
+     JOIN ${TABLES.locations} l ON d.location_id = l.id
      WHERE d.user_id = $1
      ORDER BY d.entry_date DESC, d.id DESC`,
     [userId]
@@ -148,7 +148,7 @@ export async function findEpisodeProgressByUser(
   episodeId: number
 ): Promise<DBEpisodeProgress | null> {
   return queryOne<DBEpisodeProgress>(
-    `SELECT * FROM the_simpson.user_episode_progress WHERE user_id = $1 AND episode_id = $2`,
+    `SELECT * FROM ${TABLES.userEpisodeProgress} WHERE user_id = $1 AND episode_id = $2`,
     [userId, episodeId]
   );
 }
@@ -161,7 +161,7 @@ export async function findCollectionsByUser(
   userId: number
 ): Promise<DBQuoteCollection[]> {
   return query<DBQuoteCollection>(
-    `SELECT * FROM the_simpson.quote_collections WHERE user_id = $1 ORDER BY id DESC`,
+    `SELECT * FROM ${TABLES.quoteCollections} WHERE user_id = $1 ORDER BY id DESC`,
     [userId]
   );
 }
@@ -170,7 +170,7 @@ export async function findQuotesByCollection(
   collectionId: number
 ): Promise<DBCollectionQuote[]> {
   return query<DBCollectionQuote>(
-    `SELECT * FROM the_simpson.collection_quotes WHERE collection_id = $1 ORDER BY id DESC`,
+    `SELECT * FROM ${TABLES.collectionQuotes} WHERE collection_id = $1 ORDER BY id DESC`,
     [collectionId]
   );
 }
@@ -184,7 +184,7 @@ export async function isUserFollowingCharacter(
   characterId: number
 ): Promise<boolean> {
   const result = await queryOne<{ exists: boolean }>(
-    `SELECT EXISTS(SELECT 1 FROM the_simpson.character_follows WHERE user_id = $1 AND character_id = $2) as exists`,
+    `SELECT EXISTS(SELECT 1 FROM ${TABLES.characterFollows} WHERE user_id = $1 AND character_id = $2) as exists`,
     [userId, characterId]
   );
   return result?.exists ?? false;
@@ -201,13 +201,13 @@ export async function getStats(): Promise<{
 }> {
   const [charCount, epCount, triviaCount] = await Promise.all([
     queryOne<{ count: string }>(
-      "SELECT COUNT(*) as count FROM the_simpson.characters"
+      `SELECT COUNT(*) as count FROM ${TABLES.characters}`
     ),
     queryOne<{ count: string }>(
-      "SELECT COUNT(*) as count FROM the_simpson.episodes"
+      `SELECT COUNT(*) as count FROM ${TABLES.episodes}`
     ),
     queryOne<{ count: string }>(
-      "SELECT COUNT(*) as count FROM the_simpson.trivia_facts"
+      `SELECT COUNT(*) as count FROM ${TABLES.triviaFacts}`
     ),
   ]);
 

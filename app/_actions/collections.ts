@@ -1,6 +1,7 @@
 "use server";
 
 import { execute } from "@/app/_lib/db-utils";
+import { TABLES } from "@/app/_lib/db-schema";
 import { getCurrentUser } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import {
@@ -11,7 +12,7 @@ import {
 export async function createCollection(name: string, description: string) {
   const user = await getCurrentUser();
   await execute(
-    `INSERT INTO the_simpson.quote_collections (user_id, name, description) VALUES ($1, $2, $3)`,
+    `INSERT INTO ${TABLES.quoteCollections} (user_id, name, description) VALUES ($1, $2, $3)`,
     [user.id, name, description]
   );
   revalidatePath("/collections");
@@ -29,7 +30,7 @@ export async function addQuote(
   episode: string
 ) {
   await execute(
-    `INSERT INTO the_simpson.collection_quotes (collection_id, quote_text, character_name, source_episode) 
+    `INSERT INTO ${TABLES.collectionQuotes} (collection_id, quote_text, character_name, source_episode) 
      VALUES ($1, $2, $3, $4)`,
     [collectionId, text, character, episode]
   );
