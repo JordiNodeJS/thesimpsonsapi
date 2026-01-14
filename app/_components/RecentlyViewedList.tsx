@@ -3,6 +3,7 @@
 import { useLocalStorage } from "@/app/_lib/hooks";
 import Link from "next/link";
 import CharacterImage from "@/app/_components/CharacterImage";
+import { useEffect, useState } from "react";
 
 interface ViewedCharacter {
   id: number;
@@ -15,9 +16,14 @@ export default function RecentlyViewedList() {
     "recently-viewed-characters",
     []
   );
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Only render on client after hydration
-  if (typeof window === "undefined" || recentlyViewed.length === 0) return null;
+  if (!isClient || recentlyViewed.length === 0) return null;
 
   return (
     <div className="mb-12">

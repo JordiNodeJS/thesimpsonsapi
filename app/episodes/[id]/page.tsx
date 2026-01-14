@@ -42,6 +42,7 @@ export default async function EpisodeDetailPage({
                 src={episode.image_url}
                 alt={episode.title}
                 fill
+                sizes="(max-width: 768px) 100vw, 66vw"
                 className="object-cover"
                 priority
               />

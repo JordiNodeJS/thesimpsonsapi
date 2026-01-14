@@ -1,6 +1,7 @@
 "use server";
 
 import { execute } from "@/app/_lib/db-utils";
+import { TABLES } from "@/app/_lib/db-schema";
 import { getCurrentUser } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import { findTriviaByEntity } from "@/app/_lib/repositories";
@@ -12,7 +13,7 @@ export async function submitTrivia(
 ) {
   const user = await getCurrentUser();
   await execute(
-    `INSERT INTO the_simpson.trivia_facts (related_entity_type, related_entity_id, content, submitted_by_user_id)
+    `INSERT INTO ${TABLES.triviaFacts} (related_entity_type, related_entity_id, content, submitted_by_user_id)
      VALUES ($1, $2, $3, $4)`,
     [entityType, entityId, content, user.id]
   );

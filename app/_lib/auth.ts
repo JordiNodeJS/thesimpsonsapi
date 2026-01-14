@@ -1,4 +1,5 @@
 import { queryOne } from "@/app/_lib/db-utils";
+import { TABLES } from "@/app/_lib/db-schema";
 import type { DBUser } from "@/app/_lib/db-types";
 
 /**
@@ -9,7 +10,7 @@ export async function getCurrentUser(): Promise<DBUser> {
   const username = "SimpsonsFan";
 
   const user = await queryOne<DBUser>(
-    `INSERT INTO users (username) VALUES ($1) 
+    `INSERT INTO ${TABLES.users} (username) VALUES ($1) 
      ON CONFLICT (username) DO UPDATE SET username = EXCLUDED.username 
      RETURNING id, username`,
     [username]

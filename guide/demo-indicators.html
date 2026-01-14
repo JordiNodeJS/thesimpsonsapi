@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo: Sistema de Indicadores Responsivos</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        color: #fff;
+        padding: 2rem;
+        line-height: 1.6;
+      }
+
+      .header {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 217, 15, 0.1),
+          rgba(255, 165, 0, 0.1)
+        );
+        border-radius: 20px;
+        margin-bottom: 3rem;
+        border: 2px solid #ffd90f;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        color: #ffd90f;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 20px rgba(255, 217, 15, 0.5);
+      }
+
+      .header p {
+        color: #ccc;
+        font-size: 1.2rem;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .demo-section {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        border: 2px solid rgba(255, 217, 15, 0.2);
+      }
+
+      .demo-section h2 {
+        color: #ffd90f;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .demo-section h3 {
+        color: #ffa500;
+        font-size: 1.3rem;
+        margin: 2rem 0 1rem 0;
+      }
+
+      .demo-section p {
+        color: #ccc;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Simulación de screenshot container */
+      .screenshot-container {
+        position: relative;
+        margin: 2rem auto;
+        border-radius: 20px;
+        overflow: visible;
+        box-shadow: 0 10px 60px rgba(0, 0, 0, 0.5);
+        background: #000;
+        display: inline-block;
+        max-width: 100%;
+        width: 100%;
+      }
+
+      .screenshot {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 20px;
+        vertical-align: top;
+      }
+
+      /* Placeholder para demostración */
+      .screenshot-placeholder {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 1.5rem;
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .screenshot-placeholder::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 20px,
+          rgba(255, 217, 15, 0.05) 20px,
+          rgba(255, 217, 15, 0.05) 40px
+        );
+      }
+
+      /* Indicadores */
+      .indicator {
+        position: absolute;
+        animation: pulse 2s infinite;
+        z-index: 10;
+        pointer-events: none;
+        transform-origin: center center;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.8;
+        }
+      }
+
+      .indicator-number {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #ffd90f 0%, #ffa500 100%);
+        color: #000;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 20px rgba(255, 217, 15, 0.6);
+        border: 3px solid #fff;
+        transform: translate(-50%, -50%);
+      }
+
+      .indicator-tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.9);
+        color: #ffd90f;
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        max-width: 250px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+        border: 2px solid rgba(255, 217, 15, 0.5);
+        line-height: 1.4;
+        transform: translateY(-100%);
+        margin-top: -10px;
+      }
+
+      .indicator-tooltip::before {
+        content: "💡";
+        margin-right: 0.5rem;
+      }
+
+      .indicator-label {
+        position: relative;
+        background: linear-gradient(135deg, #ffd90f 0%, #ffa500 100%);
+        color: #000;
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 0.85rem;
+        box-shadow: 0 4px 20px rgba(255, 217, 15, 0.6);
+        white-space: nowrap;
+        display: inline-block;
+        letter-spacing: 0.02em;
+        transform: translate(-50%, -100%);
+        margin-top: -15px;
+      }
+
+      .indicator-label::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid #ffa500;
+      }
+
+      .indicator-circle {
+        width: 60px;
+        height: 60px;
+        border: 4px solid #ffd90f;
+        border-radius: 50%;
+        box-shadow: 0 0 20px rgba(255, 217, 15, 0.8),
+          inset 0 0 10px rgba(255, 217, 15, 0.3);
+        background: rgba(255, 217, 15, 0.15);
+        transform: translate(-50%, -50%);
+      }
+
+      .indicator-arrow {
+        font-size: 3rem;
+        color: #ffd90f;
+        filter: drop-shadow(0 0 10px rgba(255, 217, 15, 0.8));
+        text-shadow: 0 0 20px rgba(255, 217, 15, 1);
+        transform: translate(-50%, -50%);
+      }
+
+      .indicator-box {
+        border: 3px dashed #ffd90f;
+        background: rgba(255, 217, 15, 0.08);
+        backdrop-filter: blur(5px);
+        border-radius: 8px;
+      }
+
+      /* Code blocks */
+      .code-block {
+        background: rgba(0, 0, 0, 0.9);
+        color: #0f0;
+        font-family: "Courier New", monospace;
+        padding: 1.5rem;
+        border-radius: 10px;
+        overflow-x: auto;
+        margin: 1rem 0;
+        border: 2px solid rgba(255, 217, 15, 0.3);
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+
+      .code-block .comment {
+        color: #888;
+      }
+
+      .code-block .tag {
+        color: #ffd90f;
+      }
+
+      .code-block .attr {
+        color: #ff6b6b;
+      }
+
+      .code-block .string {
+        color: #4ecdc4;
+      }
+
+      /* Info box */
+      .info-box {
+        background: rgba(255, 217, 15, 0.1);
+        border-left: 4px solid #ffd90f;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin: 1.5rem 0;
+      }
+
+      .info-box h4 {
+        color: #ffd90f;
+        margin-bottom: 0.5rem;
+      }
+
+      .info-box p {
+        color: #ccc;
+        margin-bottom: 0;
+      }
+
+      /* Responsive test */
+      .resize-demo {
+        border: 3px dashed rgba(255, 217, 15, 0.5);
+        padding: 1rem;
+        border-radius: 10px;
+        background: rgba(255, 217, 15, 0.05);
+        margin: 1rem 0;
+        text-align: center;
+        color: #ffd90f;
+        font-weight: bold;
+        cursor: ew-resize;
+        user-select: none;
+      }
+
+      .resize-demo:hover {
+        background: rgba(255, 217, 15, 0.1);
+        border-color: #ffd90f;
+      }
+
+      /* Grid de ejemplos */
+      .examples-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+
+      .example-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1.5rem;
+        border-radius: 10px;
+        border: 2px solid rgba(255, 217, 15, 0.2);
+      }
+
+      .example-card h4 {
+        color: #ffd90f;
+        margin-bottom: 1rem;
+      }
+
+      /* Buttons */
+      .btn {
+        background: linear-gradient(135deg, #ffd90f 0%, #ffa500 100%);
+        color: #000;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-block;
+        text-decoration: none;
+        margin: 0.5rem;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 217, 15, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🎯 Demo: Sistema de Indicadores Responsivos</h1>
+      <p>
+        Prueba en vivo del sistema que mantiene los indicadores alineados en
+        cualquier tamaño
+      </p>
+    </div>
+
+    <div class="container">
+      <!-- Sección 1: Introducción -->
+      <div class="demo-section">
+        <h2>🎨 ¿Qué es este sistema?</h2>
+        <p>
+          Este sistema garantiza que los
+          <strong>marcadores/indicadores</strong> en las imágenes guía
+          <strong>siempre permanezcan alineados</strong> con las características
+          de la imagen, sin importar el tamaño del navegador.
+        </p>
+
+        <div class="info-box">
+          <h4>✨ Características principales:</h4>
+          <p>
+            ✅ 100% Responsivo<br />
+            ✅ Auto-ajustable al redimensionar<br />
+            ✅ Basado en porcentajes relativos<br />
+            ✅ Optimizado con debouncing<br />
+            ✅ Compatible con todos los navegadores modernos
+          </p>
+        </div>
+      </div>
+
+      <!-- Sección 2: Demo Interactiva -->
+      <div class="demo-section">
+        <h2>🔍 Demo Interactiva</h2>
+        <p>
+          <strong
+            >👇 Redimensiona esta ventana del navegador y observa cómo los
+            indicadores se mantienen perfectamente alineados con los elementos
+            del "screenshot":</strong
+          >
+        </p>
+
+        <div class="screenshot-container">
+          <div class="screenshot-placeholder">
+            <div style="position: relative; z-index: 1">
+              📱 SIMULA UN SCREENSHOT DE LA APP
+            </div>
+          </div>
+
+          <!-- Indicador 1: Esquina superior izquierda -->
+          <div class="indicator indicator-number" style="top: 15%; left: 20%">
+            1
+          </div>
+          <div class="indicator indicator-tooltip" style="top: 15%; left: 20%">
+            Este indicador está en la esquina superior izquierda
+          </div>
+
+          <!-- Indicador 2: Centro -->
+          <div
+            class="indicator indicator-circle"
+            style="top: 50%; left: 50%"
+          ></div>
+          <div class="indicator indicator-label" style="top: 50%; left: 50%">
+            📍 Centro Exacto
+          </div>
+
+          <!-- Indicador 3: Esquina inferior derecha -->
+          <div class="indicator indicator-number" style="top: 85%; left: 80%">
+            2
+          </div>
+          <div class="indicator indicator-tooltip" style="top: 85%; left: 80%">
+            Este indicador está en la esquina inferior derecha
+          </div>
+
+          <!-- Indicador 4: Flecha -->
+          <div class="indicator indicator-arrow" style="top: 30%; left: 70%">
+            ↓
+          </div>
+
+          <!-- Indicador 5: Caja de área -->
+          <div
+            class="indicator indicator-box"
+            style="top: 20%; left: 10%; width: 150px; height: 100px"
+          ></div>
+        </div>
+
+        <div class="resize-demo">
+          👆 Redimensiona el navegador (Ctrl + / Ctrl -) para ver cómo se
+          ajustan los indicadores
+        </div>
+      </div>
+
+      <!-- Sección 3: Ejemplos de Código -->
+      <div class="demo-section">
+        <h2>💻 Ejemplos de Código</h2>
+
+        <h3>Ejemplo 1: Indicador Numerado con Tooltip</h3>
+        <div class="code-block">
+          <span class="comment">&lt;!-- Número del indicador --&gt;</span>
+          <span class="tag">&lt;div</span> <span class="attr">class=</span
+          ><span class="string">"indicator indicator-number"</span>
+          <span class="attr">style=</span
+          ><span class="string">"top: 86%; left: 18%;"</span
+          ><span class="tag">&gt;</span>
+          1
+          <span class="tag">&lt;/div&gt;</span>
+
+          <span class="comment">&lt;!-- Tooltip explicativo --&gt;</span>
+          <span class="tag">&lt;div</span> <span class="attr">class=</span
+          ><span class="string">"indicator indicator-tooltip"</span>
+          <span class="attr">style=</span
+          ><span class="string">"top: 82%; left: 10%;"</span
+          ><span class="tag">&gt;</span>
+          Haz clic en "Start Tracking" para ir a episodios
+          <span class="tag">&lt;/div&gt;</span>
+        </div>
+
+        <h3>Ejemplo 2: Etiqueta Centrada</h3>
+        <div class="code-block">
+          <span class="comment"
+            >&lt;!-- Etiqueta centrada horizontalmente --&gt;</span
+          >
+          <span class="tag">&lt;div</span> <span class="attr">class=</span
+          ><span class="string">"indicator indicator-label"</span>
+          <span class="attr">style=</span
+          ><span class="string"
+            >"top: 88%; left: 60%; transform: translateX(-50%);"</span
+          ><span class="tag">&gt;</span>
+          📊 Estadísticas en Tiempo Real
+          <span class="tag">&lt;/div&gt;</span>
+        </div>
+
+        <h3>Ejemplo 3: Desde la Derecha</h3>
+        <div class="code-block">
+          <span class="comment"
+            >&lt;!-- Posicionado desde la derecha --&gt;</span
+          >
+          <span class="tag">&lt;div</span> <span class="attr">class=</span
+          ><span class="string">"indicator indicator-number"</span>
+          <span class="attr">style=</span
+          ><span class="string">"top: 92%; right: 10%;"</span
+          ><span class="tag">&gt;</span>
+          4
+          <span class="tag">&lt;/div&gt;</span>
+        </div>
+      </div>
+
+      <!-- Sección 4: Tipos de Indicadores -->
+      <div class="demo-section">
+        <h2>🎨 Tipos de Indicadores Disponibles</h2>
+
+        <div class="examples-grid">
+          <div class="example-card">
+            <h4>1️⃣ Número de Secuencia</h4>
+            <div
+              style="
+                position: relative;
+                height: 100px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 8px;
+                margin: 1rem 0;
+              "
+            >
+              <div
+                class="indicator indicator-number"
+                style="top: 50%; left: 50%"
+              >
+                1
+              </div>
+            </div>
+            <div class="code-block" style="font-size: 0.75rem">
+              &lt;div class="indicator indicator-number" style="top: 50%; left:
+              50%;"&gt; 1 &lt;/div&gt;
+            </div>
+          </div>
+
+          <div class="example-card">
+            <h4>💡 Tooltip</h4>
+            <div
+              style="
+                position: relative;
+                height: 100px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 8px;
+                margin: 1rem 0;
+              "
+            >
+              <div
+                class="indicator indicator-tooltip"
+                style="top: 60%; left: 50%; transform: translateX(-50%)"
+              >
+                Texto de ayuda
+              </div>
+            </div>
+            <div class="code-block" style="font-size: 0.75rem">
+              &lt;div class="indicator indicator-tooltip"&gt; Texto de ayuda
+              &lt;/div&gt;
+            </div>
+          </div>
+
+          <div class="example-card">
+            <h4>🏷️ Etiqueta</h4>
+            <div
+              style="
+                position: relative;
+                height: 100px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 8px;
+                margin: 1rem 0;
+              "
+            >
+              <div
+                class="indicator indicator-label"
+                style="top: 60%; left: 50%"
+              >
+                📊 Estadística
+              </div>
+            </div>
+            <div class="code-block" style="font-size: 0.75rem">
+              &lt;div class="indicator indicator-label"&gt; 📊 Estadística
+              &lt;/div&gt;
+            </div>
+          </div>
+
+          <div class="example-card">
+            <h4>⭕ Círculo</h4>
+            <div
+              style="
+                position: relative;
+                height: 100px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 8px;
+                margin: 1rem 0;
+              "
+            >
+              <div
+                class="indicator indicator-circle"
+                style="top: 50%; left: 50%"
+              ></div>
+            </div>
+            <div class="code-block" style="font-size: 0.75rem">
+              &lt;div class="indicator indicator-circle"&gt; &lt;/div&gt;
+            </div>
+          </div>
+
+          <div class="example-card">
+            <h4>➡️ Flecha</h4>
+            <div
+              style="
+                position: relative;
+                height: 100px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 8px;
+                margin: 1rem 0;
+              "
+            >
+              <div
+                class="indicator indicator-arrow"
+                style="top: 50%; left: 50%"
+              >
+                ↓
+              </div>
+            </div>
+            <div class="code-block" style="font-size: 0.75rem">
+              &lt;div class="indicator indicator-arrow"&gt; ↓ &lt;/div&gt;
+            </div>
+          </div>
+
+          <div class="example-card">
+            <h4>📦 Caja de Área</h4>
+            <div
+              style="
+                position: relative;
+                height: 100px;
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 8px;
+                margin: 1rem 0;
+              "
+            >
+              <div
+                class="indicator indicator-box"
+                style="top: 20%; left: 20%; width: 60%; height: 60%"
+              ></div>
+            </div>
+            <div class="code-block" style="font-size: 0.75rem">
+              &lt;div class="indicator indicator-box" style="width: 200px;
+              height: 100px;"&gt; &lt;/div&gt;
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 5: Herramientas -->
+      <div class="demo-section">
+        <h2>🛠️ Herramientas Disponibles</h2>
+
+        <div class="info-box">
+          <h4>🎯 Herramienta Visual de Posicionamiento</h4>
+          <p>
+            Usa <strong>indicator-helper.html</strong> para posicionar
+            indicadores de forma visual:
+          </p>
+          <p style="margin-top: 1rem">
+            1️⃣ Carga tu screenshot<br />
+            2️⃣ Haz clic donde quieras indicadores<br />
+            3️⃣ Arrastra para ajustar<br />
+            4️⃣ Copia el código HTML generado
+          </p>
+          <a href="indicator-helper.html" class="btn"
+            >🚀 Abrir Herramienta Visual</a
+          >
+        </div>
+
+        <div class="info-box" style="margin-top: 1rem">
+          <h4>📚 Documentación Completa</h4>
+          <p>
+            Lee <strong>INDICATORS_GUIDE.md</strong> para detalles técnicos
+            completos:
+          </p>
+          <p style="margin-top: 1rem">
+            📖 Cómo calcular posiciones<br />
+            🎨 Tipos de indicadores<br />
+            🐛 Solución de problemas<br />
+            💡 Mejores prácticas
+          </p>
+          <a href="INDICATORS_GUIDE.md" class="btn">📖 Ver Documentación</a>
+        </div>
+      </div>
+
+      <!-- Sección 6: Cálculo de Posiciones -->
+      <div class="demo-section">
+        <h2>🧮 Cómo Calcular Posiciones</h2>
+
+        <h3>Fórmula Simple:</h3>
+        <div class="code-block">
+          <span class="comment"
+            >// Para calcular el porcentaje X (horizontal)</span
+          >
+          X% = (Posición X en píxeles / Ancho Total en píxeles) × 100
+
+          <span class="comment"
+            >// Para calcular el porcentaje Y (vertical)</span
+          >
+          Y% = (Posición Y en píxeles / Alto Total en píxeles) × 100
+        </div>
+
+        <h3>Ejemplo Práctico:</h3>
+        <div class="code-block">
+          <span class="comment">// Imagen: 1920×1080px</span>
+          <span class="comment"
+            >// Botón "Start Tracking" está en: X=350px, Y=930px</span
+          >
+
+          X% = (350 / 1920) × 100 = <span class="string">18.2%</span> Y% = (930
+          / 1080) × 100 = <span class="string">86.1%</span>
+
+          <span class="comment">// HTML resultante:</span>
+          <span class="tag">&lt;div</span> <span class="attr">style=</span
+          ><span class="string">"top: 86.1%; left: 18.2%;"</span
+          ><span class="tag">&gt;</span>...<span class="tag">&lt;/div&gt;</span>
+        </div>
+
+        <div class="info-box">
+          <h4>💡 Consejo Pro:</h4>
+          <p>
+            Usa la herramienta visual
+            <strong>indicator-helper.html</strong> para obtener estos valores
+            automáticamente sin necesidad de calcular manualmente.
+          </p>
+        </div>
+      </div>
+
+      <!-- Sección 7: Responsive Test -->
+      <div class="demo-section">
+        <h2>📱 Test de Responsividad</h2>
+        <p>
+          El sistema funciona perfectamente en todos los tamaños de pantalla:
+        </p>
+
+        <div class="info-box">
+          <h4>✅ Dispositivos Soportados:</h4>
+          <p>
+            🖥️ Desktop: 1920×1080, 1600×900, 1366×768<br />
+            📱 Tablet: 1024×768, 768×1024<br />
+            📱 Mobile: 414×896, 390×844, 375×667<br />
+            🔍 Zoom: 50%, 75%, 100%, 125%, 150%, 200%
+          </p>
+        </div>
+
+        <div class="info-box" style="margin-top: 1rem">
+          <h4>🌐 Navegadores Compatibles:</h4>
+          <p>
+            ✅ Chrome 90+<br />
+            ✅ Firefox 88+<br />
+            ✅ Safari 14+<br />
+            ✅ Edge 90+<br />
+            ✅ Opera 76+
+          </p>
+        </div>
+      </div>
+
+      <!-- Sección 8: Recursos -->
+      <div class="demo-section">
+        <h2>📚 Recursos Adicionales</h2>
+
+        <div class="examples-grid">
+          <div class="example-card">
+            <h4>🎯 Guía Interactiva</h4>
+            <p style="color: #ccc; margin-bottom: 1rem">
+              Guía paso a paso con todos los screenshots anotados
+            </p>
+            <a href="index.html" class="btn">Ver Guía</a>
+          </div>
+
+          <div class="example-card">
+            <h4>🛠️ Herramienta Visual</h4>
+            <p style="color: #ccc; margin-bottom: 1rem">
+              Posiciona indicadores arrastrando y soltando
+            </p>
+            <a href="indicator-helper.html" class="btn">Abrir Tool</a>
+          </div>
+
+          <div class="example-card">
+            <h4>📖 Documentación</h4>
+            <p style="color: #ccc; margin-bottom: 1rem">
+              Guía técnica completa del sistema
+            </p>
+            <a href="INDICATORS_GUIDE.md" class="btn">Leer Docs</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Demo interactiva
+      console.log(
+        "%c🎯 Sistema de Indicadores Responsivos",
+        "font-size: 20px; color: #ffd90f; font-weight: bold;"
+      );
+      console.log(
+        "%cRedimensiona la ventana del navegador para ver cómo se ajustan los indicadores automáticamente",
+        "color: #ccc;"
+      );
+
+      // Mostrar dimensiones actuales
+      function showDimensions() {
+        console.log(
+          `📐 Dimensiones actuales: ${window.innerWidth}×${window.innerHeight}px`
+        );
+      }
+
+      window.addEventListener("resize", () => {
+        clearTimeout(window.resizeDebounce);
+        window.resizeDebounce = setTimeout(showDimensions, 500);
+      });
+
+      showDimensions();
+    </script>
+  </body>
+</html>

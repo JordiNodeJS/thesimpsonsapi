@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Springfield Life - Guía Interactiva de Usuario</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        color: #ffffff;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .header {
+        background: linear-gradient(90deg, #000000 0%, #1a1a1a 100%);
+        padding: 2rem;
+        text-align: center;
+        border-bottom: 4px solid #ffd90f;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 4px 20px rgba(255, 217, 15, 0.3);
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        color: #ffd90f;
+        text-shadow: 0 0 20px rgba(255, 217, 15, 0.5);
+        margin-bottom: 0.5rem;
+      }
+
+      .header p {
+        color: #999;
+        font-size: 1.1rem;
+        letter-spacing: 0.05em;
+      }
+
+      .donut {
+        display: inline-block;
+        font-size: 2rem;
+        animation: rotate 3s linear infinite;
+      }
+
+      @keyframes rotate {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .progress-bar {
+        background: rgba(255, 255, 255, 0.1);
+        height: 8px;
+        border-radius: 10px;
+        margin: 2rem 0;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ffd90f 0%, #ffa500 100%);
+        border-radius: 10px;
+        transition: width 0.3s ease;
+        box-shadow: 0 0 20px rgba(255, 217, 15, 0.5);
+      }
+
+      .step {
+        display: none;
+        animation: fadeIn 0.5s ease;
+      }
+
+      .step.active {
+        display: block;
+      }
+
+      .screenshot-wrapper {
+        text-align: center;
+        width: 100%;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .step-header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+
+      .step-number {
+        display: inline-block;
+        background: #ffd90f;
+        color: #000;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        line-height: 60px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 20px rgba(255, 217, 15, 0.4);
+      }
+
+      .step-title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: #ffd90f;
+      }
+
+      .step-description {
+        font-size: 1.2rem;
+        color: #ccc;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .screenshot-container {
+        position: relative;
+        margin: 2rem auto;
+        border-radius: 20px;
+        overflow: visible;
+        box-shadow: 0 10px 60px rgba(0, 0, 0, 0.5);
+        background: #000;
+        display: inline-block;
+        max-width: 100%;
+        width: 100%;
+      }
+
+      /* Wrapper para mantener aspect ratio */
+      .screenshot-aspect-wrapper {
+        position: relative;
+        width: 100%;
+        /* Se calcula dinámicamente con JS basado en la imagen real */
+      }
+
+      .screenshot {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 20px;
+        vertical-align: top;
+      }
+
+      .indicator {
+        position: absolute;
+        animation: pulse 2s infinite;
+        z-index: 10;
+        pointer-events: none;
+        transform-origin: center center;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.8;
+        }
+      }
+
+      .indicator-circle {
+        width: 50px;
+        height: 50px;
+        border: 3px solid #ffd90f;
+        border-radius: 50%;
+        box-shadow: 0 0 20px rgba(255, 217, 15, 0.8),
+          inset 0 0 10px rgba(255, 217, 15, 0.3);
+        background: rgba(255, 217, 15, 0.15);
+      }
+
+      .indicator-arrow {
+        font-size: 2.5rem;
+        color: #ffd90f;
+        filter: drop-shadow(0 0 10px rgba(255, 217, 15, 0.8));
+        text-shadow: 0 0 20px rgba(255, 217, 15, 1);
+      }
+
+      .indicator-box {
+        border: 3px dashed #ffd90f;
+        background: rgba(255, 217, 15, 0.08);
+        backdrop-filter: blur(5px);
+        min-width: 100px;
+        padding: 10px;
+        border-radius: 8px;
+      }
+
+      .indicator-label {
+        position: relative;
+        background: linear-gradient(135deg, #ffd90f 0%, #ffa500 100%);
+        color: #000;
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 0.85rem;
+        box-shadow: 0 4px 20px rgba(255, 217, 15, 0.6);
+        white-space: nowrap;
+        display: inline-block;
+        letter-spacing: 0.02em;
+      }
+
+      .indicator-label::before {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid #ffa500;
+      }
+
+      .indicator-number {
+        position: absolute;
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #ffd90f 0%, #ffa500 100%);
+        color: #000;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+        box-shadow: 0 3px 15px rgba(255, 217, 15, 0.6);
+        border: 2px solid #fff;
+      }
+
+      .indicator-line {
+        position: absolute;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 217, 15, 0.8),
+          rgba(255, 217, 15, 0.3)
+        );
+        height: 2px;
+        box-shadow: 0 0 10px rgba(255, 217, 15, 0.8);
+      }
+
+      .indicator-tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.9);
+        color: #ffd90f;
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        max-width: 250px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 217, 15, 0.3);
+        line-height: 1.4;
+      }
+
+      .indicator-tooltip::before {
+        content: "💡";
+        margin-right: 0.5rem;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin: 3rem 0;
+      }
+
+      .feature-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2rem;
+        border-radius: 15px;
+        border: 2px solid rgba(255, 217, 15, 0.2);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: #ffd90f;
+        box-shadow: 0 10px 30px rgba(255, 217, 15, 0.3);
+      }
+
+      .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .feature-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #ffd90f;
+        margin-bottom: 0.5rem;
+      }
+
+      .feature-text {
+        color: #999;
+        font-size: 0.95rem;
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 2px solid rgba(255, 217, 15, 0.2);
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #ffd90f 0%, #ffa500 100%);
+        color: #000;
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 217, 15, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(255, 217, 15, 0.6);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: #ffd90f;
+      }
+
+      .step-counter {
+        color: #999;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .tips-box {
+        background: rgba(255, 217, 15, 0.1);
+        border-left: 4px solid #ffd90f;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin: 2rem 0;
+      }
+
+      .tips-title {
+        color: #ffd90f;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .tips-list {
+        color: #ccc;
+        padding-left: 1.5rem;
+      }
+
+      .tips-list li {
+        margin: 0.5rem 0;
+      }
+
+      .action-list {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2rem;
+        border-radius: 15px;
+        margin: 2rem 0;
+      }
+
+      .action-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .action-item:hover {
+        background: rgba(255, 217, 15, 0.1);
+        transform: translateX(5px);
+      }
+
+      .action-number {
+        background: #ffd90f;
+        color: #000;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+
+      .action-content h4 {
+        color: #ffd90f;
+        margin-bottom: 0.5rem;
+      }
+
+      .action-content p {
+        color: #999;
+        font-size: 0.95rem;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 3rem 2rem;
+        margin-top: 4rem;
+        border-top: 2px solid rgba(255, 217, 15, 0.2);
+        color: #666;
+      }
+
+      .footer a {
+        color: #ffd90f;
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .footer a:hover {
+        text-shadow: 0 0 10px rgba(255, 217, 15, 0.8);
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 1.8rem;
+        }
+
+        .step-title {
+          font-size: 1.5rem;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .navigation {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+
+      .welcome-screen {
+        text-align: center;
+        padding: 4rem 2rem;
+      }
+
+      .welcome-logo {
+        font-size: 5rem;
+        margin-bottom: 2rem;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-20px);
+        }
+      }
+
+      .welcome-title {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #ffd90f;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 30px rgba(255, 217, 15, 0.5);
+      }
+
+      .welcome-subtitle {
+        font-size: 1.5rem;
+        color: #ccc;
+        margin-bottom: 3rem;
+      }
+
+      .start-btn {
+        background: linear-gradient(135deg, #ffd90f 0%, #ffa500 100%);
+        color: #000;
+        border: none;
+        padding: 1.5rem 4rem;
+        border-radius: 50px;
+        font-size: 1.3rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 30px rgba(255, 217, 15, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .start-btn:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 12px 40px rgba(255, 217, 15, 0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>
+        <span class="donut">🍩</span> SPRINGFIELD LIFE
+        <span class="donut">🍩</span>
+      </h1>
+      <p>Guía Interactiva de Usuario</p>
+    </div>
+
+    <div class="container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressBar"></div>
+      </div>
+
+      <!-- Pantalla de Bienvenida -->
+      <div class="step active" id="step0">
+        <div class="welcome-screen">
+          <div class="welcome-logo">🍩</div>
+          <h2 class="welcome-title">¡Bienvenido a Springfield Life!</h2>
+          <p class="welcome-subtitle">
+            Tu compañero definitivo para explorar el universo de Los Simpson
+          </p>
+
+          <div class="features-grid" style="margin-top: 3rem">
+            <div class="feature-card">
+              <div class="feature-icon">📺</div>
+              <div class="feature-title">Seguimiento de Episodios</div>
+              <div class="feature-text">
+                Marca episodios vistos, califícalos y toma notas
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">👥</div>
+              <div class="feature-title">Perfiles de Personajes</div>
+              <div class="feature-text">
+                Sigue a tus personajes favoritos e interactúa
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">✍️</div>
+              <div class="feature-title">Diario de Springfield</div>
+              <div class="feature-text">Documenta tu viaje por la serie</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">📜</div>
+              <div class="feature-title">Colecciones de Frases</div>
+              <div class="feature-text">Guarda tus citas favoritas</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🧠</div>
+              <div class="feature-title">Trivia Comunitaria</div>
+              <div class="feature-text">Comparte datos curiosos</div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">🔄</div>
+              <div class="feature-title">Sincronización de Datos</div>
+              <div class="feature-text">Mantén todo actualizado</div>
+            </div>
+          </div>
+
+          <button class="start-btn" onclick="nextStep()">
+            ¡Comenzar Tour! →
+          </button>
+        </div>
+      </div>
+
+      <!-- Paso 1: Página de Inicio -->
+      <div class="step" id="step1">
+        <div class="step-header">
+          <div class="step-number">1</div>
+          <h2 class="step-title">Página de Inicio</h2>
+          <p class="step-description">
+            Tu punto de partida en Springfield. Aquí encontrarás estadísticas,
+            personajes destacados y acceso rápido a todas las funciones.
+          </p>
+        </div>
+
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/01-home-page.png"
+              alt="Página de Inicio"
+              class="screenshot"
+            />
+
+            <!-- Indicadores con números de secuencia -->
+            <div class="indicator indicator-number" style="top: 86%; left: 18%">
+              1
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 82%; left: 10%"
+            >
+              Haz clic en "Start Tracking" para ir a episodios
+            </div>
+
+            <div class="indicator indicator-number" style="top: 86%; left: 48%">
+              2
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 82%; left: 40%"
+            >
+              "Meet the Cast" te lleva a todos los personajes
+            </div>
+
+            <div
+              class="indicator indicator-number"
+              style="top: 92%; left: 60%; transform: translateX(-50%)"
+            >
+              3
+            </div>
+            <div
+              class="indicator indicator-label"
+              style="top: 88%; left: 60%; transform: translateX(-50%)"
+            >
+              📊 Estadísticas en Tiempo Real
+            </div>
+
+            <div
+              class="indicator indicator-number"
+              style="top: 92%; right: 10%"
+            >
+              4
+            </div>
+            <div class="indicator indicator-label" style="top: 88%; right: 5%">
+              👥 Familia Simpson - Haz clic en cualquier personaje
+            </div>
+          </div>
+        </div>
+
+        <div class="action-list">
+          <h3 style="color: #ffd90f; margin-bottom: 1.5rem">
+            🎯 Acciones Disponibles:
+          </h3>
+          <div class="action-item">
+            <div class="action-number">1</div>
+            <div class="action-content">
+              <h4>Start Tracking</h4>
+              <p>
+                Haz clic en este botón amarillo para ir directamente al
+                rastreador de episodios y comenzar a marcar los que ya has
+                visto.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">2</div>
+            <div class="action-content">
+              <h4>Meet the Cast</h4>
+              <p>
+                Explora todos los personajes disponibles. Perfecto para
+                descubrir más sobre tus favoritos.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">3</div>
+            <div class="action-content">
+              <h4>Ver Estadísticas</h4>
+              <p>
+                Revisa cuántos episodios, personajes y datos curiosos hay
+                disponibles en la base de datos.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">4</div>
+            <div class="action-content">
+              <h4>Explorar Personajes</h4>
+              <p>
+                Haz clic en cualquier personaje de "The Main Cast" para ver su
+                perfil completo.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips-box">
+          <div class="tips-title">💡 Consejo Pro:</div>
+          <ul class="tips-list">
+            <li>
+              La navegación superior siempre está disponible para moverte entre
+              secciones
+            </li>
+            <li>
+              Usa el botón "Sync Data from API" para actualizar la base de datos
+            </li>
+            <li>Los personajes mostrados son la familia Simpson principal</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Paso 2: Explorar Personajes -->
+      <div class="step" id="step2">
+        <div class="step-header">
+          <div class="step-number">2</div>
+          <h2 class="step-title">Explorar Personajes</h2>
+          <p class="step-description">
+            Descubre todos los personajes de Springfield. Más de 1,182
+            personajes disponibles en una cuadrícula visual.
+          </p>
+        </div>
+
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/02-characters-page.png"
+              alt="Página de Personajes"
+              class="screenshot"
+            />
+
+            <div class="indicator indicator-number" style="top: 32%; left: 5%">
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 28%; left: 8%">
+              🔄 Personajes Vistos Recientemente
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 36%; left: 5%">
+              Lista horizontal con los últimos personajes que visitaste
+            </div>
+
+            <div class="indicator indicator-number" style="top: 53%; left: 40%">
+              2
+            </div>
+            <div class="indicator indicator-label" style="top: 49%; left: 45%">
+              🎭 Grid de 1,182+ Personajes
+            </div>
+
+            <div
+              class="indicator indicator-circle"
+              style="top: 70%; left: 15%"
+            ></div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 76%; left: 10%"
+            >
+              Haz clic para ver perfil completo
+            </div>
+
+            <div
+              class="indicator indicator-circle"
+              style="top: 70%; left: 50%"
+            ></div>
+            <div
+              class="indicator indicator-circle"
+              style="top: 70%; right: 15%"
+            ></div>
+          </div>
+        </div>
+
+        <div class="action-list">
+          <h3 style="color: #ffd90f; margin-bottom: 1.5rem">
+            🎯 Acciones Disponibles:
+          </h3>
+          <div class="action-item">
+            <div class="action-number">1</div>
+            <div class="action-content">
+              <h4>Ver Personajes Recientes</h4>
+              <p>
+                La sección superior muestra los personajes que has visitado
+                recientemente para acceso rápido.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">2</div>
+            <div class="action-content">
+              <h4>Explorar la Cuadrícula</h4>
+              <p>
+                Desplázate por la cuadrícula para ver todos los personajes. Cada
+                tarjeta muestra el nombre y ocupación.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">3</div>
+            <div class="action-content">
+              <h4>Hacer Clic en un Personaje</h4>
+              <p>
+                Selecciona cualquier personaje para ver su perfil completo con
+                biografía y opciones de interacción.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips-box">
+          <div class="tips-title">💡 Consejo Pro:</div>
+          <ul class="tips-list">
+            <li>
+              La cuadrícula es responsive: 2 columnas en móvil, 3 en tablet, 4
+              en desktop
+            </li>
+            <li>
+              Los personajes visitados recientemente se desplazan
+              horizontalmente
+            </li>
+            <li>
+              Cada tarjeta incluye una imagen y datos básicos del personaje
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Paso 3: Perfil de Personaje -->
+      <div class="step" id="step3">
+        <div class="step-header">
+          <div class="step-number">3</div>
+          <h2 class="step-title">Perfil de Personaje</h2>
+          <p class="step-description">
+            Interactúa con tus personajes favoritos. Síguelos, deja comentarios
+            y comparte datos curiosos.
+          </p>
+        </div>
+
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/03-character-detail.png"
+              alt="Perfil de Personaje"
+              class="screenshot"
+            />
+
+            <div class="indicator indicator-number" style="top: 90%; left: 15%">
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 86%; left: 10%">
+              👤 Imagen y Bio del Personaje
+            </div>
+
+            <div class="indicator indicator-number" style="top: 25%; right: 8%">
+              2
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 29%; right: 5%"
+            >
+              Haz clic para seguir/dejar de seguir
+            </div>
+
+            <div class="indicator indicator-number" style="top: 48%; left: 8%">
+              3
+            </div>
+            <div class="indicator indicator-label" style="top: 44%; left: 5%">
+              🧠 Trivia del Personaje
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 52%; left: 5%">
+              Añade datos curiosos y lee los de otros fans
+            </div>
+
+            <div
+              class="indicator indicator-number"
+              style="top: 90%; right: 15%"
+            >
+              4
+            </div>
+            <div class="indicator indicator-label" style="top: 86%; right: 10%">
+              💬 Muro de Comentarios Comunitario
+            </div>
+          </div>
+        </div>
+
+        <div class="action-list">
+          <h3 style="color: #ffd90f; margin-bottom: 1.5rem">
+            🎯 Acciones Disponibles:
+          </h3>
+          <div class="action-item">
+            <div class="action-number">1</div>
+            <div class="action-content">
+              <h4>Seguir Personaje</h4>
+              <p>
+                Haz clic en el botón "Follow" para seguir al personaje. El botón
+                cambiará a "Following".
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">2</div>
+            <div class="action-content">
+              <h4>Añadir Trivia</h4>
+              <p>
+                Escribe un dato curioso en el campo de texto y haz clic en
+                "Submit Fact" para compartirlo.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">3</div>
+            <div class="action-content">
+              <h4>Dejar Comentario</h4>
+              <p>
+                Escribe un mensaje en el área de texto del muro y presiona "Post
+                Comment" para publicarlo.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">4</div>
+            <div class="action-content">
+              <h4>Ver Comentarios</h4>
+              <p>
+                Lee los comentarios de la comunidad. Los más recientes aparecen
+                primero.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips-box">
+          <div class="tips-title">💡 Consejo Pro:</div>
+          <ul class="tips-list">
+            <li>Los comentarios muestran avatar, nombre de usuario y fecha</li>
+            <li>
+              Puedes seguir múltiples personajes para crear tu lista de
+              favoritos
+            </li>
+            <li>La trivia que compartes será visible para toda la comunidad</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Paso 4: Lista de Episodios -->
+      <div class="step" id="step4">
+        <div class="step-header">
+          <div class="step-number">4</div>
+          <h2 class="step-title">Rastreador de Episodios</h2>
+          <p class="step-description">
+            Explora los 768+ episodios de Los Simpson. Cada episodio incluye
+            póster, descripción completa y número de temporada.
+          </p>
+        </div>
+
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/04-episodes-page.png"
+              alt="Lista de Episodios"
+              class="screenshot"
+            />
+
+            <div class="indicator indicator-number" style="top: 32%; left: 8%">
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 28%; left: 5%">
+              📺 768+ Episodios Disponibles
+            </div>
+
+            <div class="indicator indicator-tooltip" style="top: 36%; left: 5%">
+              Póster grande del episodio
+            </div>
+
+            <div class="indicator indicator-number" style="top: 32%; right: 8%">
+              2
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 36%; right: 5%"
+            >
+              Título, temporada/episodio y sinopsis completa
+            </div>
+
+            <div
+              class="indicator indicator-arrow"
+              style="top: 75%; left: 50%; transform: translateX(-50%)"
+            >
+              ↓
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 80%; left: 50%; transform: translateX(-50%)"
+            >
+              Desplázate para ver más episodios
+            </div>
+          </div>
+        </div>
+
+        <div class="action-list">
+          <h3 style="color: #ffd90f; margin-bottom: 1.5rem">
+            🎯 Acciones Disponibles:
+          </h3>
+          <div class="action-item">
+            <div class="action-number">1</div>
+            <div class="action-content">
+              <h4>Explorar Episodios</h4>
+              <p>
+                Desplázate por la lista vertical para ver todos los episodios
+                disponibles de las 35+ temporadas.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">2</div>
+            <div class="action-content">
+              <h4>Ver Información</h4>
+              <p>
+                Cada tarjeta muestra el póster, título, temporada/episodio (S#
+                E#) y sinopsis completa.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">3</div>
+            <div class="action-content">
+              <h4>Seleccionar Episodio</h4>
+              <p>
+                Haz clic en cualquier episodio para acceder a la página de
+                seguimiento con calificaciones y notas.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips-box">
+          <div class="tips-title">💡 Consejo Pro:</div>
+          <ul class="tips-list">
+            <li>
+              Los episodios están organizados secuencialmente por fecha de
+              emisión
+            </li>
+            <li>Cada póster es una imagen de alta calidad del episodio</li>
+            <li>Las sinopsis son completas y sin spoilers importantes</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Paso 5: Detalle de Episodio -->
+      <div class="step" id="step5">
+        <div class="step-header">
+          <div class="step-number">5</div>
+          <h2 class="step-title">Rastrear Episodio</h2>
+          <p class="step-description">
+            Marca episodios como vistos, califícalos con estrellas y añade notas
+            personales sobre tus momentos favoritos.
+          </p>
+        </div>
+
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/05-episode-detail.png"
+              alt="Detalle de Episodio"
+              class="screenshot"
+            />
+
+            <div
+              class="indicator indicator-number"
+              style="top: 33%; right: 15%"
+            >
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 29%; right: 10%">
+              ⭐ Califica con Estrellas (1-5)
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 37%; right: 10%"
+            >
+              Haz clic en cualquier estrella para dar tu calificación
+            </div>
+
+            <div
+              class="indicator indicator-number"
+              style="top: 48%; right: 15%"
+            >
+              2
+            </div>
+            <div class="indicator indicator-label" style="top: 44%; right: 10%">
+              📝 Añade Tus Notas
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 52%; right: 10%"
+            >
+              "What did you think?" - Escribe tus pensamientos
+            </div>
+
+            <div
+              class="indicator indicator-number"
+              style="top: 62%; right: 15%"
+            >
+              3
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 66%; right: 10%"
+            >
+              Botón "Save Progress" para guardar todo
+            </div>
+          </div>
+        </div>
+
+        <div class="action-list">
+          <h3 style="color: #ffd90f; margin-bottom: 1.5rem">
+            🎯 Acciones Disponibles:
+          </h3>
+          <div class="action-item">
+            <div class="action-number">1</div>
+            <div class="action-content">
+              <h4>Calificar Episodio</h4>
+              <p>
+                Haz clic en las estrellas (1-5) para calificar el episodio según
+                tu experiencia.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">2</div>
+            <div class="action-content">
+              <h4>Escribir Notas</h4>
+              <p>
+                Usa el área de texto "What did you think?" para guardar tus
+                pensamientos sobre el episodio.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">3</div>
+            <div class="action-content">
+              <h4>Guardar Progreso</h4>
+              <p>
+                Presiona "Save Progress" para almacenar tu calificación y notas
+                en tu perfil.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">4</div>
+            <div class="action-content">
+              <h4>Añadir Trivia</h4>
+              <p>
+                Comparte datos curiosos sobre el episodio usando el formulario
+                "Did You Know?".
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips-box">
+          <div class="tips-title">💡 Consejo Pro:</div>
+          <ul class="tips-list">
+            <li>
+              Tus calificaciones y notas se guardan automáticamente en la base
+              de datos
+            </li>
+            <li>Puedes editar tus notas visitando el episodio nuevamente</li>
+            <li>
+              Las estrellas son interactivas: haz clic en cualquiera para
+              seleccionar
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Paso 6: Colecciones -->
+      <div class="step" id="step6">
+        <div class="step-header">
+          <div class="step-number">6</div>
+          <h2 class="step-title">Colecciones de Frases</h2>
+          <p class="step-description">
+            Crea colecciones personalizadas de tus frases favoritas. Organízalas
+            por personaje, temporada o tema.
+          </p>
+        </div>
+
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/06-collections-page.png"
+              alt="Colecciones"
+              class="screenshot"
+            />
+
+            <div class="indicator indicator-number" style="top: 32%; left: 12%">
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 28%; left: 8%">
+              🎭 Crear Nueva Colección
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 52%; left: 5%">
+              Nombre y descripción personalizados
+            </div>
+
+            <div
+              class="indicator indicator-number"
+              style="top: 32%; right: 12%"
+            >
+              2
+            </div>
+            <div class="indicator indicator-label" style="top: 28%; right: 8%">
+              📜 Colecciones Existentes
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 42%; right: 5%"
+            >
+              Haz clic en "View Quotes" para ver las frases
+            </div>
+          </div>
+        </div>
+
+        <div class="action-list">
+          <h3 style="color: #ffd90f; margin-bottom: 1.5rem">
+            🎯 Acciones Disponibles:
+          </h3>
+          <div class="action-item">
+            <div class="action-number">1</div>
+            <div class="action-content">
+              <h4>Crear Colección</h4>
+              <p>
+                Inicia una nueva colección con un nombre personalizado como
+                "Homer's Wisdom" o "Ralph-isms".
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">2</div>
+            <div class="action-content">
+              <h4>Añadir Frases</h4>
+              <p>
+                Agrega citas memorables de episodios o personajes a tus
+                colecciones.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">3</div>
+            <div class="action-content">
+              <h4>Organizar por Tema</h4>
+              <p>
+                Crea colecciones temáticas: por personaje, por temporada, o por
+                tipo de humor.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips-box">
+          <div class="tips-title">💡 Consejo Pro:</div>
+          <ul class="tips-list">
+            <li>No hay límite en el número de colecciones que puedes crear</li>
+            <li>
+              Puedes reorganizar y editar tus colecciones en cualquier momento
+            </li>
+            <li>
+              Incluye el contexto de la frase para recordar mejor el momento
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Paso 7: Diario de Springfield -->
+      <div class="step" id="step7">
+        <div class="step-header">
+          <div class="step-number">7</div>
+          <h2 class="step-title">Diario de Springfield</h2>
+          <p class="step-description">
+            Documenta tu viaje ficticio por Springfield. Escribe entradas de
+            diario sobre visitas a lugares icónicos.
+          </p>
+        </div>
+
+        <div class="screenshot-wrapper">
+          <div class="screenshot-container">
+            <img
+              src="screenshots/07-diary-page.png"
+              alt="Diario"
+              class="screenshot"
+            />
+
+            <div class="indicator indicator-number" style="top: 28%; left: 12%">
+              1
+            </div>
+            <div class="indicator indicator-label" style="top: 24%; left: 8%">
+              ✍️ Log a New Memory
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 50%; left: 5%">
+              Selecciona personaje, ubicación y escribe qué pasó
+            </div>
+
+            <div class="indicator indicator-number" style="top: 36%; left: 15%">
+              2
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 40%; left: 5%">
+              👤 ¿Con quién estuviste?
+            </div>
+
+            <div class="indicator indicator-number" style="top: 48%; left: 15%">
+              3
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 52%; left: 5%">
+              📍 ¿Dónde estuviste?
+            </div>
+
+            <div class="indicator indicator-number" style="top: 60%; left: 15%">
+              4
+            </div>
+            <div class="indicator indicator-tooltip" style="top: 64%; left: 5%">
+              📝 ¿Qué sucedió?
+            </div>
+
+            <div
+              class="indicator indicator-number"
+              style="top: 28%; right: 12%"
+            >
+              5
+            </div>
+            <div class="indicator indicator-label" style="top: 24%; right: 8%">
+              📅 Your Timeline
+            </div>
+            <div
+              class="indicator indicator-tooltip"
+              style="top: 48%; right: 5%"
+            >
+              Historial de tus entradas de diario
+            </div>
+          </div>
+        </div>
+
+        <div class="action-list">
+          <h3 style="color: #ffd90f; margin-bottom: 1.5rem">
+            🎯 Acciones Disponibles:
+          </h3>
+          <div class="action-item">
+            <div class="action-number">1</div>
+            <div class="action-content">
+              <h4>Nueva Entrada</h4>
+              <p>
+                Crea una entrada de diario simulando una experiencia en
+                Springfield.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">2</div>
+            <div class="action-content">
+              <h4>Seleccionar Ubicación</h4>
+              <p>
+                Elige un lugar icónico: Moe's Tavern, Kwik-E-Mart, Planta
+                Nuclear, etc.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">3</div>
+            <div class="action-content">
+              <h4>Etiquetar Personajes</h4>
+              <p>
+                Indica con qué personajes "interactuaste" en tu entrada
+                ficticia.
+              </p>
+            </div>
+          </div>
+          <div class="action-item">
+            <div class="action-number">4</div>
+            <div class="action-content">
+              <h4>Ver Timeline</h4>
+              <p>
+                Revisa tu línea temporal de aventuras en Springfield en orden
+                cronológico.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips-box">
+          <div class="tips-title">💡 Ejemplo de Entrada:</div>
+          <ul class="tips-list">
+            <li>
+              "Tomé una cerveza en Moe's con Barney y hablamos sobre el último
+              desastre de Homer"
+            </li>
+            <li>
+              "Compré un Squishee en el Kwik-E-Mart mientras Apu me contaba una
+              historia"
+            </li>
+            <li>
+              "Presencié otro cuasi-accidente en la Planta Nuclear. ¡D'oh!"
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Paso Final -->
+      <div class="step" id="step8">
+        <div class="step-header">
+          <div class="step-number">✓</div>
+          <h2 class="step-title">¡Tour Completado!</h2>
+          <p class="step-description">
+            Ya conoces todas las funciones principales de Springfield Life.
+            ¡Hora de explorar por tu cuenta!
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🎓</div>
+            <div class="feature-title">Ahora Sabes Cómo:</div>
+            <div class="feature-text">
+              <ul style="text-align: left; margin-top: 1rem">
+                <li>✓ Navegar por la aplicación</li>
+                <li>✓ Seguir personajes</li>
+                <li>✓ Rastrear episodios</li>
+                <li>✓ Dejar comentarios</li>
+                <li>✓ Compartir trivia</li>
+                <li>✓ Crear colecciones</li>
+                <li>✓ Escribir en el diario</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <div class="feature-title">Próximos Pasos</div>
+            <div class="feature-text">
+              <ul style="text-align: left; margin-top: 1rem">
+                <li>Marca tus episodios favoritos</li>
+                <li>Sigue a la familia Simpson</li>
+                <li>Crea tu primera colección</li>
+                <li>Comparte datos curiosos</li>
+                <li>Escribe tu primera entrada de diario</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <div class="feature-title">Consejos Finales</div>
+            <div class="feature-text">
+              <ul style="text-align: left; margin-top: 1rem">
+                <li>Sincroniza datos regularmente</li>
+                <li>Explora todos los personajes</li>
+                <li>Lee comentarios de la comunidad</li>
+                <li>Califica honestamente</li>
+                <li>¡Diviértete explorando!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem">
+          <a
+            href="https://thesimpsonsapi-nu.vercel.app"
+            target="_blank"
+            style="text-decoration: none"
+          >
+            <button class="start-btn">🍩 Ir a Springfield Life →</button>
+          </a>
+          <p style="margin-top: 1.5rem; color: #666">
+            ¿Necesitas repasar algo?
+            <button
+              onclick="currentStep=0; showStep()"
+              style="
+                background: none;
+                border: none;
+                color: #ffd90f;
+                cursor: pointer;
+                text-decoration: underline;
+              "
+            >
+              Reiniciar tour
+            </button>
+          </p>
+        </div>
+      </div>
+
+      <!-- Navegación -->
+      <div class="navigation">
+        <button class="btn btn-secondary" id="prevBtn" onclick="prevStep()">
+          ← Anterior
+        </button>
+
+        <div class="step-counter" id="stepCounter">Paso 0 de 8</div>
+
+        <button class="btn" id="nextBtn" onclick="nextStep()">
+          Siguiente →
+        </button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>
+        © 2025-2026 Springfield Life. Creado por
+        <a href="https://webcode.es" target="_blank">webcode.es</a>
+      </p>
+      <p style="margin-top: 0.5rem">
+        <a href="https://github.com/JordiNodeJS/thesimpsonsapi" target="_blank"
+          >GitHub</a
+        >
+        •
+        <a href="https://thesimpsonsapi-nu.vercel.app" target="_blank"
+          >App en Vivo</a
+        >
+        •
+        <a href="USER_GUIDE.md" target="_blank">Documentación</a>
+      </p>
+      <p style="margin-top: 1rem; font-size: 2rem">🍩</p>
+    </div>
+
+    <script>
+      let currentStep = 0;
+      const totalSteps = 8;
+      let resizeTimer;
+      let indicatorConfigs = new Map();
+
+      /**
+       * Sistema mejorado de posicionamiento de indicadores
+       * Usa coordenadas normalizadas (0-1) basadas en el tamaño REAL de la imagen
+       */
+      function initializeIndicators() {
+        const containers = document.querySelectorAll(".screenshot-container");
+
+        containers.forEach((container, containerIndex) => {
+          const img = container.querySelector(".screenshot");
+          const indicators = container.querySelectorAll(".indicator");
+
+          if (!img || indicators.length === 0) return;
+
+          // Esperar a que la imagen cargue completamente
+          const processIndicators = () => {
+            if (!img.complete || img.naturalWidth === 0) {
+              img.addEventListener("load", processIndicators, { once: true });
+              return;
+            }
+
+            const imgWidth = img.naturalWidth;
+            const imgHeight = img.naturalHeight;
+
+            indicators.forEach((indicator, indicatorIndex) => {
+              const key = `${containerIndex}-${indicatorIndex}`;
+              const style = indicator.getAttribute("style") || "";
+
+              // Convertir porcentajes CSS a coordenadas normalizadas (0-1)
+              const config = {
+                element: indicator,
+                container: container,
+                // Coordenadas normalizadas basadas en los porcentajes actuales
+                x: parsePercentage(style.match(/left:\s*([^;%]+)%/)?.[1]),
+                y: parsePercentage(style.match(/top:\s*([^;%]+)%/)?.[1]),
+                xFromRight: parsePercentage(
+                  style.match(/right:\s*([^;%]+)%/)?.[1]
+                ),
+                yFromBottom: parsePercentage(
+                  style.match(/bottom:\s*([^;%]+)%/)?.[1]
+                ),
+                transform:
+                  style.match(/transform:\s*([^;]+)/)?.[1]?.trim() || "",
+                originalStyle: style,
+              };
+
+              indicatorConfigs.set(key, config);
+            });
+
+            updateIndicatorPositions();
+          };
+
+          processIndicators();
+        });
+      }
+
+      function parsePercentage(value) {
+        if (value === undefined || value === null) return null;
+        const num = parseFloat(value);
+        return isNaN(num) ? null : num / 100; // Convertir a 0-1
+      }
+
+      function updateIndicatorPositions() {
+        indicatorConfigs.forEach((config, key) => {
+          const {
+            element,
+            container,
+            x,
+            y,
+            xFromRight,
+            yFromBottom,
+            transform,
+          } = config;
+          const img = container.querySelector(".screenshot");
+
+          if (!img || !img.complete) return;
+
+          // Obtener dimensiones ACTUALES de la imagen renderizada
+          const rect = img.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+
+          // Construir estilos con las posiciones actualizadas
+          let styles = [];
+
+          if (y !== null) {
+            styles.push(`top: ${y * 100}%`);
+          }
+          if (yFromBottom !== null) {
+            styles.push(`bottom: ${yFromBottom * 100}%`);
+          }
+          if (x !== null) {
+            styles.push(`left: ${x * 100}%`);
+          }
+          if (xFromRight !== null) {
+            styles.push(`right: ${xFromRight * 100}%`);
+          }
+          if (transform) {
+            styles.push(`transform: ${transform}`);
+          }
+
+          element.setAttribute("style", styles.join("; "));
+        });
+      }
+
+      // Recalcular posiciones cuando se redimensiona la ventana
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          updateIndicatorPositions();
+        }, 100); // Debounce de 100ms para respuesta más rápida
+      });
+
+      // Inicializar cuando la página se carga
+      window.addEventListener("load", () => {
+        initializeIndicators();
+      });
+
+      // También inicializar cuando el DOM está listo
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initializeIndicators);
+      } else {
+        initializeIndicators();
+      }
+
+      // Re-inicializar indicadores cuando cambia de paso
+      function showStep() {
+        // Ocultar todos los pasos
+        document.querySelectorAll(".step").forEach((step) => {
+          step.classList.remove("active");
+        });
+
+        // Mostrar paso actual
+        document.getElementById("step" + currentStep).classList.add("active");
+
+        // Actualizar barra de progreso
+        const progress = (currentStep / totalSteps) * 100;
+        document.getElementById("progressBar").style.width = progress + "%";
+
+        // Actualizar contador
+        document.getElementById("stepCounter").textContent =
+          currentStep === 0
+            ? "Inicio"
+            : currentStep === totalSteps
+            ? "Completado"
+            : `Paso ${currentStep} de ${totalSteps}`;
+
+        // Actualizar botones
+        document.getElementById("prevBtn").disabled = currentStep === 0;
+        document.getElementById("nextBtn").disabled =
+          currentStep === totalSteps;
+
+        if (currentStep === totalSteps) {
+          document.getElementById("nextBtn").textContent = "✓ Finalizado";
+        } else if (currentStep === 0) {
+          document.getElementById("nextBtn").textContent = "Comenzar →";
+        } else {
+          document.getElementById("nextBtn").textContent = "Siguiente →";
+        }
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        // Re-inicializar indicadores para el nuevo paso
+        setTimeout(() => {
+          initializeIndicators();
+        }, 150);
+      }
+
+      function nextStep() {
+        if (currentStep < totalSteps) {
+          currentStep++;
+          showStep();
+        }
+      }
+
+      function prevStep() {
+        if (currentStep > 0) {
+          currentStep--;
+          showStep();
+        }
+      }
+
+      // Soporte de teclado
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") nextStep();
+        if (e.key === "ArrowLeft") prevStep();
+      });
+
+      // Inicializar
+      showStep();
+    </script>
+  </body>
+</html>
