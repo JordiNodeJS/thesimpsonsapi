@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 
 /**
  * Proxy para proteger rutas que requieren autenticación.
- * 
+ *
  * NOTA: En Next.js 16, middleware.ts ha sido renombrado a proxy.ts
  * para clarificar su propósito y evitar confusión con Express.js middleware.
  *

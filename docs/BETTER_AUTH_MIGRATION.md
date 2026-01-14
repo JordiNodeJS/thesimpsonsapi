@@ -167,6 +167,7 @@ All functions with `userId` parameters changed from `number` to `string`:
 **NOTA IMPORTANTE**: En Next.js 16, `middleware.ts` ha sido renombrado a `proxy.ts`.
 
 Creamos dos archivos:
+
 - [middleware.ts](middleware.ts) - Versión legacy (deprecated)
 - [proxy.ts](proxy.ts) - Nueva convención de Next.js 16 ✅ **Recomendado**
 
@@ -199,6 +200,7 @@ export async function proxy(request: NextRequest) {
 ```
 
 **Migración**: Next.js 16 proporciona un codemod:
+
 ```bash
 npx @next/codemod@canary middleware-to-proxy .
 ```
@@ -297,6 +299,7 @@ chmod +x scripts/setup-vercel-env.sh
 ```
 
 El script configura automáticamente:
+
 - `NEXT_PUBLIC_APP_URL=https://thesimpson.webcode.es`
 - `BETTER_AUTH_URL=https://thesimpson.webcode.es`
 - `BETTER_AUTH_SECRET` (generado automáticamente)
@@ -331,6 +334,7 @@ Ver más detalles en [.github/skills/vercel-cli-management/SKILL.md](.github/ski
 **Status**: ✅ Ya aplicada al main branch
 
 Las siguientes tablas fueron creadas:
+
 - `the_simpson.session`
 - `the_simpson.account`
 - `the_simpson.verification`
