@@ -1,21 +1,26 @@
 # Better Auth Migration - Implementation Summary
 
 ## Overview
+
 Successfully migrated from mock authentication (hardcoded "SimpsonsFan" user) to **Better Auth** with full email/password authentication, session management, and route protection.
 
 ## What Was Changed
 
 ### 1. Dependencies Added
+
 - ✅ `better-auth@1.4.12` - Main authentication library
 - ✅ `bcryptjs@3.0.3` - Password hashing
 
 ### 2. Database Schema Migration
+
 Created Better Auth tables in `the_simpson` schema:
+
 - ✅ `session` - User sessions with token management
 - ✅ `account` - Provider accounts (email/password initially)
 - ✅ `verification` - Email verification tokens
 
 Updated `users` table:
+
 - ✅ Added `email_verified` (BOOLEAN)
 - ✅ Added `image` (TEXT)
 - ✅ Added `created_at` (TIMESTAMP)
@@ -27,6 +32,7 @@ Updated `users` table:
 ### 3. Authentication Configuration
 
 #### Server-Side ([lib/auth.ts](lib/auth.ts))
+
 ```typescript
 import { betterAuth } from "better-auth";
 import { Pool } from "@neondatabase/serverless";
@@ -40,6 +46,7 @@ export const auth = betterAuth({
 ```
 
 #### Client-Side ([lib/auth-client.ts](lib/auth-client.ts))
+
 ```typescript
 import { createAuthClient } from "better-auth/react";
 
@@ -49,6 +56,7 @@ export const authClient = createAuthClient({
 ```
 
 #### API Routes ([app/api/auth/[...all]/route.ts](app/api/auth/[...all]/route.ts))
+
 ```typescript
 import { auth } from "@/lib/auth";
 import { toNextJsHandler } from "better-auth/next-js";
@@ -56,9 +64,10 @@ import { toNextJsHandler } from "better-auth/next-js";
 export const { POST, GET } = toNextJsHandler(auth);
 ```
 
-### 4. Updated getCurrentUser() ([app/_lib/auth.ts](app/_lib/auth.ts))
+### 4. Updated getCurrentUser() ([app/\_lib/auth.ts](app/_lib/auth.ts))
 
 **Before:**
+
 ```typescript
 export async function getCurrentUser(): Promise<DBUser> {
   const username = "SimpsonsFan";
@@ -72,10 +81,11 @@ export async function getCurrentUser(): Promise<DBUser> {
 ```
 
 **After:**
+
 ```typescript
 export async function getCurrentUser(): Promise<DBUser> {
   const session = await auth.api.getSession({ headers: await headers() });
-  
+
   if (!session?.user) {
     throw new Error("Unauthorized: No active session");
   }
@@ -91,12 +101,13 @@ export async function getCurrentUser(): Promise<DBUser> {
 }
 ```
 
-### 5. Type Updates ([app/_lib/db-types.ts](app/_lib/db-types.ts))
+### 5. Type Updates ([app/\_lib/db-types.ts](app/_lib/db-types.ts))
 
 **DBUser interface:**
+
 ```typescript
 export interface DBUser extends QueryResultRow {
-  id: string;              // Changed from number to string (UUID)
+  id: string; // Changed from number to string (UUID)
   username: string;
   email: string | null;
   email_verified: boolean | null;
@@ -107,14 +118,17 @@ export interface DBUser extends QueryResultRow {
 ```
 
 **All user_id foreign keys updated to string:**
+
 - `DBComment.user_id: string`
 - `DBTriviaFact.submitted_by_user_id: string`
 - `DBDiaryEntry.user_id: string`
 - `DBEpisodeProgress.user_id: string`
 - `DBQuoteCollection.user_id: string`
 
-### 6. Repository Functions Updated ([app/_lib/repositories.ts](app/_lib/repositories.ts))
+### 6. Repository Functions Updated ([app/\_lib/repositories.ts](app/_lib/repositories.ts))
+
 All functions with `userId` parameters changed from `number` to `string`:
+
 - ✅ `findDiaryEntriesByUser(userId: string)`
 - ✅ `findEpisodeProgressByUser(userId: string, episodeId: number)`
 - ✅ `findCollectionsByUser(userId: string)`
@@ -123,36 +137,52 @@ All functions with `userId` parameters changed from `number` to `string`:
 ### 7. UI Components Created
 
 #### Login Page ([app/login/page.tsx](app/login/page.tsx))
+
 - Email/password sign-in form
 - Error handling
 - Link to registration
 - Uses `authClient.signIn.email()`
 
 #### Register Page ([app/register/page.tsx](app/register/page.tsx))
+
 - Email/password/username sign-up form
 - Password validation (min 8 chars)
 - Error handling
 - Uses `authClient.signUp.email()`
 
-#### UserNav Component ([app/_components/UserNav.tsx](app/_components/UserNav.tsx))
+#### UserNav Component ([app/\_components/UserNav.tsx](app/_components/UserNav.tsx))
+
 - Displays user avatar and name
 - Dropdown menu with sign-out
 - Shows sign-in/sign-up buttons when not authenticated
 - Uses `useSession()` hook from Better Auth
 
-#### Updated SimpsonsHeader ([app/_components/SimpsonsHeader.tsx](app/_components/SimpsonsHeader.tsx))
+#### Updated SimpsonsHeader ([app/\_components/SimpsonsHeader.tsx](app/_components/SimpsonsHeader.tsx))
+
 - Integrated `<UserNav />` component
 - Displayed on desktop (hidden on mobile for now)
 
-### 8. Route Protection ([middleware.ts](middleware.ts))
+### 8. Route Protection
+
+**NOTA IMPORTANTE**: En Next.js 16, `middleware.ts` ha sido renombrado a `proxy.ts`.
+
+Creamos dos archivos:
+- [middleware.ts](middleware.ts) - Versión legacy (deprecated)
+- [proxy.ts](proxy.ts) - Nueva convención de Next.js 16 ✅ **Recomendado**
+
 ```typescript
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const session = await auth.api.getSession({ headers: request.headers });
   const isAuthenticated = !!session?.user;
 
   // Protected routes
-  const protectedPaths = ["/diary", "/collections", "/episodes/", "/characters/"];
-  
+  const protectedPaths = [
+    "/diary",
+    "/collections",
+    "/episodes/",
+    "/characters/",
+  ];
+
   if (isProtectedRoute && !isAuthenticated) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
@@ -168,13 +198,22 @@ export async function middleware(request: NextRequest) {
 }
 ```
 
+**Migración**: Next.js 16 proporciona un codemod:
+```bash
+npx @next/codemod@canary middleware-to-proxy .
+```
+
 **Protected routes:**
+
 - ✅ `/diary` - Personal diary entries
 - ✅ `/collections` - Quote collections
 - ✅ `/episodes/[id]` - Episode ratings/notes
 - ✅ `/characters/[id]` - Comments/follows
 
+Ver más detalles en [.github/skills/nextjs16-proxy-middleware/SKILL.md](.github/skills/nextjs16-proxy-middleware/SKILL.md)
+
 ### 9. Environment Variables ([.env.example](.env.example))
+
 ```env
 DATABASE_URL=postgresql://username:password@host/database
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -185,11 +224,12 @@ BETTER_AUTH_URL=http://localhost:3000
 ## Server Actions Status
 
 All 14 server actions across 5 files are compatible with the new auth system:
-- ✅ [app/_actions/collections.ts](app/_actions/collections.ts) - 3 actions
-- ✅ [app/_actions/diary.ts](app/_actions/diary.ts) - 3 actions
-- ✅ [app/_actions/episodes.ts](app/_actions/episodes.ts) - 2 actions
-- ✅ [app/_actions/social.ts](app/_actions/social.ts) - 3 actions
-- ✅ [app/_actions/trivia.ts](app/_actions/trivia.ts) - 1 action
+
+- ✅ [app/\_actions/collections.ts](app/_actions/collections.ts) - 3 actions
+- ✅ [app/\_actions/diary.ts](app/_actions/diary.ts) - 3 actions
+- ✅ [app/\_actions/episodes.ts](app/_actions/episodes.ts) - 2 actions
+- ✅ [app/\_actions/social.ts](app/_actions/social.ts) - 3 actions
+- ✅ [app/\_actions/trivia.ts](app/_actions/trivia.ts) - 1 action
 
 All actions call `getCurrentUser()` which now validates Better Auth sessions.
 
@@ -198,6 +238,7 @@ All actions call `getCurrentUser()` which now validates Better Auth sessions.
 Before merging to main:
 
 ### Authentication Flow
+
 - [ ] Visit `/login` and sign in with existing user
 - [ ] Visit `/register` and create a new account
 - [ ] Verify sign-out functionality
@@ -205,6 +246,7 @@ Before merging to main:
 - [ ] Verify redirect to callback URL after login
 
 ### Protected Routes
+
 - [ ] Try accessing `/diary` without authentication → should redirect to `/login`
 - [ ] Try accessing `/collections` without authentication → should redirect to `/login`
 - [ ] Try accessing `/episodes/1` without authentication → should redirect to `/login`
@@ -212,6 +254,7 @@ Before merging to main:
 - [ ] Verify authenticated users can access all protected routes
 
 ### UI/UX
+
 - [ ] UserNav component displays correctly in header
 - [ ] Avatar shows user initials or image
 - [ ] Sign-in/Sign-up buttons appear when not authenticated
@@ -219,6 +262,7 @@ Before merging to main:
 - [ ] Mobile responsiveness (UserNav hidden on small screens)
 
 ### Server Actions
+
 - [ ] Create diary entry (requires auth)
 - [ ] Create collection (requires auth)
 - [ ] Rate episode (requires auth)
@@ -227,39 +271,105 @@ Before merging to main:
 - [ ] Submit trivia (requires auth)
 
 ### Data Migration
+
 - [ ] Verify "SimpsonsFan" user exists with email `demo@simpsonsapi.com`
 - [ ] Check that existing data is still accessible
 - [ ] Confirm new users can create data
 
 ### Database
+
 - [ ] Verify Better Auth tables created: `session`, `account`, `verification`
 - [ ] Check users table has new columns: `email_verified`, `image`, `created_at`, `updated_at`
 - [ ] Confirm all user_id foreign keys are TEXT (UUID)
 
 ## Deployment Steps
 
-1. **Update environment variables** in production:
-   ```bash
-   BETTER_AUTH_SECRET=$(openssl rand -base64 32)
-   NEXT_PUBLIC_APP_URL=https://your-production-url.com
-   BETTER_AUTH_URL=https://your-production-url.com
-   ```
+### 1. Configurar Variables de Entorno en Vercel
 
-2. **Database migration** already applied to main branch ✅
+**Dominio de producción**: https://thesimpson.webcode.es
 
-3. **Deploy application** with new Better Auth code
+#### Opción A: Script Automático (Recomendado)
 
-4. **Create admin user** (if needed):
-   ```sql
-   INSERT INTO the_simpson.users (username, email, email_verified)
-   VALUES ('admin', 'admin@simpsonsapi.com', TRUE);
-   ```
+```bash
+# Ejecutar script de configuración
+chmod +x scripts/setup-vercel-env.sh
+./scripts/setup-vercel-env.sh
+```
+
+El script configura automáticamente:
+- `NEXT_PUBLIC_APP_URL=https://thesimpson.webcode.es`
+- `BETTER_AUTH_URL=https://thesimpson.webcode.es`
+- `BETTER_AUTH_SECRET` (generado automáticamente)
+- `DATABASE_URL` (si está en el ambiente)
+
+#### Opción B: Configuración Manual con Vercel CLI
+
+```bash
+# Instalar Vercel CLI
+pnpm add -g vercel
+
+# Login
+vercel login
+
+# Link proyecto
+vercel link
+
+# Agregar variables de entorno
+echo "https://thesimpson.webcode.es" | vercel env add NEXT_PUBLIC_APP_URL production
+echo "https://thesimpson.webcode.es" | vercel env add BETTER_AUTH_URL production
+echo "$(openssl rand -base64 32)" | vercel env add BETTER_AUTH_SECRET production
+echo "postgresql://..." | vercel env add DATABASE_URL production
+
+# Verificar
+vercel env ls
+```
+
+Ver más detalles en [.github/skills/vercel-cli-management/SKILL.md](.github/skills/vercel-cli-management/SKILL.md)
+
+### 2. Database Migration
+
+**Status**: ✅ Ya aplicada al main branch
+
+Las siguientes tablas fueron creadas:
+- `the_simpson.session`
+- `the_simpson.account`
+- `the_simpson.verification`
+
+La tabla `users` fue actualizada con campos de Better Auth.
+
+### 3. Deploy Application
+
+```bash
+# Deploy a preview primero (testing)
+vercel
+
+# Después de testing, deploy a production
+vercel --prod
+```
+
+### 4. Configurar Dominio (Si aún no está configurado)
+
+```bash
+# Agregar dominio
+vercel domains add thesimpson.webcode.es
+
+# Asignar al proyecto
+vercel alias set <deployment-url> thesimpson.webcode.es
+```
+
+### 5. Crear Admin User (Opcional)
+
+```sql
+INSERT INTO the_simpson.users (username, email, email_verified)
+VALUES ('admin', 'admin@simpsonsapi.com', TRUE);
+```
 
 ## Future Enhancements
 
 Consider implementing:
 
 1. **OAuth Providers** - Google, GitHub, Discord login
+
    ```typescript
    export const auth = betterAuth({
      // ... existing config
@@ -271,6 +381,7 @@ Consider implementing:
    ```
 
 2. **Email Verification** - Enable email confirmation for new accounts
+
    ```typescript
    emailAndPassword: {
      enabled: true,
@@ -287,6 +398,7 @@ Consider implementing:
 ## Breaking Changes
 
 ⚠️ **User IDs changed from INTEGER to TEXT (UUID)**
+
 - This is already reflected in the database
 - All code has been updated to use `string` for user IDs
 - No data migration needed (database was already using TEXT)
@@ -294,6 +406,7 @@ Consider implementing:
 ## Migration Success ✅
 
 All tasks completed successfully:
+
 1. ✅ Created `feature/better-auth` branch
 2. ✅ Installed Better Auth dependencies
 3. ✅ Configured Better Auth

@@ -6,7 +6,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -22,18 +28,21 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await authClient.signIn.email({
-        email,
-        password,
-      }, {
-        onSuccess: () => {
-          router.push("/");
-          router.refresh();
+      await authClient.signIn.email(
+        {
+          email,
+          password,
         },
-        onError: (ctx) => {
-          setError(ctx.error.message || "Failed to sign in");
-        },
-      });
+        {
+          onSuccess: () => {
+            router.push("/");
+            router.refresh();
+          },
+          onError: (ctx) => {
+            setError(ctx.error.message || "Failed to sign in");
+          },
+        }
+      );
     } finally {
       setLoading(false);
     }
@@ -43,7 +52,9 @@ export default function LoginPage() {
     <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-screen">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Welcome Back!</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">
+            Welcome Back!
+          </CardTitle>
           <CardDescription className="text-center">
             Sign in to your Simpsons API account
           </CardDescription>

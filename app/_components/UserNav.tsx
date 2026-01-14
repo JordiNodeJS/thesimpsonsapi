@@ -34,19 +34,20 @@ export function UserNav() {
           </Button>
         </Link>
         <Link href="/register">
-          <Button size="sm">
-            Sign Up
-          </Button>
+          <Button size="sm">Sign Up</Button>
         </Link>
       </div>
     );
   }
 
-  const initials = session.user?.name
-    ?.split(" ")
-    .map((n: string) => n[0])
-    .join("")
-    .toUpperCase() || session.user?.email?.[0]?.toUpperCase() || "U";
+  const initials =
+    session.user?.name
+      ?.split(" ")
+      .map((n: string) => n[0])
+      .join("")
+      .toUpperCase() ||
+    session.user?.email?.[0]?.toUpperCase() ||
+    "U";
 
   return (
     <div className="flex items-center gap-3">
@@ -57,15 +58,22 @@ export function UserNav() {
       </div>
       <div className="relative group">
         <Avatar className="h-9 w-9 border-2 border-white shadow-lg cursor-pointer">
-          <AvatarImage src={session.user?.image || undefined} alt={session.user?.name || "User"} />
+          <AvatarImage
+            src={session.user?.image || undefined}
+            alt={session.user?.name || "User"}
+          />
           <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold">
             {initials}
           </AvatarFallback>
         </Avatar>
         <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-200">
           <div className="p-3 border-b border-gray-100">
-            <p className="text-sm font-medium text-gray-900">{session.user?.name || "User"}</p>
-            <p className="text-xs text-gray-500 truncate">{session.user?.email}</p>
+            <p className="text-sm font-medium text-gray-900">
+              {session.user?.name || "User"}
+            </p>
+            <p className="text-xs text-gray-500 truncate">
+              {session.user?.email}
+            </p>
           </div>
           <button
             onClick={handleSignOut}

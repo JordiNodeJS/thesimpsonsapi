@@ -2,7 +2,7 @@ import { createAuthClient } from "better-auth/react";
 
 /**
  * Client-side Better Auth instance
- * 
+ *
  * Use this in client components for authentication actions:
  * - authClient.signIn.email()
  * - authClient.signUp.email()

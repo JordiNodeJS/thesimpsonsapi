@@ -6,7 +6,7 @@ import type { DBUser } from "@/app/_lib/db-types";
 
 /**
  * Obtiene el usuario autenticado actual desde la sesión de Better Auth.
- * 
+ *
  * @throws Error si no hay sesión activa o el usuario no existe en la BD
  * @returns DBUser - El usuario autenticado
  */
@@ -37,7 +37,7 @@ export async function getCurrentUser(): Promise<DBUser> {
 /**
  * Verifica si hay un usuario autenticado sin lanzar error.
  * Útil para componentes que funcionan con/sin autenticación.
- * 
+ *
  * @returns DBUser | null
  */
 export async function getCurrentUserOptional(): Promise<DBUser | null> {

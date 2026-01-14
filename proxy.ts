@@ -3,7 +3,10 @@ import type { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 
 /**
- * Middleware para proteger rutas que requieren autenticación.
+ * Proxy para proteger rutas que requieren autenticación.
+ * 
+ * NOTA: En Next.js 16, middleware.ts ha sido renombrado a proxy.ts
+ * para clarificar su propósito y evitar confusión con Express.js middleware.
  *
  * Rutas protegidas:
  * - /diary - Diario personal del usuario
@@ -13,7 +16,7 @@ import { auth } from "@/lib/auth";
  *
  * Si el usuario no está autenticado, redirige a /login con el callbackUrl.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const session = await auth.api.getSession({
     headers: request.headers,
   });

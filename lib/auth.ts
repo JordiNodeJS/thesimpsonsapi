@@ -3,7 +3,7 @@ import { Pool } from "@neondatabase/serverless";
 
 /**
  * Better Auth configuration for The Simpsons API
- * 
+ *
  * Uses Neon PostgreSQL for session storage and user authentication.
  * Configured with email/password authentication initially.
  */

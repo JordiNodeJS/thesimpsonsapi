@@ -3,7 +3,7 @@ import { toNextJsHandler } from "better-auth/next-js";
 
 /**
  * Better Auth API route handler
- * 
+ *
  * Handles all authentication endpoints:
  * - POST /api/auth/sign-up
  * - POST /api/auth/sign-in
