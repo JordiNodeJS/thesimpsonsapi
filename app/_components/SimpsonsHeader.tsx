@@ -2,6 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
+import { UserNav } from "./UserNav";
 
 const CLOUDS_COUNT = 4;
 
@@ -274,7 +275,7 @@ export default function SimpsonsHeader() {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 h-full flex items-center relative z-10">
+      <div className="container mx-auto px-4 h-full flex items-center justify-between relative z-10">
         <div className="flex flex-col max-w-[60%] sm:max-w-none">
           <h1
             className="text-white font-black text-3xl sm:text-4xl md:text-5xl italic tracking-tighter uppercase transform -rotate-2 origin-left drop-shadow-lg"
@@ -290,6 +291,11 @@ export default function SimpsonsHeader() {
               {theme.subtitle}
             </p>
           </div>
+        </div>
+
+        {/* User Navigation */}
+        <div className="hidden md:block">
+          <UserNav />
         </div>
       </div>
 

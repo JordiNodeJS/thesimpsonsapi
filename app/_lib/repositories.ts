@@ -126,7 +126,7 @@ export async function findLatestTrivia(limit = 3): Promise<DBTriviaFact[]> {
 // ============================================
 
 export async function findDiaryEntriesByUser(
-  userId: number
+  userId: string
 ): Promise<DBDiaryEntry[]> {
   return query<DBDiaryEntry>(
     `SELECT d.*, c.name as character_name, l.name as location_name 
@@ -144,7 +144,7 @@ export async function findDiaryEntriesByUser(
 // ============================================
 
 export async function findEpisodeProgressByUser(
-  userId: number,
+  userId: string,
   episodeId: number
 ): Promise<DBEpisodeProgress | null> {
   return queryOne<DBEpisodeProgress>(
@@ -158,7 +158,7 @@ export async function findEpisodeProgressByUser(
 // ============================================
 
 export async function findCollectionsByUser(
-  userId: number
+  userId: string
 ): Promise<DBQuoteCollection[]> {
   return query<DBQuoteCollection>(
     `SELECT * FROM ${TABLES.quoteCollections} WHERE user_id = $1 ORDER BY id DESC`,
@@ -180,7 +180,7 @@ export async function findQuotesByCollection(
 // ============================================
 
 export async function isUserFollowingCharacter(
-  userId: number,
+  userId: string,
   characterId: number
 ): Promise<boolean> {
   const result = await queryOne<{ exists: boolean }>(

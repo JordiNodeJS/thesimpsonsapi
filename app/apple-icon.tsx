@@ -34,18 +34,80 @@ export default function Icon() {
           xmlns="http://www.w3.org/2000/svg"
         >
           {/* Main Donut Body */}
-          <circle cx="12" cy="12" r="9" fill="#EA4C89" stroke="#000" strokeWidth="0.8" />
-          
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            fill="#EA4C89"
+            stroke="#000"
+            strokeWidth="0.8"
+          />
+
           {/* Hole */}
-          <circle cx="12" cy="12" r="3.5" fill="#FFD90F" stroke="#000" strokeWidth="0.8" />
-          
+          <circle
+            cx="12"
+            cy="12"
+            r="3.5"
+            fill="#FFD90F"
+            stroke="#000"
+            strokeWidth="0.8"
+          />
+
           {/* Sprinkles (Small rectangles) */}
-          <rect x="9" y="7" width="2.5" height="1" rx="0.5" fill="#60A5FA" transform="rotate(20 9 7)" />
-          <rect x="14" y="6" width="2.5" height="1" rx="0.5" fill="#FBBF24" transform="rotate(-15 14 6)" />
-          <rect x="16" y="10" width="2.5" height="1" rx="0.5" fill="#34D399" transform="rotate(45 16 10)" />
-          <rect x="7" y="11" width="2.5" height="1" rx="0.5" fill="#FFFFFF" transform="rotate(-30 7 11)" />
-          <rect x="10" y="16" width="2.5" height="1" rx="0.5" fill="#F87171" transform="rotate(-60 10 16)" />
-          <rect x="15" y="15" width="2.5" height="1" rx="0.5" fill="#A78BFA" transform="rotate(10 15 15)" />
+          <rect
+            x="9"
+            y="7"
+            width="2.5"
+            height="1"
+            rx="0.5"
+            fill="#60A5FA"
+            transform="rotate(20 9 7)"
+          />
+          <rect
+            x="14"
+            y="6"
+            width="2.5"
+            height="1"
+            rx="0.5"
+            fill="#FBBF24"
+            transform="rotate(-15 14 6)"
+          />
+          <rect
+            x="16"
+            y="10"
+            width="2.5"
+            height="1"
+            rx="0.5"
+            fill="#34D399"
+            transform="rotate(45 16 10)"
+          />
+          <rect
+            x="7"
+            y="11"
+            width="2.5"
+            height="1"
+            rx="0.5"
+            fill="#FFFFFF"
+            transform="rotate(-30 7 11)"
+          />
+          <rect
+            x="10"
+            y="16"
+            width="2.5"
+            height="1"
+            rx="0.5"
+            fill="#F87171"
+            transform="rotate(-60 10 16)"
+          />
+          <rect
+            x="15"
+            y="15"
+            width="2.5"
+            height="1"
+            rx="0.5"
+            fill="#A78BFA"
+            transform="rotate(10 15 15)"
+          />
         </svg>
       </div>
     ),

@@ -29,13 +29,18 @@ export interface DBLocation extends QueryResultRow {
 }
 
 export interface DBUser extends QueryResultRow {
-  id: number;
+  id: string; // TEXT UUID from Better Auth
   username: string;
+  email: string | null;
+  email_verified: boolean | null;
+  image: string | null;
+  name: string | null;
+  password: string | null;
 }
 
 export interface DBComment extends QueryResultRow {
   id: number;
-  user_id: number;
+  user_id: string;
   character_id: number;
   content: string;
   created_at: Date;
@@ -47,14 +52,14 @@ export interface DBTriviaFact extends QueryResultRow {
   related_entity_type: "CHARACTER" | "EPISODE";
   related_entity_id: number;
   content: string;
-  submitted_by_user_id: number;
+  submitted_by_user_id: string;
   created_at: Date;
   username: string;
 }
 
 export interface DBDiaryEntry extends QueryResultRow {
   id: number;
-  user_id: number;
+  user_id: string;
   character_id: number;
   location_id: number;
   activity_description: string;
@@ -65,7 +70,7 @@ export interface DBDiaryEntry extends QueryResultRow {
 
 export interface DBEpisodeProgress extends QueryResultRow {
   id: number;
-  user_id: number;
+  user_id: string;
   episode_id: number;
   rating: number;
   notes: string;
@@ -74,7 +79,7 @@ export interface DBEpisodeProgress extends QueryResultRow {
 
 export interface DBQuoteCollection extends QueryResultRow {
   id: number;
-  user_id: number;
+  user_id: string;
   name: string;
   description: string | null;
 }
