@@ -11,8 +11,7 @@
 
 import { Pool } from "@neondatabase/serverless";
 
-const projectId =
-  process.env.NEXT_PUBLIC_NEON_PROJECT || "billowing-grass-71670123";
+const projectId = process.env.NEXT_PUBLIC_NEON_PROJECT || "N/A";
 const dbUrl = process.env.DATABASE_URL;
 
 if (!dbUrl) {
@@ -25,7 +24,6 @@ const pool = new Pool({ connectionString: dbUrl });
 async function runCheck() {
   console.log("\n🔍 VERIFICACIÓN DE CONEXIÓN A NEON\n");
   console.log(`📦 Proyecto: ${projectId}`);
-  console.log(`🗄️  URL: ${dbUrl?.split("@")[1]?.split(":")[0] || "N/A"}`);
 
   try {
     // 1. Verificar conexión básica
