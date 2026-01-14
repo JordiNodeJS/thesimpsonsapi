@@ -11,6 +11,9 @@ export const auth = betterAuth({
   database: new Pool({
     connectionString: process.env.DATABASE_URL,
   }),
+  user: {
+    modelName: "users", // Use 'users' table instead of default 'user'
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // Start simple, can enable later
