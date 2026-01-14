@@ -2,6 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
+import { UserNav } from "./UserNav";
 
 const CLOUDS_COUNT = 4;
 
@@ -38,7 +39,7 @@ function BackgroundCloud({ index }: { index: number }) {
 
 function Donut() {
   return (
-    <div 
+    <div
       className="absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 cursor-help group"
       role="img"
       aria-label="Homer's favorite donut - decorative element"
@@ -121,7 +122,7 @@ function Donut() {
           transform="rotate(90 20 50)"
         />
       </svg>
-      <div 
+      <div
         className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
         role="tooltip"
       >
@@ -133,7 +134,7 @@ function Donut() {
 
 function TvSet() {
   return (
-    <div 
+    <div
       className="absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 group"
       role="img"
       aria-label="Vintage television set - decorative element"
@@ -161,7 +162,7 @@ function TvSet() {
 
 function DiaryBook() {
   return (
-    <div 
+    <div
       className="absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 group rotate-3"
       role="img"
       aria-label="Lisa's diary - decorative element"
@@ -178,7 +179,7 @@ function DiaryBook() {
 
 function ComicBook() {
   return (
-    <div 
+    <div
       className="absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 group -rotate-6"
       role="img"
       aria-label="Radioactive Man comic book - decorative element"
@@ -274,7 +275,7 @@ export default function SimpsonsHeader() {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 h-full flex items-center relative z-10">
+      <div className="container mx-auto px-4 h-full flex items-center justify-between relative z-10">
         <div className="flex flex-col max-w-[60%] sm:max-w-none">
           <h1
             className="text-white font-black text-3xl sm:text-4xl md:text-5xl italic tracking-tighter uppercase transform -rotate-2 origin-left drop-shadow-lg"
@@ -291,14 +292,19 @@ export default function SimpsonsHeader() {
             </p>
           </div>
         </div>
+
+        {/* User Navigation */}
+        <div className="hidden md:block">
+          <UserNav />
+        </div>
       </div>
 
       {/* Characteristic Element */}
       {theme.icon}
 
       {/* Sun/Light Glow */}
-      <div 
-        className="absolute -top-10 -left-10 w-60 h-60 bg-white rounded-full blur-[80px] opacity-20 animate-pulse pointer-events-none" 
+      <div
+        className="absolute -top-10 -left-10 w-60 h-60 bg-white rounded-full blur-[80px] opacity-20 animate-pulse pointer-events-none"
         aria-hidden="true"
       />
     </header>

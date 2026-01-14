@@ -38,6 +38,11 @@ export const TABLES = {
   diaryEntries: table("diary_entries"),
   quoteCollections: table("quote_collections"),
   collectionQuotes: table("collection_quotes"),
+
+  // Better Auth tables
+  sessions: table("session"),
+  accounts: table("account"),
+  verifications: table("verification"),
 } as const;
 
 /**

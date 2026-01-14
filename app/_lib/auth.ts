@@ -1,24 +1,49 @@
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { queryOne } from "@/app/_lib/db-utils";
 import { TABLES } from "@/app/_lib/db-schema";
 import type { DBUser } from "@/app/_lib/db-types";
 
 /**
- * Obtiene el usuario actual o lo crea si no existe.
- * En una app real, esto vendría de una sesión/cookie.
+ * Obtiene el usuario autenticado actual desde la sesión de Better Auth.
+ *
+ * @throws Error si no hay sesión activa o el usuario no existe en la BD
+ * @returns DBUser - El usuario autenticado
  */
 export async function getCurrentUser(): Promise<DBUser> {
-  const username = "SimpsonsFan";
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
+  if (!session?.user) {
+    throw new Error("Unauthorized: No active session");
+  }
+
+  // Obtener el usuario completo desde nuestra tabla de usuarios
   const user = await queryOne<DBUser>(
-    `INSERT INTO ${TABLES.users} (username) VALUES ($1) 
-     ON CONFLICT (username) DO UPDATE SET username = EXCLUDED.username 
-     RETURNING id, username`,
-    [username]
+    `SELECT id, username, email, email_verified, image, name, password 
+     FROM ${TABLES.users} 
+     WHERE id = $1`,
+    [session.user.id]
   );
 
   if (!user) {
-    throw new Error("Failed to get or create user");
+    throw new Error("User not found in database");
   }
 
   return user;
+}
+
+/**
+ * Verifica si hay un usuario autenticado sin lanzar error.
+ * Útil para componentes que funcionan con/sin autenticación.
+ *
+ * @returns DBUser | null
+ */
+export async function getCurrentUserOptional(): Promise<DBUser | null> {
+  try {
+    return await getCurrentUser();
+  } catch {
+    return null;
+  }
 }
