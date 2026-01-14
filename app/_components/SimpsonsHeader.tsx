@@ -24,6 +24,8 @@ function BackgroundCloud({ index }: { index: number }) {
         viewBox="0 0 200 120"
         fill="currentColor"
         className="text-white/80"
+        role="presentation"
+        aria-hidden="true"
       >
         <circle cx="50" cy="70" r="40" />
         <circle cx="90" cy="60" r="45" />
@@ -36,12 +38,18 @@ function BackgroundCloud({ index }: { index: number }) {
 
 function Donut() {
   return (
-    <div className="absolute right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 cursor-help group">
+    <div 
+      className="absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 cursor-help group"
+      role="img"
+      aria-label="Homer's favorite donut - decorative element"
+    >
       <svg
         width="100"
         height="100"
         viewBox="0 0 100 100"
-        className="animate-bounce drop-shadow-xl"
+        className="animate-bounce drop-shadow-xl w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
+        role="presentation"
+        aria-hidden="true"
       >
         <circle
           cx="50"
@@ -113,7 +121,10 @@ function Donut() {
           transform="rotate(90 20 50)"
         />
       </svg>
-      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+      <div 
+        className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
+        role="tooltip"
+      >
         Mmm... donuts
       </div>
     </div>
@@ -122,7 +133,11 @@ function Donut() {
 
 function TvSet() {
   return (
-    <div className="absolute right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 group">
+    <div 
+      className="absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 group"
+      role="img"
+      aria-label="Vintage television set - decorative element"
+    >
       <div className="relative w-24 h-20 bg-purple-700 rounded-lg border-4 border-purple-900 shadow-xl flex items-center justify-center">
         {/* Screen */}
         <div className="w-16 h-12 bg-zinc-200 rounded overflow-hidden relative">
@@ -146,7 +161,11 @@ function TvSet() {
 
 function DiaryBook() {
   return (
-    <div className="absolute right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 group rotate-3">
+    <div 
+      className="absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 group rotate-3"
+      role="img"
+      aria-label="Lisa's diary - decorative element"
+    >
       <div className="relative w-20 h-24 bg-pink-500 rounded-r-lg border-l-8 border-l-zinc-800 shadow-xl flex flex-col items-center justify-center">
         <div className="absolute top-0 bottom-0 left-0 w-px bg-black/10" />
         <div className="w-12 h-16 border-2 border-pink-700/30 bg-white/10 rounded-sm" />
@@ -159,7 +178,11 @@ function DiaryBook() {
 
 function ComicBook() {
   return (
-    <div className="absolute right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 group -rotate-6">
+    <div 
+      className="absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 opacity-90 hover:opacity-100 transition-all duration-500 hover:scale-110 group -rotate-6"
+      role="img"
+      aria-label="Radioactive Man comic book - decorative element"
+    >
       <div className="relative w-20 h-28 bg-gradient-to-br from-green-500 to-green-600 rounded-sm shadow-xl border border-white/20 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-6 bg-red-600 flex items-center justify-center">
           <span className="text-[8px] font-black text-white uppercase tracking-tighter">
@@ -238,11 +261,13 @@ export default function SimpsonsHeader() {
   }
 
   return (
-    <div
-      className={`relative w-full h-40 overflow-hidden ${theme.bgClass} border-b-4 ${theme.borderClass} transition-colors duration-500`}
+    <header
+      className={`relative w-full h-32 sm:h-40 overflow-hidden ${theme.bgClass} border-b-4 ${theme.borderClass} transition-colors duration-500`}
+      role="banner"
+      aria-label={`${theme.title} - ${theme.subtitle}`}
     >
       {/* Background Pattern / Clouds */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0" aria-hidden="true">
         {[...Array(CLOUDS_COUNT)].map((_, i) => (
           <BackgroundCloud key={i} index={i} />
         ))}
@@ -250,18 +275,18 @@ export default function SimpsonsHeader() {
 
       {/* Content */}
       <div className="container mx-auto px-4 h-full flex items-center relative z-10">
-        <div className="flex flex-col">
-          <h2
-            className="text-white font-black text-5xl italic tracking-tighter uppercase transform -rotate-2 origin-left drop-shadow-lg"
+        <div className="flex flex-col max-w-[60%] sm:max-w-none">
+          <h1
+            className="text-white font-black text-3xl sm:text-4xl md:text-5xl italic tracking-tighter uppercase transform -rotate-2 origin-left drop-shadow-lg"
             style={{
               WebkitTextStroke: `2px ${theme.textStrokeColor}`,
               textShadow: `4px 4px 0 ${theme.textStrokeColor}`,
             }}
           >
             {theme.title}
-          </h2>
-          <div className="inline-block bg-white/90 dark:bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full mt-2 transform rotate-1 origin-left shadow-sm border border-white/20">
-            <p className="text-zinc-800 dark:text-white font-bold text-xs uppercase tracking-[0.3em]">
+          </h1>
+          <div className="inline-block bg-white/95 dark:bg-black/70 backdrop-blur-sm px-2 sm:px-3 py-1 rounded-full mt-2 transform rotate-1 origin-left shadow-sm border border-white/20">
+            <p className="text-zinc-900 dark:text-zinc-100 font-bold text-[0.6rem] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em]">
               {theme.subtitle}
             </p>
           </div>
@@ -272,7 +297,10 @@ export default function SimpsonsHeader() {
       {theme.icon}
 
       {/* Sun/Light Glow */}
-      <div className="absolute -top-10 -left-10 w-60 h-60 bg-white rounded-full blur-[80px] opacity-20 animate-pulse pointer-events-none" />
-    </div>
+      <div 
+        className="absolute -top-10 -left-10 w-60 h-60 bg-white rounded-full blur-[80px] opacity-20 animate-pulse pointer-events-none" 
+        aria-hidden="true"
+      />
+    </header>
   );
 }
