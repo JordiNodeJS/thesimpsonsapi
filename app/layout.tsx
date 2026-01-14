@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import SimpsonsHeader from "@/app/_components/SimpsonsHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -74,6 +75,7 @@ export default function RootLayout({
             </div>
           </div>
         </nav>
+        <SimpsonsHeader />
         <main className="flex-1 bg-zinc-50 dark:bg-black">{children}</main>
         <footer className="border-t bg-white dark:bg-zinc-950 py-8">
           <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
