@@ -1,13 +1,11 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { queryOne } from "@/app/_lib/db-utils";
-import { TABLES } from "@/app/_lib/db-schema";
 import type { DBUser } from "@/app/_lib/db-types";
 
 /**
  * Obtiene el usuario autenticado actual desde la sesión de Better Auth.
  *
- * @throws Error si no hay sesión activa o el usuario no existe en la BD
+ * @throws Error si no hay sesión activa
  * @returns DBUser - El usuario autenticado
  */
 export async function getCurrentUser(): Promise<DBUser> {
@@ -19,19 +17,17 @@ export async function getCurrentUser(): Promise<DBUser> {
     throw new Error("Unauthorized: No active session");
   }
 
-  // Obtener el usuario completo desde nuestra tabla de usuarios
-  const user = await queryOne<DBUser>(
-    `SELECT id, username, email, email_verified, image, name, password 
-     FROM ${TABLES.users} 
-     WHERE id = $1`,
-    [session.user.id]
-  );
-
-  if (!user) {
-    throw new Error("User not found in database");
-  }
-
-  return user;
+  // Retornar el usuario desde la sesión de Better Auth
+  // La sesión contiene toda la información necesaria del usuario
+  return {
+    id: session.user.id,
+    username: session.user.name || session.user.email?.split("@")[0] || "User",
+    email: session.user.email,
+    email_verified: session.user.emailVerified,
+    image: session.user.image,
+    name: session.user.name,
+    password: null, // No incluir la contraseña en memoria
+  };
 }
 
 /**
