@@ -68,7 +68,7 @@ async function EpisodeList() {
             </Card>
           </Link>
         ))}
-      </div>    </>
+      </div>
   );
 }
 

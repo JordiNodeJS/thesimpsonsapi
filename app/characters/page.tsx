@@ -56,7 +56,7 @@ async function CharacterList() {
             </Card>
           </Link>
         ))}
-      </div>    </>
+      </div>
   );
 }
 
