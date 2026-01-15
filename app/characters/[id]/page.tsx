@@ -7,6 +7,7 @@ import { isFollowing, getComments } from "@/app/_actions/social";
 import { getTrivia } from "@/app/_actions/trivia";
 import RecentlyViewedTracker from "@/app/_components/RecentlyViewedTracker";
 import { findCharacterById } from "@/app/_lib/repositories";
+import { Breadcrumbs } from "@/app/_components/Breadcrumbs";
 
 async function loadCharacterData(id: number) {
   const character = await findCharacterById(id);
@@ -44,9 +45,16 @@ export default async function CharacterDetailPage({
           image: character.image_url ?? "",
         }}
       />
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Characters", href: "/characters" },
+          { label: character.name },
+        ]}
+      />
       <div className="grid md:grid-cols-3 gap-8">
         <div className="space-y-6 text-center md:text-left">
-          <div className="relative h-[400px] w-full rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+          <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800">
             <CharacterImage
               src={character.image_url ?? ""}
               alt={character.name}

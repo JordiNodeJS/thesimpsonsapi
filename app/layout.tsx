@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import SimpsonsHeader from "@/app/_components/SimpsonsHeader";
 import HelpButton from "@/app/_components/HelpButton";
+import { Toaster } from "@/app/_components/Toaster";
+import { MobileMenuButton } from "@/app/_components/MobileMenuButton";
+import { CURRENT_YEAR, SITE_INFO } from "@/app/_lib/constants";
+import { DesktopNav } from "@/app/_components/DesktopNav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -42,57 +45,44 @@ export default function RootLayout({
                 Life
               </span>
             </Link>
-            <div className="hidden md:flex gap-8 text-sm font-bold uppercase tracking-widest">
-              <Link
-                href="/episodes"
-                className="hover:text-yellow-500 transition-colors"
-              >
-                Episodes
-              </Link>
-              <Link
-                href="/characters"
-                className="hover:text-yellow-500 transition-colors"
-              >
-                Characters
-              </Link>
-              <Link
-                href="/diary"
-                className="hover:text-yellow-500 transition-colors"
-              >
-                Diary
-              </Link>
-              <Link
-                href="/collections"
-                className="hover:text-yellow-500 transition-colors"
-              >
-                Collections
-              </Link>
-            </div>
-            <div className="md:hidden">
-              {/* Mobile menu could go here, but keeping it simple for now */}
-              <Button variant="ghost" size="sm">
-                Menu
-              </Button>
-            </div>
+            <DesktopNav />
+            <MobileMenuButton />
           </div>
         </nav>
         <SimpsonsHeader />
         <main className="flex-1 bg-zinc-50 dark:bg-black">{children}</main>
         <HelpButton />
+        <Toaster />
         <footer className="border-t bg-white dark:bg-zinc-950 py-8">
           <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              © 2025 Springfield Life. All rights reserved.
+              © {CURRENT_YEAR} {SITE_INFO.name}. All rights reserved.
             </p>
+            <div className="flex items-center gap-6 text-sm">
+              <Link
+                href="/guide"
+                className="text-zinc-600 dark:text-zinc-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded px-2 py-1"
+              >
+                About
+              </Link>
+              <a
+                href="https://github.com/JordiNodeJS/thesimpsonsapi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-600 dark:text-zinc-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded px-2 py-1"
+              >
+                GitHub
+              </a>
+            </div>
             <p className="text-sm font-medium">
               Creado por{" "}
               <a
-                href="https://webcode.es"
+                href={SITE_INFO.creatorUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-yellow-600 hover:text-yellow-500 transition-colors underline underline-offset-4"
+                className="text-yellow-600 hover:text-yellow-500 transition-colors underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded"
               >
-                webcode.es
+                {SITE_INFO.creator}
               </a>
             </p>
           </div>

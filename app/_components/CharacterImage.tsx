@@ -26,9 +26,9 @@ export default function CharacterImage({
   if (error || !src) {
     return (
       <div
-        className={`flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-400 ${className} ${
+        className={`flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-400 ${
           fill ? "absolute inset-0 h-full w-full" : "h-full w-full"
-        }`}
+        } ${className}`}
       >
         <User size={fill ? 64 : 32} strokeWidth={1} />
       </div>

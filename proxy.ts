@@ -42,6 +42,7 @@ export async function proxy(request: NextRequest) {
   if (isProtectedRoute && !isAuthenticated) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
+    loginUrl.searchParams.set("message", "auth_required");
     return NextResponse.redirect(loginUrl);
   }
 

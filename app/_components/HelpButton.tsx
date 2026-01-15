@@ -1,13 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function HelpButton() {
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [timeoutId]);
+
+  const handleMouseEnter = () => {
+    const id = setTimeout(() => {
+      setIsTooltipVisible(true);
+    }, 500);
+    setTimeoutId(id);
+  };
+
+  const handleMouseLeave = () => {
+    if (timeoutId) clearTimeout(timeoutId);
+    setIsTooltipVisible(false);
+  };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-end gap-3">
+    <div className="fixed bottom-6 right-6 z-[45] flex items-end gap-3">
       {/* Tooltip */}
       {isTooltipVisible && (
         <div className="bg-zinc-900 text-white text-sm px-4 py-2 rounded-lg shadow-xl border border-zinc-700 whitespace-nowrap animate-in fade-in slide-in-from-right-2 duration-200">
@@ -18,8 +37,8 @@ export default function HelpButton() {
       {/* Help Button */}
       <Link href="/guide" prefetch={false}>
         <button
-          onMouseEnter={() => setIsTooltipVisible(true)}
-          onMouseLeave={() => setIsTooltipVisible(false)}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
           className="group relative w-14 h-14 bg-gradient-to-br from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center ring-4 ring-yellow-400/20 hover:ring-yellow-400/40"
           aria-label="Abrir guía de usuario"
         >

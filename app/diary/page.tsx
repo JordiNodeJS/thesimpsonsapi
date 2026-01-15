@@ -13,7 +13,7 @@ async function loadDiaryData() {
   if (!user) {
     redirect("/login");
   }
-  
+
   const [characters, locations, entries] = await Promise.all([
     findCharacterNames(),
     getLocations(),
@@ -37,9 +37,15 @@ export default async function DiaryPage() {
         <div className="lg:col-span-2 space-y-6">
           <h2 className="text-2xl font-semibold">Your Timeline</h2>
           {entries.length === 0 ? (
-            <p className="text-muted-foreground">
-              No entries yet. Start living your Springfield life!
-            </p>
+            <div className="text-center py-12 px-4 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg">
+              <p className="text-lg font-medium text-zinc-600 dark:text-zinc-400 mb-2">
+                No entries yet
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Start living your Springfield life by creating your first
+                memory!
+              </p>
+            </div>
           ) : (
             <div className="relative border-l border-zinc-200 dark:border-zinc-800 ml-4 space-y-8">
               {entries.map((entry) => (

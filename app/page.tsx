@@ -10,6 +10,7 @@ import {
   findFeaturedCharacters,
   findLatestTrivia,
 } from "@/app/_lib/repositories";
+import { CURRENT_YEAR, SITE_INFO } from "@/app/_lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,7 @@ export default async function Home() {
       )}
 
       {/* Quick Actions */}
-      <section className="py-12 px-6 bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800">
+      <section className="py-16 px-6 bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-wrap justify-center gap-6">
             <Button
@@ -68,7 +69,7 @@ export default async function Home() {
       </section>
 
       {/* Stats Grid */}
-      <section className="py-12 border-y border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50">
+      <section className="py-16 border-y border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50">
         <div className="container mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="flex flex-col items-center gap-1">
@@ -255,8 +256,7 @@ export default async function Home() {
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-zinc-200 dark:border-zinc-800 text-center">
         <p className="text-sm text-zinc-500">
-          © {new Date().getFullYear()} Springfield Life. Built for fans, by
-          fans.
+          © {CURRENT_YEAR} {SITE_INFO.name}. Built for fans, by fans.
         </p>
       </footer>
     </div>

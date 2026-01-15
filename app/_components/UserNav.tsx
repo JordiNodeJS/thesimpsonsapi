@@ -2,9 +2,17 @@
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 
 export function UserNav() {
   const { data: session, isPending } = authClient.useSession();
@@ -55,33 +63,36 @@ export function UserNav() {
           {session.user?.name || session.user?.email}
         </p>
       </div>
-      <div className="relative group">
-        <Avatar className="h-9 w-9 border-2 border-white shadow-lg cursor-pointer">
-          <AvatarImage
-            src={session.user?.image || undefined}
-            alt={session.user?.name || "User"}
-          />
-          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-200">
-          <div className="p-3 border-b border-gray-100">
-            <p className="text-sm font-medium text-gray-900">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 rounded-full">
+            <Avatar className="h-9 w-9 border-2 border-white shadow-lg cursor-pointer">
+              <AvatarImage
+                src={session.user?.image || undefined}
+                alt={session.user?.name || "User"}
+              />
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <div className="p-2">
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {session.user?.name || "User"}
             </p>
-            <p className="text-xs text-gray-500 truncate">
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
               {session.user?.email}
             </p>
           </div>
-          <button
-            onClick={handleSignOut}
-            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg transition-colors"
-          >
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+            <LogOut className="mr-2 h-4 w-4" />
             Sign Out
-          </button>
-        </div>
-      </div>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }

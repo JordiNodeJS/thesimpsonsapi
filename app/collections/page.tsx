@@ -13,7 +13,7 @@ export default async function CollectionsPage() {
   if (!user) {
     redirect("/login");
   }
-  
+
   const collections = await getCollections();
 
   return (
@@ -29,9 +29,14 @@ export default async function CollectionsPage() {
 
         <div className="md:col-span-2 grid gap-4">
           {collections.length === 0 ? (
-            <p className="text-muted-foreground">
-              No collections yet. Create one to start saving quotes!
-            </p>
+            <div className="text-center py-12 px-4 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg">
+              <p className="text-lg font-medium text-zinc-600 dark:text-zinc-400 mb-2">
+                No collections yet
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Create your first collection to start saving memorable quotes!
+              </p>
+            </div>
           ) : (
             collections.map((col) => (
               <Card key={col.id}>

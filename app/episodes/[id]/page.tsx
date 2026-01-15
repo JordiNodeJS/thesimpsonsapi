@@ -5,6 +5,7 @@ import TriviaSection from "@/app/_components/TriviaSection";
 import { getEpisodeProgress } from "@/app/_actions/episodes";
 import { getTrivia } from "@/app/_actions/trivia";
 import { findEpisodeById } from "@/app/_lib/repositories";
+import { Breadcrumbs } from "@/app/_components/Breadcrumbs";
 
 async function loadEpisodeData(id: number) {
   const episode = await findEpisodeById(id);
@@ -34,9 +35,16 @@ export default async function EpisodeDetailPage({
 
   return (
     <div className="container mx-auto py-8 px-4">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Episodes", href: "/episodes" },
+          { label: episode.title },
+        ]}
+      />
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
-          <div className="relative h-[400px] w-full rounded-xl overflow-hidden">
+          <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800">
             {episode.image_url && (
               <Image
                 src={episode.image_url}

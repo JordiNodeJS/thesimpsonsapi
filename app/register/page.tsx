@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { AlertCircle } from "lucide-react";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -22,12 +23,32 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{
+    email?: string;
+    password?: string;
+    username?: string;
+  }>({});
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
     setLoading(true);
+
+    // Validación de campos
+    const errors: { email?: string; password?: string; username?: string } = {};
+    if (!email) errors.email = "Email is required";
+    if (!username) errors.username = "Username is required";
+    if (!password) errors.password = "Password is required";
+    if (password && password.length < 8)
+      errors.password = "Password must be at least 8 characters";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
 
     try {
       await authClient.signUp.email(
@@ -76,7 +97,18 @@ export default function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                aria-invalid={!!fieldErrors.email}
+                aria-describedby={fieldErrors.email ? "email-error" : undefined}
               />
+              {fieldErrors.email && (
+                <p
+                  id="email-error"
+                  className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
+                >
+                  <AlertCircle className="w-3 h-3" />
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
@@ -88,7 +120,20 @@ export default function RegisterPage() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 disabled={loading}
+                aria-invalid={!!fieldErrors.username}
+                aria-describedby={
+                  fieldErrors.username ? "username-error" : undefined
+                }
               />
+              {fieldErrors.username && (
+                <p
+                  id="username-error"
+                  className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
+                >
+                  <AlertCircle className="w-3 h-3" />
+                  {fieldErrors.username}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="name">Display Name (optional)</Label>
@@ -112,14 +157,34 @@ export default function RegisterPage() {
                 required
                 minLength={8}
                 disabled={loading}
+                aria-invalid={!!fieldErrors.password}
+                aria-describedby={
+                  fieldErrors.password ? "password-error" : undefined
+                }
               />
-              <p className="text-xs text-muted-foreground">
-                Must be at least 8 characters
-              </p>
+              {fieldErrors.password ? (
+                <p
+                  id="password-error"
+                  className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
+                >
+                  <AlertCircle className="w-3 h-3" />
+                  {fieldErrors.password}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Must be at least 8 characters
+                </p>
+              )}
             </div>
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
-                {error}
+              <div
+                role="alert"
+                className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3"
+              >
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700 dark:text-red-300">
+                  {error}
+                </p>
               </div>
             )}
             <Button type="submit" className="w-full" disabled={loading}>

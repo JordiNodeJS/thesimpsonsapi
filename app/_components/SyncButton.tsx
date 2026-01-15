@@ -4,6 +4,7 @@ import { useState } from "react";
 import { syncExternalData, SyncResult } from "@/app/_actions/sync";
 import { useFormAction } from "@/app/_lib/hooks";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 export default function SyncButton() {
   const [status, setStatus] = useState<string | null>(null);
@@ -27,7 +28,14 @@ export default function SyncButton() {
   return (
     <div className="flex flex-col items-center gap-2">
       <Button onClick={() => execute()} disabled={isPending}>
-        {isPending ? "Syncing..." : "Sync Data from API"}
+        {isPending ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Syncing...
+          </>
+        ) : (
+          "Sync Data from API"
+        )}
       </Button>
       {status && <p className="text-sm text-gray-500">{status}</p>}
     </div>

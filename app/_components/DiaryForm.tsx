@@ -68,7 +68,7 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
               setFormState((prev) => ({ ...prev, charId }))
             }
           >
-            <SelectTrigger className="h-12 bg-muted/20 border-muted hover:border-primary/50 transition-colors">
+            <SelectTrigger className="h-12 bg-muted/20 border-muted hover:border-primary/50 transition-all duration-200">
               <SelectValue placeholder="Select a friend..." />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
@@ -107,7 +107,7 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
               setFormState((prev) => ({ ...prev, locId }))
             }
           >
-            <SelectTrigger className="h-12 bg-muted/20 border-muted hover:border-primary/50 transition-colors">
+            <SelectTrigger className="h-12 bg-muted/20 border-muted hover:border-primary/50 transition-all duration-200">
               <SelectValue placeholder="Pick a location..." />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
@@ -137,7 +137,8 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
           onChange={(e) =>
             setFormState((prev) => ({ ...prev, desc: e.target.value }))
           }
-          placeholder="e.g., Had a Duff beer and watched the game..."
+          placeholder="Describe your adventure in Springfield... e.g., 'Had a Duff beer at Moe's and discussed the Springfield Isotopes game with the gang.'"
+          className="min-h-[120px]"
         />
       </div>
 

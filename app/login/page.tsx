@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,18 +14,50 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Mostrar toast si viene con mensaje de autenticación requerida
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message === "auth_required") {
+      toast.warning("Debes iniciar sesión para acceder a esta sección", {
+        description: "Por favor, ingresa tus credenciales para continuar",
+        duration: 5000,
+      });
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
     setLoading(true);
+
+    // Validación de campos
+    const errors: { email?: string; password?: string } = {};
+    if (!email) errors.email = "Email is required";
+    if (!password) errors.password = "Password is required";
+    if (password && password.length < 8)
+      errors.password = "Password must be at least 8 characters";
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
 
     try {
       await authClient.signIn.email(
@@ -35,7 +67,11 @@ export default function LoginPage() {
         },
         {
           onSuccess: () => {
-            router.push("/");
+            const callbackUrl = searchParams.get("callbackUrl") || "/";
+            toast.success("¡Bienvenido de nuevo!", {
+              description: "Has iniciado sesión correctamente",
+            });
+            router.push(callbackUrl);
             router.refresh();
           },
           onError: (ctx) => {
@@ -71,7 +107,18 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                aria-invalid={!!fieldErrors.email}
+                aria-describedby={fieldErrors.email ? "email-error" : undefined}
               />
+              {fieldErrors.email && (
+                <p
+                  id="email-error"
+                  className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
+                >
+                  <AlertCircle className="w-3 h-3" />
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -83,11 +130,30 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
+                aria-invalid={!!fieldErrors.password}
+                aria-describedby={
+                  fieldErrors.password ? "password-error" : undefined
+                }
               />
+              {fieldErrors.password && (
+                <p
+                  id="password-error"
+                  className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
+                >
+                  <AlertCircle className="w-3 h-3" />
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
-                {error}
+              <div
+                role="alert"
+                className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3"
+              >
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700 dark:text-red-300">
+                  {error}
+                </p>
               </div>
             )}
             <Button type="submit" className="w-full" disabled={loading}>
@@ -103,5 +169,19 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-16 flex items-center justify-center min-h-screen">
+          Loading...
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
