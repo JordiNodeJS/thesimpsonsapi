@@ -22,10 +22,10 @@ export async function getCurrentUser(): Promise<DBUser> {
   return {
     id: session.user.id,
     username: session.user.name || session.user.email?.split("@")[0] || "User",
-    email: session.user.email,
-    email_verified: session.user.emailVerified,
-    image: session.user.image,
-    name: session.user.name,
+    email: session.user.email || null,
+    email_verified: session.user.emailVerified || null,
+    image: session.user.image || null,
+    name: session.user.name || null,
     password: null, // No incluir la contraseña en memoria
   };
 }
