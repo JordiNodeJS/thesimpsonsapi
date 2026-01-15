@@ -2,7 +2,7 @@
 
 import { execute } from "@/app/_lib/db-utils";
 import { TABLES } from "@/app/_lib/db-schema";
-import { getCurrentUser } from "@/app/_lib/auth";
+import { getCurrentUser, getCurrentUserOptional } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import { findEpisodeProgressByUser } from "@/app/_lib/repositories";
 
@@ -25,5 +25,6 @@ export async function trackEpisode(
 
 export async function getEpisodeProgress(episodeId: number) {
   const user = await getCurrentUser();
+  if (!user) return null;
   return findEpisodeProgressByUser(user.id, episodeId);
 }

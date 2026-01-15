@@ -2,7 +2,7 @@
 
 import { execute } from "@/app/_lib/db-utils";
 import { TABLES } from "@/app/_lib/db-schema";
-import { getCurrentUser } from "@/app/_lib/auth";
+import { getCurrentUser, getCurrentUserOptional } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import {
   isUserFollowingCharacter,
@@ -31,7 +31,8 @@ export async function toggleFollow(characterId: number) {
 }
 
 export async function isFollowing(characterId: number) {
-  const user = await getCurrentUser();
+  const user = await getCurrentUserOptional();
+  if (!user) return false;
   return isUserFollowingCharacter(user.id, characterId);
 }
 

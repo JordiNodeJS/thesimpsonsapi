@@ -2,10 +2,18 @@ import DiaryForm from "@/app/_components/DiaryForm";
 import { getDiaryEntries, getLocations } from "@/app/_actions/diary";
 import DeleteDiaryEntryButton from "@/app/_components/DeleteDiaryEntryButton";
 import { findCharacterNames } from "@/app/_lib/repositories";
+import { getCurrentUserOptional } from "@/app/_lib/auth";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 async function loadDiaryData() {
+  // Verificar autenticación primero
+  const user = await getCurrentUserOptional();
+  if (!user) {
+    redirect("/login");
+  }
+  
   const [characters, locations, entries] = await Promise.all([
     findCharacterNames(),
     getLocations(),

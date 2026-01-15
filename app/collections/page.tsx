@@ -2,10 +2,18 @@ import { getCollections } from "@/app/_actions/collections";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import CreateCollectionForm from "@/app/_components/CreateCollectionForm";
+import { getCurrentUserOptional } from "@/app/_lib/auth";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function CollectionsPage() {
+  // Verificar autenticación primero
+  const user = await getCurrentUserOptional();
+  if (!user) {
+    redirect("/login");
+  }
+  
   const collections = await getCollections();
 
   return (
