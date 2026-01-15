@@ -11,7 +11,11 @@ export async function trackEpisode(
   rating: number,
   notes: string
 ) {
-  const user = await getCurrentUser();
+  const user = await getCurrentUserOptional();
+  if (!user) {
+    throw new Error("Please log in to track episodes");
+  }
+
   await execute(
     `INSERT INTO ${TABLES.userEpisodeProgress} (user_id, episode_id, rating, notes, watched_at)
      VALUES ($1, $2, $3, $4, NOW())
@@ -24,7 +28,7 @@ export async function trackEpisode(
 }
 
 export async function getEpisodeProgress(episodeId: number) {
-  const user = await getCurrentUser();
+  const user = await getCurrentUserOptional();
   if (!user) return null;
   return findEpisodeProgressByUser(user.id, episodeId);
 }
