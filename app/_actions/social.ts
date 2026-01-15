@@ -12,26 +12,35 @@ import {
 export async function toggleFollow(characterId: number) {
   const user = await getCurrentUserOptional();
   if (!user) {
-    throw new Error("Please log in to follow characters");
+    return { success: false, error: "Please log in to follow characters" };
   }
 
-  const isCurrentlyFollowing = await isUserFollowingCharacter(
-    user.id,
-    characterId
-  );
+  try {
+    const isCurrentlyFollowing = await isUserFollowingCharacter(
+      user.id,
+      characterId
+    );
 
-  if (isCurrentlyFollowing) {
-    await execute(
-      `DELETE FROM ${TABLES.characterFollows} WHERE user_id = $1 AND character_id = $2`,
-      [user.id, characterId]
-    );
-  } else {
-    await execute(
-      `INSERT INTO ${TABLES.characterFollows} (user_id, character_id) VALUES ($1, $2)`,
-      [user.id, characterId]
-    );
+    if (isCurrentlyFollowing) {
+      await execute(
+        `DELETE FROM ${TABLES.characterFollows} WHERE user_id = $1 AND character_id = $2`,
+        [user.id, characterId]
+      );
+    } else {
+      await execute(
+        `INSERT INTO ${TABLES.characterFollows} (user_id, character_id) VALUES ($1, $2)`,
+        [user.id, characterId]
+      );
+    }
+    revalidatePath(`/characters/${characterId}`);
+    return { success: true, isFollowing: !isCurrentlyFollowing };
+  } catch (error) {
+    console.error("[toggleFollow] Error:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Failed to update follow status" 
+    };
   }
-  revalidatePath(`/characters/${characterId}`);
 }
 
 export async function isFollowing(characterId: number) {
@@ -43,14 +52,23 @@ export async function isFollowing(characterId: number) {
 export async function postComment(characterId: number, content: string) {
   const user = await getCurrentUserOptional();
   if (!user) {
-    throw new Error("Please log in to post comments");
+    return { success: false, error: "Please log in to post comments" };
   }
 
-  await execute(
-    `INSERT INTO ${TABLES.characterComments} (user_id, character_id, content) VALUES ($1, $2, $3)`,
-    [user.id, characterId, content]
-  );
-  revalidatePath(`/characters/${characterId}`);
+  try {
+    await execute(
+      `INSERT INTO ${TABLES.characterComments} (user_id, character_id, content) VALUES ($1, $2, $3)`,
+      [user.id, characterId, content]
+    );
+    revalidatePath(`/characters/${characterId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("[postComment] Error:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Failed to post comment" 
+    };
+  }
 }
 
 export async function getComments(characterId: number) {

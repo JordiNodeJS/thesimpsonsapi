@@ -22,14 +22,23 @@ export default function CommentSection({
   comments: CommentData[];
 }) {
   const [content, setContent] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const { execute, isPending } = useFormAction(
     async () => {
       if (!content.trim()) return;
-      await postComment(characterId, content);
-      setContent("");
-    },
-    { onError: (err) => console.error("Failed to post comment:", err) }
+      try {
+        const result = await postComment(characterId, content);
+        if (result?.success) {
+          setContent("");
+          setError(null);
+        } else if (result?.error) {
+          setError(result.error);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to post comment");
+      }
+    }
   );
 
   return (
@@ -42,6 +51,9 @@ export default function CommentSection({
           onChange={(e) => setContent(e.target.value)}
           placeholder="Leave a message for this character..."
         />
+        {error && (
+          <p className="text-sm text-red-500">{error}</p>
+        )}
         <Button onClick={() => execute()} disabled={isPending}>
           {isPending ? "Posting..." : "Post Comment"}
         </Button>
