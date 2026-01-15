@@ -24,22 +24,20 @@ export default function CommentSection({
   const [content, setContent] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const { execute, isPending } = useFormAction(
-    async () => {
-      if (!content.trim()) return;
-      try {
-        const result = await postComment(characterId, content);
-        if (result?.success) {
-          setContent("");
-          setError(null);
-        } else if (result?.error) {
-          setError(result.error);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to post comment");
+  const { execute, isPending } = useFormAction(async () => {
+    if (!content.trim()) return;
+    try {
+      const result = await postComment(characterId, content);
+      if (result?.success) {
+        setContent("");
+        setError(null);
+      } else if (result?.error) {
+        setError(result.error);
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to post comment");
     }
-  );
+  });
 
   return (
     <div className="space-y-6">
@@ -51,9 +49,7 @@ export default function CommentSection({
           onChange={(e) => setContent(e.target.value)}
           placeholder="Leave a message for this character..."
         />
-        {error && (
-          <p className="text-sm text-red-500">{error}</p>
-        )}
+        {error && <p className="text-sm text-red-500">{error}</p>}
         <Button onClick={() => execute()} disabled={isPending}>
           {isPending ? "Posting..." : "Post Comment"}
         </Button>
@@ -67,7 +63,7 @@ export default function CommentSection({
           >
             <Avatar>
               <AvatarFallback>
-                {comment.username[0].toUpperCase()}
+                {(comment.username?.trim()?.[0] ?? "?").toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div>

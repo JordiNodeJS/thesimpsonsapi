@@ -83,7 +83,8 @@ export async function findCommentsByCharacter(
   characterId: number
 ): Promise<DBComment[]> {
   return query<DBComment>(
-    `SELECT c.*, u.username 
+    `SELECT c.*, 
+            COALESCE(NULLIF(u.username, ''), NULLIF(u.name, ''), 'Anonymous') as username
      FROM ${TABLES.characterComments} c 
      JOIN ${TABLES.users} u ON c.user_id = u.id 
      WHERE c.character_id = $1 
@@ -101,7 +102,8 @@ export async function findTriviaByEntity(
   entityId: number
 ): Promise<DBTriviaFact[]> {
   return query<DBTriviaFact>(
-    `SELECT t.*, u.username 
+    `SELECT t.*, 
+            COALESCE(NULLIF(u.username, ''), NULLIF(u.name, ''), 'Anonymous') as username
      FROM ${TABLES.triviaFacts} t
      JOIN ${TABLES.users} u ON t.submitted_by_user_id = u.id
      WHERE related_entity_type = $1 AND related_entity_id = $2
@@ -112,7 +114,8 @@ export async function findTriviaByEntity(
 
 export async function findLatestTrivia(limit = 3): Promise<DBTriviaFact[]> {
   return query<DBTriviaFact>(
-    `SELECT t.*, u.username 
+    `SELECT t.*, 
+            COALESCE(NULLIF(u.username, ''), NULLIF(u.name, ''), 'Anonymous') as username
      FROM ${TABLES.triviaFacts} t
      JOIN ${TABLES.users} u ON t.submitted_by_user_id = u.id
      ORDER BY t.created_at DESC

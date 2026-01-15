@@ -12,18 +12,19 @@ Se completó el ciclo 4 de correcciones que implementa el fix crítico para la a
 
 ### Commit: `9f85f06` - "fix: coerce undefined to null in session user mapping"
 
-**Archivo**: [app/_lib/auth.ts](app/_lib/auth.ts)
+**Archivo**: [app/\_lib/auth.ts](app/_lib/auth.ts)
 
 **Cambios**:
+
 ```typescript
 // ANTES:
 return {
   id: session.user.id,
   username: session.user.name || session.user.email?.split("@")[0] || "User",
-  email: session.user.email,                    // ❌ Puede ser undefined
-  email_verified: session.user.emailVerified,   // ❌ Puede ser undefined
-  image: session.user.image,                     // ❌ Puede ser undefined
-  name: session.user.name,                       // ❌ Puede ser undefined
+  email: session.user.email, // ❌ Puede ser undefined
+  email_verified: session.user.emailVerified, // ❌ Puede ser undefined
+  image: session.user.image, // ❌ Puede ser undefined
+  name: session.user.name, // ❌ Puede ser undefined
   password: null,
 };
 
@@ -31,10 +32,10 @@ return {
 return {
   id: session.user.id,
   username: session.user.name || session.user.email?.split("@")[0] || "User",
-  email: session.user.email || null,            // ✅ Coerced to null
-  email_verified: session.user.emailVerified || null,  // ✅ Coerced to null
-  image: session.user.image || null,            // ✅ Coerced to null
-  name: session.user.name || null,              // ✅ Coerced to null
+  email: session.user.email || null, // ✅ Coerced to null
+  email_verified: session.user.emailVerified || null, // ✅ Coerced to null
+  image: session.user.image || null, // ✅ Coerced to null
+  name: session.user.name || null, // ✅ Coerced to null
   password: null,
 };
 ```
@@ -46,11 +47,13 @@ return {
 ## ✅ Tests en Producción
 
 ### Ambiente
+
 - **URL**: https://thesimpson.webcode.es/
 - **Deployment**: `thesimpsonsapi-lzpx3s7t5` (Production, Ready)
 - **Usuario**: Copilot Test User (autenticado)
 
 ### Test 1: Follow Button (Character Detail Page)
+
 ```
 ✅ PASADO
 - Navegué a /characters/3 (Bart Simpson)
@@ -60,6 +63,7 @@ return {
 ```
 
 ### Test 2: Unfollow (Follow Button Toggle)
+
 ```
 ✅ PASADO (verificado en snapshot)
 - El button state cambió de "Follow" a "Following"
@@ -68,6 +72,7 @@ return {
 ```
 
 ### Test 3: Protected Route - /diary
+
 ```
 ✅ PASADO
 - Usuario autenticado puede acceder a /diary
@@ -76,6 +81,7 @@ return {
 ```
 
 ### Test 4: Comment Posting - Community Wall
+
 ```
 ✅ PASADO
 - Navegué a /characters/2 (Marge Simpson)
@@ -87,6 +93,7 @@ return {
 ```
 
 ### Test 5: Episodes Page (Public Route)
+
 ```
 ✅ PASADO
 - Navegué a /episodes
@@ -98,18 +105,19 @@ return {
 
 ## 📊 Ciclo Completo de Correcciones
 
-| Ciclo | PR | Commit | Status | Descripción |
-|-------|-----|--------|--------|-------------|
-| 1 | #6 | ef8f671 | ✅ Merged | Fix critical production errors (Episodes 500, Follow 500, Auth redirects) |
-| 2 | #7 | 1e2ba41 | ✅ Merged | Improve error handling in server actions (toggleFollow, postComment) |
-| 3 | #8 | e46c195 | ✅ Merged | Use session user directly instead of querying DB |
-| 4 | - | 9f85f06 | ✅ Pushed | Coerce undefined to null in session user mapping |
+| Ciclo | PR  | Commit  | Status    | Descripción                                                               |
+| ----- | --- | ------- | --------- | ------------------------------------------------------------------------- |
+| 1     | #6  | ef8f671 | ✅ Merged | Fix critical production errors (Episodes 500, Follow 500, Auth redirects) |
+| 2     | #7  | 1e2ba41 | ✅ Merged | Improve error handling in server actions (toggleFollow, postComment)      |
+| 3     | #8  | e46c195 | ✅ Merged | Use session user directly instead of querying DB                          |
+| 4     | -   | 9f85f06 | ✅ Pushed | Coerce undefined to null in session user mapping                          |
 
 ---
 
 ## 🎯 Problemas Solucionados
 
 ### Problema 1: Error 500 en Follow Button
+
 **Causa**: `getCurrentUser()` hacía una query a `the_simpson.users` que fallaba porque el usuario existía en la sesión de Better Auth pero no en la tabla de usuarios (o había un problema con la query).
 
 **Solución**: Usar directamente el objeto `session.user` de Better Auth que ya contiene toda la información necesaria.
@@ -117,6 +125,7 @@ return {
 **Resultado**: ✅ El Follow button ahora funciona sin errores.
 
 ### Problema 2: Error de TypeScript en Deployment
+
 **Causa**: El tipo `DBUser.image` es `string | null`, pero `session.user.image` es `string | null | undefined`. TypeScript rechazó la asignación directa.
 
 **Solución**: Coercer todos los campos potencialmente `undefined` a `null` usando el operador `||`.
@@ -128,12 +137,14 @@ return {
 ## 🚀 Impacto en Producción
 
 ### Funcionalidades Restauradas
+
 - ✅ Follow/Unfollow de personajes (sin error 500)
 - ✅ Posting de comentarios (sin error 500)
 - ✅ Acceso a rutas protegidas (/diary, /collections)
 - ✅ Navegación en páginas públicas (/episodes, /characters)
 
 ### Mejoras de Rendimiento
+
 - 🚀 Una query menos por request de `getCurrentUser()`
 - 🚀 Eliminación de latencia de query adicional
 - 🚀 Mejor confiabilidad (no depende de sincronización de tabla de usuarios)
@@ -142,14 +153,14 @@ return {
 
 ## 📈 Métricas
 
-| Métrica | Valor |
-|---------|-------|
-| Total de cambios | 2 commits |
+| Métrica              | Valor                  |
+| -------------------- | ---------------------- |
+| Total de cambios     | 2 commits              |
 | Archivos modificados | 1 (`app/_lib/auth.ts`) |
-| Líneas cambiadas | +4 coerciones de null |
-| Deployment time | 50s |
-| Build status | ✅ Ready |
-| Tests en prod | 5/5 ✅ PASADOS |
+| Líneas cambiadas     | +4 coerciones de null  |
+| Deployment time      | 50s                    |
+| Build status         | ✅ Ready               |
+| Tests en prod        | 5/5 ✅ PASADOS         |
 
 ---
 
@@ -160,6 +171,7 @@ return {
 2. **Análisis de usar table**: Evaluar si la tabla `users` en `the_simpson.users` es realmente necesaria o si puede eliminarse (ya que Better Auth maneja toda la autenticación)
 
 3. **Testing adicional**:
+
    - [ ] Registro de nuevo usuario
    - [ ] Login/Logout
    - [ ] Email verification (si aplica)
@@ -173,6 +185,7 @@ return {
 ## ✨ Conclusión
 
 El fix de la sesión de usuario fue exitoso. Todos los tests en producción pasaron correctamente. La aplicación ahora es mucho más confiable para:
+
 - Seguir personajes
 - Postear comentarios
 - Acceder a funcionalidades protegidas
