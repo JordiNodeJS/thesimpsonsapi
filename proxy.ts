@@ -25,14 +25,11 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Rutas que requieren autenticación
-  const protectedPaths = [
-    "/diary",
-    "/collections",
-    "/episodes",
-    "/episodes/",
-    "/characters",
-    "/characters/",
-  ];
+  // NOTA: /episodes y /characters NO están protegidos porque funcionan
+  // tanto para usuarios autenticados como no autenticados.
+  // Solo ciertas funcionalidades dentro de esas páginas requieren auth
+  // (follow, comentarios, ratings) pero las páginas en sí son públicas.
+  const protectedPaths = ["/diary", "/collections"];
 
   const isProtectedRoute = protectedPaths.some((path) =>
     pathname.startsWith(path)

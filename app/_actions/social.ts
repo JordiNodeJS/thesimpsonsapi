@@ -10,7 +10,11 @@ import {
 } from "@/app/_lib/repositories";
 
 export async function toggleFollow(characterId: number) {
-  const user = await getCurrentUser();
+  const user = await getCurrentUserOptional();
+  if (!user) {
+    throw new Error("Please log in to follow characters");
+  }
+
   const isCurrentlyFollowing = await isUserFollowingCharacter(
     user.id,
     characterId
@@ -37,7 +41,11 @@ export async function isFollowing(characterId: number) {
 }
 
 export async function postComment(characterId: number, content: string) {
-  const user = await getCurrentUser();
+  const user = await getCurrentUserOptional();
+  if (!user) {
+    throw new Error("Please log in to post comments");
+  }
+
   await execute(
     `INSERT INTO ${TABLES.characterComments} (user_id, character_id, content) VALUES ($1, $2, $3)`,
     [user.id, characterId, content]
