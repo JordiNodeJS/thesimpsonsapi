@@ -14,7 +14,7 @@ interface ViewedCharacter {
 export default function RecentlyViewedList() {
   const [recentlyViewed] = useLocalStorage<ViewedCharacter[]>(
     "recently-viewed-characters",
-    []
+    [],
   );
   const [isClient, setIsClient] = useState(false);
 

@@ -17,7 +17,7 @@ const CreateCollectionSchema = z.object({
 export async function createCollection(name: string, description: string) {
   const validated = CreateCollectionSchema.parse({ name, description });
   const user = await getCurrentUser();
-  
+
   try {
     await prisma.quoteCollection.create({
       data: {
@@ -50,7 +50,7 @@ export async function addQuote(
   collectionId: number,
   text: string,
   character: string,
-  episode: string
+  episode: string,
 ) {
   const validated = AddQuoteSchema.parse({
     collectionId,
@@ -58,7 +58,7 @@ export async function addQuote(
     character,
     episode,
   });
-  
+
   try {
     await prisma.collectionQuote.create({
       data: {

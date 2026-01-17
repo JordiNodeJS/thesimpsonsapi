@@ -18,7 +18,7 @@ const CreateDiaryEntrySchema = z.object({
 export async function createDiaryEntry(
   characterId: number,
   locationId: number,
-  description: string
+  description: string,
 ) {
   const validated = CreateDiaryEntrySchema.parse({
     characterId,
@@ -26,7 +26,7 @@ export async function createDiaryEntry(
     description,
   });
   const user = await getCurrentUser();
-  
+
   try {
     await prisma.diaryEntry.create({
       data: {
@@ -61,7 +61,7 @@ const DeleteDiaryEntrySchema = z.object({
 export async function deleteDiaryEntry(id: number) {
   const validated = DeleteDiaryEntrySchema.parse({ id });
   const user = await getCurrentUser();
-  
+
   try {
     const result = await prisma.diaryEntry.deleteMany({
       where: {
@@ -69,15 +69,19 @@ export async function deleteDiaryEntry(id: number) {
         userId: user.id,
       },
     });
-    
+
     if (result.count === 0) {
-      throw new Error("Entry not found or you don't have permission to delete it");
+      throw new Error(
+        "Entry not found or you don't have permission to delete it",
+      );
     }
-    
+
     revalidatePath("/diary");
     return { success: true };
   } catch (error) {
     console.error("[deleteDiaryEntry] Error:", error);
-    throw error instanceof Error ? error : new Error("Failed to delete diary entry");
+    throw error instanceof Error
+      ? error
+      : new Error("Failed to delete diary entry");
   }
 }

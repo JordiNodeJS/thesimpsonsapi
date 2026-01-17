@@ -18,11 +18,11 @@ const SubmitTriviaSchema = z.object({
 export async function submitTrivia(
   entityType: "CHARACTER" | "EPISODE",
   entityId: number,
-  content: string
+  content: string,
 ) {
   const validated = SubmitTriviaSchema.parse({ entityType, entityId, content });
   const user = await getCurrentUser();
-  
+
   try {
     await prisma.triviaFact.create({
       data: {
@@ -32,13 +32,13 @@ export async function submitTrivia(
         submittedByUserId: user.id,
       },
     });
-    
+
     // Revalidate paths based on entity type
     if (validated.entityType === "CHARACTER")
       revalidatePath(`/characters/${validated.entityId}`);
     if (validated.entityType === "EPISODE")
       revalidatePath(`/episodes/${validated.entityId}`);
-    
+
     return { success: true };
   } catch (error) {
     console.error("[submitTrivia] Error:", error);
@@ -48,7 +48,7 @@ export async function submitTrivia(
 
 export async function getTrivia(
   entityType: "CHARACTER" | "EPISODE",
-  entityId: number
+  entityId: number,
 ) {
   return findTriviaByEntity(entityType, entityId);
 }

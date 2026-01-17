@@ -15,7 +15,7 @@ const TrackEpisodeSchema = z.object({
 export async function trackEpisode(
   episodeId: number,
   rating: number,
-  notes: string
+  notes: string,
 ) {
   const validated = TrackEpisodeSchema.parse({ episodeId, rating, notes });
   const user = await getCurrentUserOptional();

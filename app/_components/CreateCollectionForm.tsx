@@ -25,10 +25,12 @@ export default function CreateCollectionForm() {
         setDesc("");
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to create collection");
+        setError(
+          err instanceof Error ? err.message : "Failed to create collection",
+        );
       }
     },
-    { onError: (err) => setError(err.message) }
+    { onError: (err) => setError(err.message) },
   );
 
   return (

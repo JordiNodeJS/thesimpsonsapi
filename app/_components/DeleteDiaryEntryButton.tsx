@@ -8,7 +8,7 @@ import { Trash2, Loader2 } from "lucide-react";
 
 export default function DeleteDiaryEntryButton({ id }: { id: number }) {
   const [error, setError] = useState<string | null>(null);
-  
+
   const { execute, isPending } = useFormAction(
     async () => {
       if (!confirm("Are you sure you want to delete this memory?")) return;
@@ -19,7 +19,7 @@ export default function DeleteDiaryEntryButton({ id }: { id: number }) {
         setError(err instanceof Error ? err.message : "Failed to delete entry");
       }
     },
-    { onError: (err) => setError(err.message) }
+    { onError: (err) => setError(err.message) },
   );
 
   return (

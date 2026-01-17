@@ -67,7 +67,9 @@ export default function EpisodeTracker({
         )}
       </Button>
       {rating === 0 && (
-        <p className="text-sm text-muted-foreground">Please select a rating first</p>
+        <p className="text-sm text-muted-foreground">
+          Please select a rating first
+        </p>
       )}
     </div>
   );

@@ -48,7 +48,7 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
       await createDiaryEntry(
         parseInt(formState.charId),
         parseInt(formState.locId),
-        formState.desc
+        formState.desc,
       );
       setFormState(EMPTY_DRAFT);
       setError(null);
@@ -151,13 +151,13 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
         />
       </div>
 
-      {error && (
-        <p className="text-sm text-red-500 font-medium">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-500 font-medium">{error}</p>}
 
       <Button
         onClick={() => execute()}
-        disabled={isPending || !formState.charId || !formState.locId || !formState.desc}
+        disabled={
+          isPending || !formState.charId || !formState.locId || !formState.desc
+        }
         className="w-full h-10 font-medium"
       >
         {isPending ? (
