@@ -3,12 +3,18 @@
 import { prisma } from "@/app/_lib/prisma";
 import { getCurrentUserOptional } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import {
   isUserFollowingCharacter,
   findCommentsByCharacter,
 } from "@/app/_lib/repositories";
 
+const ToggleFollowSchema = z.object({
+  characterId: z.number().int().positive(),
+});
+
 export async function toggleFollow(characterId: number) {
+  const validated = ToggleFollowSchema.parse({ characterId });
   const user = await getCurrentUserOptional();
   if (!user) {
     return { success: false, error: "Please log in to follow characters" };
@@ -17,7 +23,7 @@ export async function toggleFollow(characterId: number) {
   try {
     const isCurrentlyFollowing = await isUserFollowingCharacter(
       user.id,
-      characterId
+      validated.characterId
     );
 
     if (isCurrentlyFollowing) {
@@ -25,7 +31,7 @@ export async function toggleFollow(characterId: number) {
         where: {
           userId_characterId: {
             userId: user.id,
-            characterId,
+            characterId: validated.characterId,
           },
         },
       });
@@ -33,11 +39,11 @@ export async function toggleFollow(characterId: number) {
       await prisma.characterFollow.create({
         data: {
           userId: user.id,
-          characterId,
+          characterId: validated.characterId,
         },
       });
     }
-    revalidatePath(`/characters/${characterId}`);
+    revalidatePath(`/characters/${validated.characterId}`);
     return { success: true, isFollowing: !isCurrentlyFollowing };
   } catch (error) {
     console.error("[toggleFollow] Error:", error);
@@ -57,7 +63,13 @@ export async function isFollowing(characterId: number) {
   return isUserFollowingCharacter(user.id, characterId);
 }
 
+const PostCommentSchema = z.object({
+  characterId: z.number().int().positive(),
+  content: z.string().min(1, "Comment cannot be empty").max(1000),
+});
+
 export async function postComment(characterId: number, content: string) {
+  const validated = PostCommentSchema.parse({ characterId, content });
   const user = await getCurrentUserOptional();
   if (!user) {
     return { success: false, error: "Please log in to post comments" };
@@ -67,11 +79,11 @@ export async function postComment(characterId: number, content: string) {
     await prisma.characterComment.create({
       data: {
         userId: user.id,
-        characterId,
-        content,
+        characterId: validated.characterId,
+        content: validated.content,
       },
     });
-    revalidatePath(`/characters/${characterId}`);
+    revalidatePath(`/characters/${validated.characterId}`);
     return { success: true };
   } catch (error) {
     console.error("[postComment] Error:", error);

@@ -126,6 +126,7 @@ model Episode {
   // Relations
   userProgress UserEpisodeProgress[]
 
+  @@index([season, episodeNumber])
   @@map("episodes")
   @@schema("the_simpson")
 }
@@ -156,6 +157,9 @@ model CharacterComment {
   user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
   character Character? @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
+  @@index([characterId])
+  @@index([userId])
+  @@index([createdAt])
   @@map("character_comments")
   @@schema("the_simpson")
 }
@@ -169,6 +173,7 @@ model CharacterFollow {
   character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@id([userId, characterId])
+  @@index([characterId])
   @@map("character_follows")
   @@schema("the_simpson")
 }
@@ -197,6 +202,8 @@ model DiaryEntry {
   character Character? @relation(fields: [characterId], references: [id], onDelete: SetNull)
   location  Location?  @relation(fields: [locationId], references: [id], onDelete: SetNull)
 
+  @@index([userId])
+  @@index([entryDate])
   @@map("diary_entries")
   @@schema("the_simpson")
 }
@@ -237,6 +244,8 @@ model TriviaFact {
 
   user User? @relation(fields: [submittedByUserId], references: [id], onDelete: SetNull)
 
+  @@index([relatedEntityType, relatedEntityId])
+  @@index([createdAt])
   @@map("trivia_facts")
   @@schema("the_simpson")
 }

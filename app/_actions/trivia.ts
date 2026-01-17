@@ -3,25 +3,38 @@
 import { prisma } from "@/app/_lib/prisma";
 import { getCurrentUser } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { findTriviaByEntity } from "@/app/_lib/repositories";
+
+const SubmitTriviaSchema = z.object({
+  entityType: z.enum(["CHARACTER", "EPISODE"]),
+  entityId: z.number().int().positive(),
+  content: z
+    .string()
+    .min(10, "Trivia must be at least 10 characters")
+    .max(1000),
+});
 
 export async function submitTrivia(
   entityType: "CHARACTER" | "EPISODE",
   entityId: number,
   content: string
 ) {
+  const validated = SubmitTriviaSchema.parse({ entityType, entityId, content });
   const user = await getCurrentUser();
   await prisma.triviaFact.create({
     data: {
-      relatedEntityType: entityType,
-      relatedEntityId: entityId,
-      content,
+      relatedEntityType: validated.entityType,
+      relatedEntityId: validated.entityId,
+      content: validated.content,
       submittedByUserId: user.id,
     },
   });
   // Revalidate paths based on entity type
-  if (entityType === "CHARACTER") revalidatePath(`/characters/${entityId}`);
-  if (entityType === "EPISODE") revalidatePath(`/episodes/${entityId}`);
+  if (validated.entityType === "CHARACTER")
+    revalidatePath(`/characters/${validated.entityId}`);
+  if (validated.entityType === "EPISODE")
+    revalidatePath(`/episodes/${validated.entityId}`);
 }
 
 export async function getTrivia(

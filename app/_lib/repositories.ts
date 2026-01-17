@@ -9,7 +9,7 @@ export type CommentWithUser = {
   userId: string | null;
   characterId: number | null;
   content: string;
-  createdAt: Date | null;
+  createdAt: string | null;
   username: string;
 };
 
@@ -19,7 +19,7 @@ export type TriviaWithUser = {
   relatedEntityId: number;
   content: string;
   submittedByUserId: string | null;
-  createdAt: Date | null;
+  createdAt: string | null;
   username: string;
 };
 
@@ -29,7 +29,7 @@ export type DiaryEntryWithRelations = {
   characterId: number | null;
   locationId: number | null;
   activityDescription: string;
-  entryDate: Date | null;
+  entryDate: string | null;
   characterName: string | null;
   locationName: string | null;
 };
@@ -131,7 +131,7 @@ export async function findCommentsByCharacter(
     userId: c.userId,
     characterId: c.characterId,
     content: c.content,
-    createdAt: c.createdAt,
+    createdAt: c.createdAt ? c.createdAt.toISOString() : null,
     username: c.user?.username || c.user?.name || "Anonymous",
   }));
 }
@@ -166,7 +166,7 @@ export async function findTriviaByEntity(
     relatedEntityId: t.relatedEntityId,
     content: t.content,
     submittedByUserId: t.submittedByUserId,
-    createdAt: t.createdAt,
+    createdAt: t.createdAt ? t.createdAt.toISOString() : null,
     username: t.user?.username || t.user?.name || "Anonymous",
   }));
 }
@@ -191,7 +191,7 @@ export async function findLatestTrivia(limit = 3): Promise<TriviaWithUser[]> {
     relatedEntityId: t.relatedEntityId,
     content: t.content,
     submittedByUserId: t.submittedByUserId,
-    createdAt: t.createdAt,
+    createdAt: t.createdAt ? t.createdAt.toISOString() : null,
     username: t.user?.username || t.user?.name || "Anonymous",
   }));
 }
@@ -222,7 +222,7 @@ export async function findDiaryEntriesByUser(
     characterId: e.characterId,
     locationId: e.locationId,
     activityDescription: e.activityDescription,
-    entryDate: e.entryDate,
+    entryDate: e.entryDate ? new Date(e.entryDate).toISOString() : null,
     characterName: e.character?.name ?? null,
     locationName: e.location?.name ?? null,
   }));
