@@ -34,29 +34,29 @@ async function CharacterList() {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {characters.map((char) => (
-          <Link key={char.id} href={`/characters/${char.id}`}>
-            <Card className="h-full hover:shadow-xl transition-shadow cursor-pointer overflow-hidden text-center">
-              <div className="relative h-48 w-full mt-4">
-                <CharacterImage
-                  src={char.image_url}
-                  alt={char.name}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <CardHeader>
-                <CardTitle className="text-lg">{char.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  {char.occupation || "Unknown"}
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      {characters.map((char) => (
+        <Link key={char.id} href={`/characters/${char.id}`}>
+          <Card className="h-full hover:shadow-xl transition-shadow cursor-pointer overflow-hidden text-center">
+            <div className="relative h-48 w-full mt-4">
+              <CharacterImage
+                src={char.imageUrl}
+                alt={char.name}
+                fill
+                className="object-contain"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle className="text-lg">{char.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                {char.occupation || "Unknown"}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+      ))}
+    </div>
   );
 }
 
@@ -64,9 +64,7 @@ export default function CharactersPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-6">Springfield Citizens</h1>
-
       <RecentlyViewedList />
-
       <Suspense
         fallback={
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -77,6 +75,7 @@ export default function CharactersPage() {
         }
       >
         <CharacterList />
-      </Suspense>    </div>
+      </Suspense>{" "}
+    </div>
   );
 }

@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, User, Loader2 } from "lucide-react";
 
 interface DiaryFormProps {
-  characters: Array<{ id: number; name: string; image_url: string | null }>;
+  characters: Array<{ id: number; name: string; imageUrl: string | null }>;
   locations: Array<{ id: number; name: string }>;
 }
 
@@ -81,7 +81,7 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
                   <div className="flex items-center gap-3">
                     <Avatar className="h-6 w-6 border border-border/50">
                       <AvatarImage
-                        src={c.image_url || undefined}
+                        src={c.imageUrl || undefined}
                         alt={c.name}
                         className="object-contain bg-white"
                       />

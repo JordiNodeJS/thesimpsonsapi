@@ -1,10 +1,7 @@
-export interface Character {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-  occupation: string;
-}
+/**
+ * Types for external API responses
+ * These are used for syncing data from thesimpsonsapi.com
+ */
 
 export interface APICharacter {
   id: number;
@@ -27,53 +24,24 @@ export interface APILocation {
   name: string;
 }
 
-export interface Episode {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-  season: number;
-  episode: number;
-}
-
-export interface Location {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-}
-
-export interface Comment {
-  id: number;
-  character_id: number;
-  username: string;
-  content: string;
-  created_at: Date;
-}
-
-export interface TriviaFact {
-  id: number;
-  entity_type: "CHARACTER" | "EPISODE";
-  entity_id: number;
-  username: string;
-  content: string;
-  created_at: Date;
-}
-
-export interface EpisodeProgress {
-  id: number;
-  episode_id: number;
-  rating: number;
-  notes: string;
-  watched_at: Date;
-}
-
-export interface DiaryEntry {
-  id: number;
-  character_id: number;
-  location_id: number;
-  description: string;
-  entry_date: Date;
-  character_name?: string;
-  location_name?: string;
-}
+/**
+ * Re-export Prisma types for convenience
+ * Import these from @prisma/client for full type support
+ */
+export type {
+  Character,
+  Episode,
+  Location,
+  User,
+  Session,
+  Account,
+  Verification,
+  CharacterComment,
+  CharacterFollow,
+  CharacterFavorite,
+  DiaryEntry,
+  QuoteCollection,
+  CollectionQuote,
+  TriviaFact,
+  UserEpisodeProgress,
+} from "@prisma/client";

@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Star, Loader2 } from "lucide-react";
-import { EpisodeProgress } from "@/app/_lib/types";
+import type { UserEpisodeProgress } from "@prisma/client";
 
 interface EpisodeTrackerProps {
   episodeId: number;
-  initialProgress: EpisodeProgress | null;
+  initialProgress: UserEpisodeProgress | null;
 }
 
 export default function EpisodeTracker({

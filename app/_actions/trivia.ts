@@ -1,7 +1,6 @@
 "use server";
 
-import { execute } from "@/app/_lib/db-utils";
-import { TABLES } from "@/app/_lib/db-schema";
+import { prisma } from "@/app/_lib/prisma";
 import { getCurrentUser } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import { findTriviaByEntity } from "@/app/_lib/repositories";
@@ -12,11 +11,14 @@ export async function submitTrivia(
   content: string
 ) {
   const user = await getCurrentUser();
-  await execute(
-    `INSERT INTO ${TABLES.triviaFacts} (related_entity_type, related_entity_id, content, submitted_by_user_id)
-     VALUES ($1, $2, $3, $4)`,
-    [entityType, entityId, content, user.id]
-  );
+  await prisma.triviaFact.create({
+    data: {
+      relatedEntityType: entityType,
+      relatedEntityId: entityId,
+      content,
+      submittedByUserId: user.id,
+    },
+  });
   // Revalidate paths based on entity type
   if (entityType === "CHARACTER") revalidatePath(`/characters/${entityId}`);
   if (entityType === "EPISODE") revalidatePath(`/episodes/${entityId}`);

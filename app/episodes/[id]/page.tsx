@@ -45,9 +45,9 @@ export default async function EpisodeDetailPage({
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
           <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-            {episode.image_url && (
+            {episode.imageUrl && (
               <Image
-                src={episode.image_url}
+                src={episode.imageUrl}
                 alt={episode.title}
                 fill
                 sizes="(max-width: 768px) 100vw, 66vw"
@@ -59,7 +59,7 @@ export default async function EpisodeDetailPage({
           <div>
             <h1 className="text-4xl font-bold mb-2">{episode.title}</h1>
             <p className="text-xl text-muted-foreground mb-4">
-              Season {episode.season}, Episode {episode.episode_number}
+              Season {episode.season}, Episode {episode.episodeNumber}
             </p>
             <p className="text-lg leading-relaxed">{episode.synopsis}</p>
           </div>

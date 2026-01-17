@@ -1,7 +1,6 @@
 "use server";
 
-import { execute } from "@/app/_lib/db-utils";
-import { TABLES } from "@/app/_lib/db-schema";
+import { prisma } from "@/app/_lib/prisma";
 import { getCurrentUser } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import {
@@ -15,11 +14,15 @@ export async function createDiaryEntry(
   description: string
 ) {
   const user = await getCurrentUser();
-  await execute(
-    `INSERT INTO ${TABLES.diaryEntries} (user_id, character_id, location_id, activity_description, entry_date)
-     VALUES ($1, $2, $3, $4, CURRENT_DATE)`,
-    [user.id, characterId, locationId, description]
-  );
+  await prisma.diaryEntry.create({
+    data: {
+      userId: user.id,
+      characterId,
+      locationId,
+      activityDescription: description,
+      entryDate: new Date(),
+    },
+  });
   revalidatePath("/diary");
 }
 
@@ -34,9 +37,11 @@ export async function getLocations() {
 
 export async function deleteDiaryEntry(id: number) {
   const user = await getCurrentUser();
-  await execute(
-    `DELETE FROM ${TABLES.diaryEntries} WHERE id = $1 AND user_id = $2`,
-    [id, user.id]
-  );
+  await prisma.diaryEntry.deleteMany({
+    where: {
+      id,
+      userId: user.id,
+    },
+  });
   revalidatePath("/diary");
 }

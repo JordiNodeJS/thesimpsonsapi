@@ -42,7 +42,7 @@ export default async function CharacterDetailPage({
         character={{
           id: character.id,
           name: character.name,
-          image: character.image_url ?? "",
+          image: character.imageUrl ?? "",
         }}
       />
       <Breadcrumbs
@@ -56,7 +56,7 @@ export default async function CharacterDetailPage({
         <div className="space-y-6 text-center md:text-left">
           <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800">
             <CharacterImage
-              src={character.image_url ?? ""}
+              src={character.imageUrl ?? ""}
               alt={character.name}
               fill
               className="object-contain p-4"
