@@ -56,7 +56,7 @@ export default function EpisodeTracker({
         />
       </div>
 
-      <Button onClick={() => execute()} disabled={isPending}>
+      <Button onClick={() => execute()} disabled={isPending || rating === 0}>
         {isPending ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -66,6 +66,9 @@ export default function EpisodeTracker({
           "Save Progress"
         )}
       </Button>
+      {rating === 0 && (
+        <p className="text-sm text-muted-foreground">Please select a rating first</p>
+      )}
     </div>
   );
 }

@@ -25,11 +25,20 @@ export default function TriviaSection({
   facts,
 }: TriviaSectionProps) {
   const [content, setContent] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const { execute, isPending } = useFormAction(async () => {
-    if (!content.trim()) return;
-    await submitTrivia(entityType, entityId, content);
-    setContent("");
+    if (!content.trim()) {
+      setError("Trivia cannot be empty");
+      return;
+    }
+    try {
+      await submitTrivia(entityType, entityId, content);
+      setContent("");
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to submit trivia");
+    }
   });
 
   return (
@@ -62,6 +71,7 @@ export default function TriviaSection({
             className="min-h-[80px]"
           />
         </div>
+        {error && <p className="text-sm text-red-500">{error}</p>}
         <Button onClick={() => execute()} disabled={isPending} size="sm">
           {isPending ? "Submitting..." : "Submit Fact"}
         </Button>

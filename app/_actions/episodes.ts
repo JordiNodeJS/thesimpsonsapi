@@ -23,28 +23,34 @@ export async function trackEpisode(
     throw new Error("Please log in to track episodes");
   }
 
-  await prisma.userEpisodeProgress.upsert({
-    where: {
-      userId_episodeId: {
+  try {
+    await prisma.userEpisodeProgress.upsert({
+      where: {
+        userId_episodeId: {
+          userId: user.id,
+          episodeId: validated.episodeId,
+        },
+      },
+      update: {
+        rating: validated.rating,
+        notes: validated.notes || "",
+        watchedAt: new Date(),
+      },
+      create: {
         userId: user.id,
         episodeId: validated.episodeId,
+        rating: validated.rating,
+        notes: validated.notes || "",
+        watchedAt: new Date(),
       },
-    },
-    update: {
-      rating: validated.rating,
-      notes: validated.notes || "",
-      watchedAt: new Date(),
-    },
-    create: {
-      userId: user.id,
-      episodeId: validated.episodeId,
-      rating: validated.rating,
-      notes: validated.notes || "",
-      watchedAt: new Date(),
-    },
-  });
-  revalidatePath(`/episodes/${validated.episodeId}`);
-  revalidatePath("/episodes");
+    });
+    revalidatePath(`/episodes/${validated.episodeId}`);
+    revalidatePath("/episodes");
+    return { success: true };
+  } catch (error) {
+    console.error("[trackEpisode] Error:", error);
+    throw new Error("Failed to track episode");
+  }
 }
 
 export async function getEpisodeProgress(episodeId: number) {

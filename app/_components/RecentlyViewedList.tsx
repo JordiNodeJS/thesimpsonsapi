@@ -19,7 +19,14 @@ export default function RecentlyViewedList() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    // Patron correcto: solo marcar que el componente está montado
+    let mounted = true;
+    if (mounted) {
+      setIsClient(true);
+    }
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Only render on client after hydration

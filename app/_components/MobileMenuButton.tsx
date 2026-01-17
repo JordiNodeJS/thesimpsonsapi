@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,14 @@ import { Button } from "@/components/ui/button";
 export function MobileMenuButton() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
+  const previousPathname = useRef(pathname);
 
   // Cerrar el menú cuando cambia la ruta
   useEffect(() => {
-    setIsMenuOpen(false);
+    if (pathname !== previousPathname.current) {
+      setIsMenuOpen(false);
+      previousPathname.current = pathname;
+    }
   }, [pathname]);
 
   // Prevenir scroll del body cuando el menú está abierto

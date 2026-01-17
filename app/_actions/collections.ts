@@ -17,14 +17,21 @@ const CreateCollectionSchema = z.object({
 export async function createCollection(name: string, description: string) {
   const validated = CreateCollectionSchema.parse({ name, description });
   const user = await getCurrentUser();
-  await prisma.quoteCollection.create({
-    data: {
-      userId: user.id,
-      name: validated.name,
-      description: validated.description,
-    },
-  });
-  revalidatePath("/collections");
+  
+  try {
+    await prisma.quoteCollection.create({
+      data: {
+        userId: user.id,
+        name: validated.name,
+        description: validated.description || "",
+      },
+    });
+    revalidatePath("/collections");
+    return { success: true };
+  } catch (error) {
+    console.error("[createCollection] Error:", error);
+    throw new Error("Failed to create collection");
+  }
 }
 
 export async function getCollections() {
@@ -51,15 +58,22 @@ export async function addQuote(
     character,
     episode,
   });
-  await prisma.collectionQuote.create({
-    data: {
-      collectionId: validated.collectionId,
-      quoteText: validated.text,
-      characterName: validated.character,
-      sourceEpisode: validated.episode,
-    },
-  });
-  revalidatePath("/collections");
+  
+  try {
+    await prisma.collectionQuote.create({
+      data: {
+        collectionId: validated.collectionId,
+        quoteText: validated.text,
+        characterName: validated.character,
+        sourceEpisode: validated.episode || "",
+      },
+    });
+    revalidatePath("/collections");
+    return { success: true };
+  } catch (error) {
+    console.error("[addQuote] Error:", error);
+    throw new Error("Failed to add quote to collection");
+  }
 }
 
 export async function getCollectionQuotes(collectionId: number) {

@@ -32,6 +32,7 @@ const EMPTY_DRAFT: Draft = { charId: "", locId: "", desc: "" };
 export default function DiaryForm({ characters, locations }: DiaryFormProps) {
   const [draft, setDraft] = useLocalStorage<Draft>("diary-draft", EMPTY_DRAFT);
   const [formState, setFormState] = useState<Draft>(() => draft);
+  const [error, setError] = useState<string | null>(null);
 
   // Sync draft to localStorage when form state changes
   useEffect(() => {
@@ -39,13 +40,21 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
   }, [formState, setDraft]);
 
   const { execute, isPending } = useFormAction(async () => {
-    if (!formState.charId || !formState.locId || !formState.desc) return;
-    await createDiaryEntry(
-      parseInt(formState.charId),
-      parseInt(formState.locId),
-      formState.desc
-    );
-    setFormState(EMPTY_DRAFT);
+    if (!formState.charId || !formState.locId || !formState.desc) {
+      setError("Please fill in all fields");
+      return;
+    }
+    try {
+      await createDiaryEntry(
+        parseInt(formState.charId),
+        parseInt(formState.locId),
+        formState.desc
+      );
+      setFormState(EMPTY_DRAFT);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save entry");
+    }
   });
 
   return (
@@ -142,9 +151,13 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
         />
       </div>
 
+      {error && (
+        <p className="text-sm text-red-500 font-medium">{error}</p>
+      )}
+
       <Button
         onClick={() => execute()}
-        disabled={isPending}
+        disabled={isPending || !formState.charId || !formState.locId || !formState.desc}
         className="w-full h-10 font-medium"
       >
         {isPending ? (

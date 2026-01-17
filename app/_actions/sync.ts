@@ -125,7 +125,7 @@ export async function syncExternalData(): Promise<SyncResult> {
     ]);
 
     console.log(
-      `Fetched: ${characters.length} characters, ${episodes.length} episodes, ${locations.length} locations`
+      `Fetched: ${characters.length} characters, ${episodes.length} episodes, ${locations.length} locations`,
     );
 
     // Upsert all records

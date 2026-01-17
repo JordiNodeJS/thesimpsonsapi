@@ -22,19 +22,28 @@ export async function submitTrivia(
 ) {
   const validated = SubmitTriviaSchema.parse({ entityType, entityId, content });
   const user = await getCurrentUser();
-  await prisma.triviaFact.create({
-    data: {
-      relatedEntityType: validated.entityType,
-      relatedEntityId: validated.entityId,
-      content: validated.content,
-      submittedByUserId: user.id,
-    },
-  });
-  // Revalidate paths based on entity type
-  if (validated.entityType === "CHARACTER")
-    revalidatePath(`/characters/${validated.entityId}`);
-  if (validated.entityType === "EPISODE")
-    revalidatePath(`/episodes/${validated.entityId}`);
+  
+  try {
+    await prisma.triviaFact.create({
+      data: {
+        relatedEntityType: validated.entityType,
+        relatedEntityId: validated.entityId,
+        content: validated.content,
+        submittedByUserId: user.id,
+      },
+    });
+    
+    // Revalidate paths based on entity type
+    if (validated.entityType === "CHARACTER")
+      revalidatePath(`/characters/${validated.entityId}`);
+    if (validated.entityType === "EPISODE")
+      revalidatePath(`/episodes/${validated.entityId}`);
+    
+    return { success: true };
+  } catch (error) {
+    console.error("[submitTrivia] Error:", error);
+    throw new Error("Failed to submit trivia");
+  }
 }
 
 export async function getTrivia(

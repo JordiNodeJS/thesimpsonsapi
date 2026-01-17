@@ -26,16 +26,23 @@ export async function createDiaryEntry(
     description,
   });
   const user = await getCurrentUser();
-  await prisma.diaryEntry.create({
-    data: {
-      userId: user.id,
-      characterId: validated.characterId,
-      locationId: validated.locationId,
-      activityDescription: validated.description,
-      entryDate: new Date(),
-    },
-  });
-  revalidatePath("/diary");
+  
+  try {
+    await prisma.diaryEntry.create({
+      data: {
+        userId: user.id,
+        characterId: validated.characterId,
+        locationId: validated.locationId,
+        activityDescription: validated.description,
+        entryDate: new Date(),
+      },
+    });
+    revalidatePath("/diary");
+    return { success: true };
+  } catch (error) {
+    console.error("[createDiaryEntry] Error:", error);
+    throw new Error("Failed to create diary entry");
+  }
 }
 
 export async function getDiaryEntries() {
@@ -54,11 +61,23 @@ const DeleteDiaryEntrySchema = z.object({
 export async function deleteDiaryEntry(id: number) {
   const validated = DeleteDiaryEntrySchema.parse({ id });
   const user = await getCurrentUser();
-  await prisma.diaryEntry.deleteMany({
-    where: {
-      id: validated.id,
-      userId: user.id,
-    },
-  });
-  revalidatePath("/diary");
+  
+  try {
+    const result = await prisma.diaryEntry.deleteMany({
+      where: {
+        id: validated.id,
+        userId: user.id,
+      },
+    });
+    
+    if (result.count === 0) {
+      throw new Error("Entry not found or you don't have permission to delete it");
+    }
+    
+    revalidatePath("/diary");
+    return { success: true };
+  } catch (error) {
+    console.error("[deleteDiaryEntry] Error:", error);
+    throw error instanceof Error ? error : new Error("Failed to delete diary entry");
+  }
 }
