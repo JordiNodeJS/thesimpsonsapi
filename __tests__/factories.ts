@@ -1,96 +1,229 @@
 /**
  * Test Data Factories
- * 
+ *
  * Centralized mock data generation for consistent testing across the test suite.
  * Use these factories instead of creating inline mock data to ensure consistency.
  */
 
-import type { Character, Episode, Location, TriviaFact, DiaryEntry } from '@prisma/client';
+import type {
+  Character,
+  Episode,
+  Location,
+  TriviaFact,
+  DiaryEntry,
+  User,
+  QuoteCollection,
+  CollectionQuote,
+  CharacterComment,
+  CharacterFollow,
+  UserEpisodeProgress,
+} from "@prisma/client";
 
 // Character Factory
-export const createMockCharacter = (overrides?: Partial<Character>): Character => ({
+export const createMockCharacter = (
+  overrides?: Partial<Character>,
+): Character => ({
   id: 1,
-  name: 'Homer Simpson',
-  occupation: 'Safety Inspector at Springfield Nuclear Power Plant',
-  imageUrl: 'https://example.com/homer.jpg',
-  createdAt: new Date('2026-01-01'),
-  updatedAt: new Date('2026-01-01'),
+  name: "Homer Simpson",
+  occupation: "Safety Inspector at Springfield Nuclear Power Plant",
+  imageUrl: "https://example.com/homer.jpg",
+  createdAt: new Date("2026-01-01"),
+  updatedAt: new Date("2026-01-01"),
   ...overrides,
 });
 
 // Episode Factory
 export const createMockEpisode = (overrides?: Partial<Episode>): Episode => ({
   id: 1,
-  name: 'Simpsons Roasting on an Open Fire',
+  name: "Simpsons Roasting on an Open Fire",
   season: 1,
   episodeNumber: 1,
-  synopsis: 'Homer is forced to become a department store Santa when Marge has to spend the family\'s Christmas savings to remove Bart\'s tattoo.',
-  imageUrl: 'https://example.com/episode1.jpg',
-  airDate: new Date('1989-12-17'),
-  createdAt: new Date('2026-01-01'),
-  updatedAt: new Date('2026-01-01'),
+  synopsis:
+    "Homer is forced to become a department store Santa when Marge has to spend the family's Christmas savings to remove Bart's tattoo.",
+  imageUrl: "https://example.com/episode1.jpg",
+  airDate: new Date("1989-12-17"),
+  createdAt: new Date("2026-01-01"),
+  updatedAt: new Date("2026-01-01"),
   ...overrides,
 });
 
 // Location Factory
-export const createMockLocation = (overrides?: Partial<Location>): Location => ({
+export const createMockLocation = (
+  overrides?: Partial<Location>,
+): Location => ({
   id: 1,
-  name: 'Moe\'s Tavern',
-  description: 'A seedy bar frequented by Homer and his friends',
-  imageUrl: 'https://example.com/moes.jpg',
-  createdAt: new Date('2026-01-01'),
-  updatedAt: new Date('2026-01-01'),
+  name: "Moe's Tavern",
+  description: "A seedy bar frequented by Homer and his friends",
+  imageUrl: "https://example.com/moes.jpg",
+  createdAt: new Date("2026-01-01"),
+  updatedAt: new Date("2026-01-01"),
   ...overrides,
 });
 
 // Trivia Fact Factory
-export const createMockTriviaFact = (overrides?: Partial<TriviaFact>): TriviaFact => ({
+export const createMockTriviaFact = (
+  overrides?: Partial<TriviaFact>,
+): TriviaFact => ({
   id: 1,
-  relatedEntityType: 'CHARACTER',
+  relatedEntityType: "CHARACTER",
   relatedEntityId: 1,
-  content: 'Homer\'s middle name is Jay, revealed in Season 2.',
-  submittedByUserId: 'test-user-id',
-  createdAt: new Date('2026-01-01'),
-  updatedAt: new Date('2026-01-01'),
+  content: "Homer's middle name is Jay, revealed in Season 2.",
+  submittedByUserId: "test-user-id",
+  createdAt: new Date("2026-01-01"),
+  updatedAt: new Date("2026-01-01"),
   ...overrides,
 });
 
 // Diary Entry Factory
-export const createMockDiaryEntry = (overrides?: Partial<DiaryEntry>): DiaryEntry => ({
+export const createMockDiaryEntry = (
+  overrides?: Partial<DiaryEntry>,
+): DiaryEntry => ({
   id: 1,
-  userId: 'test-user-id',
+  userId: "test-user-id",
   characterId: 1,
   locationId: 1,
-  activityDescription: 'Went to Moe\'s Tavern with Homer and had a Duff beer',
-  entryDate: new Date('2026-01-15'),
-  createdAt: new Date('2026-01-15'),
-  updatedAt: new Date('2026-01-15'),
+  activityDescription: "Went to Moe's Tavern with Homer and had a Duff beer",
+  entryDate: new Date("2026-01-15"),
+  createdAt: new Date("2026-01-15"),
+  updatedAt: new Date("2026-01-15"),
   ...overrides,
 });
 
 // User Factory
-export const createMockUser = (overrides?: Partial<any>) => ({
-  id: 'test-user-id-123',
-  username: 'testuser',
-  email: 'test@example.com',
+export const createMockUser = (overrides?: Partial<User>): User => ({
+  id: "test-user-id-123",
+  username: "testuser",
+  email: "test@example.com",
   emailVerified: false,
   image: null,
-  name: 'Test User',
-  createdAt: new Date('2026-01-01'),
-  updatedAt: new Date('2026-01-01'),
+  name: "Test User",
+  createdAt: new Date("2026-01-01"),
+  updatedAt: new Date("2026-01-01"),
   ...overrides,
 });
 
-// Comment Factory (with user join)
+// Quote Collection Factory
+export const createMockQuoteCollection = (
+  overrides?: Partial<QuoteCollection>,
+): QuoteCollection => ({
+  id: 1,
+  userId: "test-user-id-123",
+  name: "Best Quotes",
+  description: "My favorite quotes from The Simpsons",
+  createdAt: new Date("2026-01-01"),
+  updatedAt: new Date("2026-01-01"),
+  ...overrides,
+});
+
+// Collection Quote Factory
+export const createMockCollectionQuote = (
+  overrides?: Partial<CollectionQuote>,
+): CollectionQuote => ({
+  id: 1,
+  collectionId: 1,
+  quoteText: "D'oh!",
+  characterName: "Homer Simpson",
+  sourceEpisode: "S01E01 - Simpsons Roasting on an Open Fire",
+  createdAt: new Date("2026-01-01"),
+  ...overrides,
+});
+
+// Character Comment Factory
+export const createMockCharacterComment = (
+  overrides?: Partial<CharacterComment>,
+): CharacterComment => ({
+  id: 1,
+  userId: "test-user-id-123",
+  characterId: 1,
+  content: "This is a great character!",
+  createdAt: new Date("2026-01-15"),
+  ...overrides,
+});
+
+// Character Follow Factory
+export const createMockCharacterFollow = (
+  overrides?: Partial<CharacterFollow>,
+): CharacterFollow => ({
+  userId: "test-user-id-123",
+  characterId: 1,
+  createdAt: new Date("2026-01-01"),
+  ...overrides,
+});
+
+// User Episode Progress Factory
+export const createMockEpisodeProgress = (
+  overrides?: Partial<UserEpisodeProgress>,
+): UserEpisodeProgress => ({
+  id: 1,
+  userId: "test-user-id-123",
+  episodeId: 1,
+  rating: 5,
+  notes: "Great episode!",
+  watchedAt: new Date("2026-01-15"),
+  ...overrides,
+});
+
+// Comment Factory (with user join) - for repository results
 export const createMockCommentWithUser = (overrides?: Partial<any>) => ({
   id: 1,
-  userId: 'test-user-id',
+  userId: "test-user-id",
   characterId: 1,
-  content: 'This is a great character!',
-  createdAt: new Date('2026-01-15'),
+  content: "This is a great character!",
+  createdAt: new Date("2026-01-15"),
   user: {
-    username: 'testuser',
-    name: 'Test User',
+    username: "testuser",
+    name: "Test User",
   },
   ...overrides,
 });
+
+// Trivia with User Factory - for repository results
+export const createMockTriviaWithUser = (overrides?: Partial<any>) => ({
+  id: 1,
+  relatedEntityType: "CHARACTER",
+  relatedEntityId: 1,
+  content: "Homer's middle name is Jay.",
+  submittedByUserId: "test-user-id",
+  createdAt: new Date("2026-01-15"),
+  user: {
+    username: "testuser",
+    name: "Test User",
+  },
+  ...overrides,
+});
+
+// Diary Entry with Relations Factory - for repository results
+export const createMockDiaryEntryWithRelations = (
+  overrides?: Partial<any>,
+) => ({
+  id: 1,
+  userId: "test-user-id",
+  characterId: 1,
+  locationId: 1,
+  activityDescription: "Went to Moe's Tavern",
+  entryDate: new Date("2026-01-15"),
+  character: { name: "Homer Simpson" },
+  location: { name: "Moe's Tavern" },
+  ...overrides,
+});
+
+// Batch factory helpers
+export const createMockCharacters = (count: number): Character[] => {
+  return Array.from({ length: count }, (_, i) =>
+    createMockCharacter({
+      id: i + 1,
+      name: `Character ${i + 1}`,
+    }),
+  );
+};
+
+export const createMockEpisodes = (count: number): Episode[] => {
+  return Array.from({ length: count }, (_, i) =>
+    createMockEpisode({
+      id: i + 1,
+      name: `Episode ${i + 1}`,
+      season: Math.floor(i / 22) + 1,
+      episodeNumber: (i % 22) + 1,
+    }),
+  );
+};
