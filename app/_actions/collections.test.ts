@@ -36,8 +36,6 @@ describe("Collections Server Actions", () => {
         userId: mockUser.id,
         name: "Best Quotes",
         description: "My favorite quotes",
-        createdAt: new Date(),
-        updatedAt: new Date(),
       });
 
       const result = await createCollection(
@@ -90,8 +88,6 @@ describe("Collections Server Actions", () => {
         userId: mockUser.id,
         name: "Quotes",
         description: "",
-        createdAt: new Date(),
-        updatedAt: new Date(),
       });
 
       const result = await createCollection("Quotes", "");
@@ -158,7 +154,6 @@ describe("Collections Server Actions", () => {
         quoteText: "D'oh!",
         characterName: "Homer Simpson",
         sourceEpisode: "S01E01",
-        createdAt: new Date(),
       });
 
       const result = await addQuote(1, "D'oh!", "Homer Simpson", "S01E01");
@@ -194,7 +189,6 @@ describe("Collections Server Actions", () => {
         quoteText: "D'oh!",
         characterName: "Homer Simpson",
         sourceEpisode: "",
-        createdAt: new Date(),
       });
 
       const result = await addQuote(1, "D'oh!", "Homer Simpson", "");

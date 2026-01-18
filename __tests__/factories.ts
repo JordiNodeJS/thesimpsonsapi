@@ -24,26 +24,23 @@ export const createMockCharacter = (
   overrides?: Partial<Character>,
 ): Character => ({
   id: 1,
+  externalId: 100,
   name: "Homer Simpson",
   occupation: "Safety Inspector at Springfield Nuclear Power Plant",
   imageUrl: "https://example.com/homer.jpg",
-  createdAt: new Date("2026-01-01"),
-  updatedAt: new Date("2026-01-01"),
   ...overrides,
 });
 
 // Episode Factory
 export const createMockEpisode = (overrides?: Partial<Episode>): Episode => ({
   id: 1,
-  name: "Simpsons Roasting on an Open Fire",
+  externalId: 1,
+  title: "Simpsons Roasting on an Open Fire",
   season: 1,
   episodeNumber: 1,
   synopsis:
     "Homer is forced to become a department store Santa when Marge has to spend the family's Christmas savings to remove Bart's tattoo.",
   imageUrl: "https://example.com/episode1.jpg",
-  airDate: new Date("1989-12-17"),
-  createdAt: new Date("2026-01-01"),
-  updatedAt: new Date("2026-01-01"),
   ...overrides,
 });
 
@@ -52,11 +49,8 @@ export const createMockLocation = (
   overrides?: Partial<Location>,
 ): Location => ({
   id: 1,
+  externalId: 1,
   name: "Moe's Tavern",
-  description: "A seedy bar frequented by Homer and his friends",
-  imageUrl: "https://example.com/moes.jpg",
-  createdAt: new Date("2026-01-01"),
-  updatedAt: new Date("2026-01-01"),
   ...overrides,
 });
 
@@ -70,7 +64,6 @@ export const createMockTriviaFact = (
   content: "Homer's middle name is Jay, revealed in Season 2.",
   submittedByUserId: "test-user-id",
   createdAt: new Date("2026-01-01"),
-  updatedAt: new Date("2026-01-01"),
   ...overrides,
 });
 
@@ -84,8 +77,6 @@ export const createMockDiaryEntry = (
   locationId: 1,
   activityDescription: "Went to Moe's Tavern with Homer and had a Duff beer",
   entryDate: new Date("2026-01-15"),
-  createdAt: new Date("2026-01-15"),
-  updatedAt: new Date("2026-01-15"),
   ...overrides,
 });
 
@@ -95,6 +86,7 @@ export const createMockUser = (overrides?: Partial<User>): User => ({
   username: "testuser",
   email: "test@example.com",
   emailVerified: false,
+  password: null,
   image: null,
   name: "Test User",
   createdAt: new Date("2026-01-01"),
@@ -110,8 +102,6 @@ export const createMockQuoteCollection = (
   userId: "test-user-id-123",
   name: "Best Quotes",
   description: "My favorite quotes from The Simpsons",
-  createdAt: new Date("2026-01-01"),
-  updatedAt: new Date("2026-01-01"),
   ...overrides,
 });
 
@@ -124,7 +114,6 @@ export const createMockCollectionQuote = (
   quoteText: "D'oh!",
   characterName: "Homer Simpson",
   sourceEpisode: "S01E01 - Simpsons Roasting on an Open Fire",
-  createdAt: new Date("2026-01-01"),
   ...overrides,
 });
 
@@ -154,7 +143,6 @@ export const createMockCharacterFollow = (
 export const createMockEpisodeProgress = (
   overrides?: Partial<UserEpisodeProgress>,
 ): UserEpisodeProgress => ({
-  id: 1,
   userId: "test-user-id-123",
   episodeId: 1,
   rating: 5,
@@ -221,7 +209,8 @@ export const createMockEpisodes = (count: number): Episode[] => {
   return Array.from({ length: count }, (_, i) =>
     createMockEpisode({
       id: i + 1,
-      name: `Episode ${i + 1}`,
+      externalId: i + 1,
+      title: `Episode ${i + 1}`,
       season: Math.floor(i / 22) + 1,
       episodeNumber: (i % 22) + 1,
     }),

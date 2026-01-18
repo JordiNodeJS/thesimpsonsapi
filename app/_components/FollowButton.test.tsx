@@ -58,7 +58,10 @@ describe("FollowButton", () => {
   describe("interaction", () => {
     it("should toggle follow state on click", async () => {
       const { toggleFollow } = await import("@/app/_actions/social");
-      vi.mocked(toggleFollow).mockResolvedValue({ success: true });
+      vi.mocked(toggleFollow).mockResolvedValue({
+        success: true,
+        isFollowing: true,
+      });
 
       const user = userEvent.setup();
       render(<FollowButton characterId={1} initialIsFollowing={false} />);
@@ -73,7 +76,10 @@ describe("FollowButton", () => {
 
     it("should call toggleFollow with correct characterId", async () => {
       const { toggleFollow } = await import("@/app/_actions/social");
-      vi.mocked(toggleFollow).mockResolvedValue({ success: true });
+      vi.mocked(toggleFollow).mockResolvedValue({
+        success: true,
+        isFollowing: true,
+      });
 
       const user = userEvent.setup();
       render(<FollowButton characterId={42} initialIsFollowing={false} />);

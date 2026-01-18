@@ -27,7 +27,6 @@ describe("Episodes Server Actions", () => {
     it("should track episode for authenticated user", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
       prismaMock.userEpisodeProgress.upsert.mockResolvedValue({
-        id: 1,
         userId: mockUser.id,
         episodeId: 1,
         rating: 5,
@@ -86,7 +85,6 @@ describe("Episodes Server Actions", () => {
     it("should handle empty notes", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
       prismaMock.userEpisodeProgress.upsert.mockResolvedValue({
-        id: 1,
         userId: mockUser.id,
         episodeId: 1,
         rating: 4,
@@ -109,7 +107,6 @@ describe("Episodes Server Actions", () => {
     it("should update existing progress", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
       prismaMock.userEpisodeProgress.upsert.mockResolvedValue({
-        id: 1,
         userId: mockUser.id,
         episodeId: 1,
         rating: 3,
