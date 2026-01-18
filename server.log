@@ -1,0 +1,14 @@
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.20.176.1:3000
+- Environments: .env.local, .env
+
+✓ Starting...
+✓ Ready in 894ms
+Persisting failed: Unable to write SST file 00003839.sst
+
+Caused by:
+    El sistema no puede encontrar la ruta especificada. (os error 3)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+[?25h

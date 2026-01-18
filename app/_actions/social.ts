@@ -1,15 +1,20 @@
 "use server";
 
-import { execute } from "@/app/_lib/db-utils";
-import { TABLES } from "@/app/_lib/db-schema";
-import { getCurrentUser, getCurrentUserOptional } from "@/app/_lib/auth";
+import { prisma } from "@/app/_lib/prisma";
+import { getCurrentUserOptional } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import {
   isUserFollowingCharacter,
   findCommentsByCharacter,
 } from "@/app/_lib/repositories";
 
+const ToggleFollowSchema = z.object({
+  characterId: z.number().int().positive(),
+});
+
 export async function toggleFollow(characterId: number) {
+  const validated = ToggleFollowSchema.parse({ characterId });
   const user = await getCurrentUserOptional();
   if (!user) {
     return { success: false, error: "Please log in to follow characters" };
@@ -18,27 +23,36 @@ export async function toggleFollow(characterId: number) {
   try {
     const isCurrentlyFollowing = await isUserFollowingCharacter(
       user.id,
-      characterId
+      validated.characterId
     );
 
     if (isCurrentlyFollowing) {
-      await execute(
-        `DELETE FROM ${TABLES.characterFollows} WHERE user_id = $1 AND character_id = $2`,
-        [user.id, characterId]
-      );
+      await prisma.characterFollow.delete({
+        where: {
+          userId_characterId: {
+            userId: user.id,
+            characterId: validated.characterId,
+          },
+        },
+      });
     } else {
-      await execute(
-        `INSERT INTO ${TABLES.characterFollows} (user_id, character_id) VALUES ($1, $2)`,
-        [user.id, characterId]
-      );
+      await prisma.characterFollow.create({
+        data: {
+          userId: user.id,
+          characterId: validated.characterId,
+        },
+      });
     }
-    revalidatePath(`/characters/${characterId}`);
+    revalidatePath(`/characters/${validated.characterId}`);
     return { success: true, isFollowing: !isCurrentlyFollowing };
   } catch (error) {
     console.error("[toggleFollow] Error:", error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Failed to update follow status" 
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to update follow status",
     };
   }
 }
@@ -49,24 +63,33 @@ export async function isFollowing(characterId: number) {
   return isUserFollowingCharacter(user.id, characterId);
 }
 
+const PostCommentSchema = z.object({
+  characterId: z.number().int().positive(),
+  content: z.string().min(1, "Comment cannot be empty").max(1000),
+});
+
 export async function postComment(characterId: number, content: string) {
+  const validated = PostCommentSchema.parse({ characterId, content });
   const user = await getCurrentUserOptional();
   if (!user) {
     return { success: false, error: "Please log in to post comments" };
   }
 
   try {
-    await execute(
-      `INSERT INTO ${TABLES.characterComments} (user_id, character_id, content) VALUES ($1, $2, $3)`,
-      [user.id, characterId, content]
-    );
-    revalidatePath(`/characters/${characterId}`);
+    await prisma.characterComment.create({
+      data: {
+        userId: user.id,
+        characterId: validated.characterId,
+        content: validated.content,
+      },
+    });
+    revalidatePath(`/characters/${validated.characterId}`);
     return { success: true };
   } catch (error) {
     console.error("[postComment] Error:", error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Failed to post comment" 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to post comment",
     };
   }
 }

@@ -1,7 +1,6 @@
 "use server";
 
-import { execute } from "@/app/_lib/db-utils";
-import { TABLES } from "@/app/_lib/db-schema";
+import { prisma } from "@/app/_lib/prisma";
 import { APICharacter, APIEpisode, APILocation } from "@/app/_lib/types";
 
 const API_BASE = "https://thesimpsonsapi.com/api";
@@ -46,55 +45,63 @@ function buildImageUrl(path: string | null | undefined): string | null {
 }
 
 /**
- * Upserts a character into the database.
+ * Upserts a character into the database using Prisma.
  */
 async function upsertCharacter(char: APICharacter): Promise<void> {
-  await execute(
-    `INSERT INTO ${TABLES.characters} (external_id, name, occupation, image_url)
-     VALUES ($1, $2, $3, $4)
-     ON CONFLICT (external_id) DO UPDATE 
-     SET name = EXCLUDED.name, 
-         occupation = EXCLUDED.occupation, 
-         image_url = EXCLUDED.image_url`,
-    [char.id, char.name, char.occupation, buildImageUrl(char.portrait_path)]
-  );
+  await prisma.character.upsert({
+    where: { externalId: char.id },
+    update: {
+      name: char.name,
+      occupation: char.occupation,
+      imageUrl: buildImageUrl(char.portrait_path),
+    },
+    create: {
+      externalId: char.id,
+      name: char.name,
+      occupation: char.occupation,
+      imageUrl: buildImageUrl(char.portrait_path),
+    },
+  });
 }
 
 /**
- * Upserts an episode into the database.
+ * Upserts an episode into the database using Prisma.
  */
 async function upsertEpisode(ep: APIEpisode): Promise<void> {
-  await execute(
-    `INSERT INTO ${TABLES.episodes} (external_id, title, season, episode_number, synopsis, image_url)
-     VALUES ($1, $2, $3, $4, $5, $6)
-     ON CONFLICT (external_id) DO UPDATE 
-     SET title = EXCLUDED.title, 
-         season = EXCLUDED.season, 
-         episode_number = EXCLUDED.episode_number, 
-         synopsis = EXCLUDED.synopsis, 
-         image_url = EXCLUDED.image_url`,
-    [
-      ep.id,
-      ep.name,
-      ep.season,
-      ep.episode_number,
-      ep.synopsis,
-      buildImageUrl(ep.image_path),
-    ]
-  );
+  await prisma.episode.upsert({
+    where: { externalId: ep.id },
+    update: {
+      title: ep.name,
+      season: ep.season,
+      episodeNumber: ep.episode_number,
+      synopsis: ep.synopsis,
+      imageUrl: buildImageUrl(ep.image_path),
+    },
+    create: {
+      externalId: ep.id,
+      title: ep.name,
+      season: ep.season,
+      episodeNumber: ep.episode_number,
+      synopsis: ep.synopsis,
+      imageUrl: buildImageUrl(ep.image_path),
+    },
+  });
 }
 
 /**
- * Upserts a location into the database.
+ * Upserts a location into the database using Prisma.
  */
 async function upsertLocation(loc: APILocation): Promise<void> {
-  await execute(
-    `INSERT INTO ${TABLES.locations} (external_id, name)
-     VALUES ($1, $2)
-     ON CONFLICT (external_id) DO UPDATE 
-     SET name = EXCLUDED.name`,
-    [loc.id, loc.name]
-  );
+  await prisma.location.upsert({
+    where: { externalId: loc.id },
+    update: {
+      name: loc.name,
+    },
+    create: {
+      externalId: loc.id,
+      name: loc.name,
+    },
+  });
 }
 
 export interface SyncResult {
@@ -118,7 +125,7 @@ export async function syncExternalData(): Promise<SyncResult> {
     ]);
 
     console.log(
-      `Fetched: ${characters.length} characters, ${episodes.length} episodes, ${locations.length} locations`
+      `Fetched: ${characters.length} characters, ${episodes.length} episodes, ${locations.length} locations`,
     );
 
     // Upsert all records

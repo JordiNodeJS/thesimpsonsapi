@@ -1,0 +1,266 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Using Prisma with Neon Serverless PostgreSQL
+// The Neon adapter is configured in lib/prisma.ts
+// Connection URL is defined in prisma.config.ts (Prisma 7+)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["the_simpson"]
+}
+
+// ============================================
+// Better Auth Tables
+// ============================================
+
+model User {
+  id            String    @id @default(dbgenerated("(gen_random_uuid())::text"))
+  email         String?   @unique
+  emailVerified Boolean?  @default(false)
+  name          String?
+  username      String?
+  password      String?
+  image         String?
+  createdAt     DateTime? @default(now())
+  updatedAt     DateTime? @default(now()) @updatedAt
+
+  // Relations
+  sessions         Session[]
+  accounts         Account[]
+  characterComments CharacterComment[]
+  characterFollows  CharacterFollow[]
+  characterFavorites CharacterFavorite[]
+  diaryEntries      DiaryEntry[]
+  quoteCollections  QuoteCollection[]
+  triviaFacts       TriviaFact[]
+  episodeProgress   UserEpisodeProgress[]
+
+  @@map("users")
+  @@schema("the_simpson")
+}
+
+model Session {
+  id        String    @id @default(dbgenerated("(gen_random_uuid())::text"))
+  expiresAt DateTime
+  token     String    @unique
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now()) @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+  @@schema("the_simpson")
+}
+
+model Account {
+  id                    String    @id @default(dbgenerated("(gen_random_uuid())::text"))
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime? @default(now())
+  updatedAt             DateTime? @default(now()) @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+  @@schema("the_simpson")
+}
+
+model Verification {
+  id         String    @id @default(dbgenerated("(gen_random_uuid())::text"))
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @default(now()) @updatedAt
+
+  @@map("verification")
+  @@schema("the_simpson")
+}
+
+// ============================================
+// Core Content Tables (synced from external API)
+// ============================================
+
+model Character {
+  id         Int     @id @default(autoincrement())
+  externalId Int     @unique @map("external_id")
+  name       String
+  occupation String?
+  imageUrl   String? @map("image_url")
+
+  // Relations
+  comments    CharacterComment[]
+  follows     CharacterFollow[]
+  favorites   CharacterFavorite[]
+  diaryEntries DiaryEntry[]
+
+  @@map("characters")
+  @@schema("the_simpson")
+}
+
+model Episode {
+  id            Int     @id @default(autoincrement())
+  externalId    Int     @unique @map("external_id")
+  title         String
+  season        Int
+  episodeNumber Int     @map("episode_number")
+  synopsis      String?
+  imageUrl      String? @map("image_url")
+
+  // Relations
+  userProgress UserEpisodeProgress[]
+
+  @@index([season, episodeNumber])
+  @@map("episodes")
+  @@schema("the_simpson")
+}
+
+model Location {
+  id         Int    @id @default(autoincrement())
+  externalId Int    @unique @map("external_id")
+  name       String
+
+  // Relations
+  diaryEntries DiaryEntry[]
+
+  @@map("locations")
+  @@schema("the_simpson")
+}
+
+// ============================================
+// User Interaction Tables
+// ============================================
+
+model CharacterComment {
+  id          Int       @id @default(autoincrement())
+  userId      String?   @map("user_id")
+  characterId Int?      @map("character_id")
+  content     String
+  createdAt   DateTime? @default(now()) @map("created_at")
+
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  character Character? @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("character_comments")
+  @@schema("the_simpson")
+}
+
+model CharacterFollow {
+  userId      String   @map("user_id")
+  characterId Int      @map("character_id")
+  createdAt   DateTime? @default(now()) @map("created_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([userId, characterId])
+  @@index([characterId])
+  @@map("character_follows")
+  @@schema("the_simpson")
+}
+
+model CharacterFavorite {
+  userId      String @map("user_id")
+  characterId Int    @map("character_id")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([userId, characterId])
+  @@map("character_favorites")
+  @@schema("the_simpson")
+}
+
+model DiaryEntry {
+  id                  Int       @id @default(autoincrement())
+  userId              String?   @map("user_id")
+  characterId         Int?      @map("character_id")
+  locationId          Int?      @map("location_id")
+  activityDescription String    @map("activity_description")
+  entryDate           DateTime? @default(dbgenerated("CURRENT_DATE")) @map("entry_date") @db.Date
+
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  character Character? @relation(fields: [characterId], references: [id], onDelete: SetNull)
+  location  Location?  @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entryDate])
+  @@map("diary_entries")
+  @@schema("the_simpson")
+}
+
+model QuoteCollection {
+  id          Int     @id @default(autoincrement())
+  userId      String? @map("user_id")
+  name        String
+  description String?
+
+  user   User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  quotes CollectionQuote[]
+
+  @@map("quote_collections")
+  @@schema("the_simpson")
+}
+
+model CollectionQuote {
+  id            Int     @id @default(autoincrement())
+  collectionId  Int?    @map("collection_id")
+  quoteText     String  @map("quote_text")
+  characterName String? @map("character_name")
+  sourceEpisode String? @map("source_episode")
+
+  collection QuoteCollection? @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@map("collection_quotes")
+  @@schema("the_simpson")
+}
+
+model TriviaFact {
+  id                Int       @id @default(autoincrement())
+  relatedEntityType String?   @map("related_entity_type")
+  relatedEntityId   Int       @map("related_entity_id")
+  content           String
+  submittedByUserId String?   @map("submitted_by_user_id")
+  createdAt         DateTime? @default(now()) @map("created_at")
+
+  user User? @relation(fields: [submittedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([relatedEntityType, relatedEntityId])
+  @@index([createdAt])
+  @@map("trivia_facts")
+  @@schema("the_simpson")
+}
+
+model UserEpisodeProgress {
+  userId    String    @map("user_id")
+  episodeId Int       @map("episode_id")
+  watchedAt DateTime? @default(now()) @map("watched_at")
+  rating    Int?
+  notes     String?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, episodeId])
+  @@map("user_episode_progress")
+  @@schema("the_simpson")
+}

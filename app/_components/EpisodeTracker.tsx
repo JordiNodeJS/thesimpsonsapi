@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Star, Loader2 } from "lucide-react";
-import { EpisodeProgress } from "@/app/_lib/types";
+import type { UserEpisodeProgress } from "@prisma/client";
 
 interface EpisodeTrackerProps {
   episodeId: number;
-  initialProgress: EpisodeProgress | null;
+  initialProgress: UserEpisodeProgress | null;
 }
 
 export default function EpisodeTracker({
@@ -56,7 +56,7 @@ export default function EpisodeTracker({
         />
       </div>
 
-      <Button onClick={() => execute()} disabled={isPending}>
+      <Button onClick={() => execute()} disabled={isPending || rating === 0}>
         {isPending ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -66,6 +66,11 @@ export default function EpisodeTracker({
           "Save Progress"
         )}
       </Button>
+      {rating === 0 && (
+        <p className="text-sm text-muted-foreground">
+          Please select a rating first
+        </p>
+      )}
     </div>
   );
 }

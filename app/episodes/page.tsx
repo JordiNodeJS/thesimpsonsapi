@@ -34,41 +34,41 @@ async function EpisodeList() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {episodes.map((ep) => (
-          <Link key={ep.id} href={`/episodes/${ep.id}`}>
-            <Card className="h-full hover:shadow-xl transition-shadow cursor-pointer overflow-hidden">
-              <div className="relative h-48 w-full bg-zinc-100 dark:bg-zinc-800">
-                {ep.image_url ? (
-                  <Image
-                    src={ep.image_url}
-                    alt={ep.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <span className="text-sm text-zinc-400">No image</span>
-                  </div>
-                )}
-              </div>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-xl">{ep.title}</CardTitle>
-                  <Badge variant="secondary">
-                    S{ep.season} E{ep.episode_number}
-                  </Badge>
+      {episodes.map((ep) => (
+        <Link key={ep.id} href={`/episodes/${ep.id}`}>
+          <Card className="h-full hover:shadow-xl transition-shadow cursor-pointer overflow-hidden">
+            <div className="relative h-48 w-full bg-zinc-100 dark:bg-zinc-800">
+              {ep.imageUrl ? (
+                <Image
+                  src={ep.imageUrl}
+                  alt={ep.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <span className="text-sm text-zinc-400">No image</span>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground line-clamp-3">
-                  {ep.synopsis}
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+              )}
+            </div>
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-xl">{ep.title}</CardTitle>
+                <Badge variant="secondary">
+                  S{ep.season} E{ep.episodeNumber}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground line-clamp-3">
+                {ep.synopsis}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+      ))}
+    </div>
   );
 }
 
@@ -76,7 +76,6 @@ export default function EpisodesPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-6">Episodes</h1>
-
       <Suspense
         fallback={
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -87,6 +86,7 @@ export default function EpisodesPage() {
         }
       >
         <EpisodeList />
-      </Suspense>    </div>
+      </Suspense>{" "}
+    </div>
   );
 }

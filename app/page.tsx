@@ -137,7 +137,7 @@ export default async function Home() {
               >
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 transition-all group-hover:border-yellow-500/50 group-hover:shadow-2xl group-hover:shadow-yellow-500/10">
                   <CharacterImage
-                    src={char.image_url}
+                    src={char.imageUrl}
                     alt={char.name}
                     fill
                     className="object-contain p-4 transition-transform group-hover:scale-110"
@@ -229,7 +229,7 @@ export default async function Home() {
                       variant="secondary"
                       className="text-[10px] uppercase tracking-tighter"
                     >
-                      {trivia.related_entity_type}
+                      {trivia.relatedEntityType}
                     </Badge>
                   </div>
                 </div>

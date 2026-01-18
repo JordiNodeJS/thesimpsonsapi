@@ -54,19 +54,21 @@ export default async function DiaryPage() {
                   <div className="flex flex-col gap-1">
                     <div className="flex justify-between items-start">
                       <span className="text-sm text-muted-foreground">
-                        {new Date(entry.entry_date).toLocaleDateString()}
+                        {entry.entryDate
+                          ? new Date(entry.entryDate).toLocaleDateString()
+                          : "Unknown date"}
                       </span>
                       <DeleteDiaryEntryButton id={entry.id} />
                     </div>
                     <h3 className="text-lg font-medium">
                       With{" "}
                       <span className="font-bold text-yellow-600 dark:text-yellow-400">
-                        {entry.character_name}
+                        {entry.characterName}
                       </span>{" "}
-                      at {entry.location_name}
+                      at {entry.locationName}
                     </h3>
                     <p className="text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-900 p-4 rounded-lg mt-2">
-                      {entry.activity_description}
+                      {entry.activityDescription}
                     </p>
                   </div>
                 </div>

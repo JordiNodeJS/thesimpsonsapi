@@ -11,15 +11,26 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 export default function CreateCollectionForm() {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const { execute, isPending } = useFormAction(
     async () => {
-      if (!name) return;
-      await createCollection(name, desc);
-      setName("");
-      setDesc("");
+      if (!name.trim()) {
+        setError("Name is required");
+        return;
+      }
+      try {
+        await createCollection(name, desc);
+        setName("");
+        setDesc("");
+        setError(null);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to create collection",
+        );
+      }
     },
-    { onError: (err) => console.error("Failed to create collection:", err) }
+    { onError: (err) => setError(err.message) },
   );
 
   return (
@@ -38,6 +49,7 @@ export default function CreateCollectionForm() {
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
         />
+        {error && <p className="text-sm text-red-500">{error}</p>}
         <Button
           onClick={() => execute()}
           disabled={isPending}

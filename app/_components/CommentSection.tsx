@@ -6,20 +6,14 @@ import { useFormAction } from "@/app/_lib/hooks";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
-interface CommentData {
-  id: number;
-  username: string;
-  content: string;
-  created_at: Date;
-}
+import type { CommentWithUser } from "@/app/_lib/repositories";
 
 export default function CommentSection({
   characterId,
   comments,
 }: {
   characterId: number;
-  comments: CommentData[];
+  comments: CommentWithUser[];
 }) {
   const [content, setContent] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +64,9 @@ export default function CommentSection({
               <div className="flex items-center gap-2">
                 <span className="font-semibold">{comment.username}</span>
                 <span className="text-xs text-muted-foreground">
-                  {new Date(comment.created_at).toLocaleDateString()}
+                  {comment.createdAt
+                    ? new Date(comment.createdAt).toLocaleDateString()
+                    : "Unknown"}
                 </span>
               </div>
               <p className="mt-1 text-sm">{comment.content}</p>

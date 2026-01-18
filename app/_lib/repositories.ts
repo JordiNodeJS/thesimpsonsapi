@@ -1,78 +1,109 @@
-import { query, queryOne } from "@/app/_lib/db-utils";
-import { TABLES } from "@/app/_lib/db-schema";
-import type {
-  DBCharacter,
-  DBEpisode,
-  DBLocation,
-  DBComment,
-  DBTriviaFact,
-  DBDiaryEntry,
-  DBEpisodeProgress,
-  DBQuoteCollection,
-  DBCollectionQuote,
-} from "@/app/_lib/db-types";
+import { prisma } from "@/app/_lib/prisma";
+
+// ============================================
+// Types for query results with joins
+// ============================================
+
+export type CommentWithUser = {
+  id: number;
+  userId: string | null;
+  characterId: number | null;
+  content: string;
+  createdAt: string | null;
+  username: string;
+};
+
+export type TriviaWithUser = {
+  id: number;
+  relatedEntityType: string | null;
+  relatedEntityId: number;
+  content: string;
+  submittedByUserId: string | null;
+  createdAt: string | null;
+  username: string;
+};
+
+export type DiaryEntryWithRelations = {
+  id: number;
+  userId: string | null;
+  characterId: number | null;
+  locationId: number | null;
+  activityDescription: string;
+  entryDate: string | null;
+  characterName: string | null;
+  locationName: string | null;
+};
 
 // ============================================
 // Characters
 // ============================================
 
-export async function findAllCharacters(limit = 50): Promise<DBCharacter[]> {
-  return query<DBCharacter>(
-    `SELECT * FROM ${TABLES.characters} ORDER BY id ASC LIMIT $1`,
-    [limit]
-  );
+export async function findAllCharacters(limit = 50) {
+  return prisma.character.findMany({
+    take: limit,
+    orderBy: { id: "asc" },
+  });
 }
 
-export async function findCharacterById(
-  id: number
-): Promise<DBCharacter | null> {
-  return queryOne<DBCharacter>(
-    `SELECT * FROM ${TABLES.characters} WHERE id = $1`,
-    [id]
-  );
+export async function findCharacterById(id: number) {
+  return prisma.character.findUnique({
+    where: { id },
+  });
 }
 
-export async function findFeaturedCharacters(): Promise<DBCharacter[]> {
-  return query<DBCharacter>(
-    `SELECT * FROM ${TABLES.characters} 
-     WHERE name IN ('Homer Simpson', 'Marge Simpson', 'Bart Simpson', 'Lisa Simpson', 'Maggie Simpson')
-     LIMIT 5`
-  );
+export async function findFeaturedCharacters() {
+  return prisma.character.findMany({
+    where: {
+      name: {
+        in: [
+          "Homer Simpson",
+          "Marge Simpson",
+          "Bart Simpson",
+          "Lisa Simpson",
+          "Maggie Simpson",
+        ],
+      },
+    },
+    take: 5,
+  });
 }
 
-export async function findCharacterNames(): Promise<
-  Pick<DBCharacter, "id" | "name" | "image_url">[]
-> {
-  return query<Pick<DBCharacter, "id" | "name" | "image_url">>(
-    `SELECT id, name, image_url FROM ${TABLES.characters} ORDER BY name ASC`
-  );
+export async function findCharacterNames() {
+  return prisma.character.findMany({
+    select: {
+      id: true,
+      name: true,
+      imageUrl: true,
+    },
+    orderBy: { name: "asc" },
+  });
 }
 
 // ============================================
 // Episodes
 // ============================================
 
-export async function findAllEpisodes(limit = 50): Promise<DBEpisode[]> {
-  return query<DBEpisode>(
-    `SELECT * FROM ${TABLES.episodes} ORDER BY season ASC, episode_number ASC LIMIT $1`,
-    [limit]
-  );
+export async function findAllEpisodes(limit = 50) {
+  return prisma.episode.findMany({
+    take: limit,
+    orderBy: [{ season: "asc" }, { episodeNumber: "asc" }],
+  });
 }
 
-export async function findEpisodeById(id: number): Promise<DBEpisode | null> {
-  return queryOne<DBEpisode>(`SELECT * FROM ${TABLES.episodes} WHERE id = $1`, [
-    id,
-  ]);
+export async function findEpisodeById(id: number) {
+  return prisma.episode.findUnique({
+    where: { id },
+  });
 }
 
 // ============================================
 // Locations
 // ============================================
 
-export async function findAllLocations(): Promise<DBLocation[]> {
-  return query<DBLocation>(
-    `SELECT * FROM ${TABLES.locations} ORDER BY name ASC`
-  );
+export async function findAllLocations() {
+  return prisma.location.findMany({
+    orderBy: { name: "asc" },
+  });
 }
 
 // ============================================
@@ -81,16 +112,28 @@ export async function findAllLocations(): Promise<DBLocation[]> {
 
 export async function findCommentsByCharacter(
   characterId: number
-): Promise<DBComment[]> {
-  return query<DBComment>(
-    `SELECT c.*, 
-            COALESCE(NULLIF(u.username, ''), NULLIF(u.name, ''), 'Anonymous') as username
-     FROM ${TABLES.characterComments} c 
-     JOIN ${TABLES.users} u ON c.user_id = u.id 
-     WHERE c.character_id = $1 
-     ORDER BY c.created_at DESC`,
-    [characterId]
-  );
+): Promise<CommentWithUser[]> {
+  const comments = await prisma.characterComment.findMany({
+    where: { characterId },
+    include: {
+      user: {
+        select: {
+          username: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return comments.map((c) => ({
+    id: c.id,
+    userId: c.userId,
+    characterId: c.characterId,
+    content: c.content,
+    createdAt: c.createdAt ? c.createdAt.toISOString() : null,
+    username: c.user?.username || c.user?.name || "Anonymous",
+  }));
 }
 
 // ============================================
@@ -100,28 +143,57 @@ export async function findCommentsByCharacter(
 export async function findTriviaByEntity(
   entityType: "CHARACTER" | "EPISODE",
   entityId: number
-): Promise<DBTriviaFact[]> {
-  return query<DBTriviaFact>(
-    `SELECT t.*, 
-            COALESCE(NULLIF(u.username, ''), NULLIF(u.name, ''), 'Anonymous') as username
-     FROM ${TABLES.triviaFacts} t
-     JOIN ${TABLES.users} u ON t.submitted_by_user_id = u.id
-     WHERE related_entity_type = $1 AND related_entity_id = $2
-     ORDER BY created_at DESC`,
-    [entityType, entityId]
-  );
+): Promise<TriviaWithUser[]> {
+  const trivia = await prisma.triviaFact.findMany({
+    where: {
+      relatedEntityType: entityType,
+      relatedEntityId: entityId,
+    },
+    include: {
+      user: {
+        select: {
+          username: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return trivia.map((t) => ({
+    id: t.id,
+    relatedEntityType: t.relatedEntityType,
+    relatedEntityId: t.relatedEntityId,
+    content: t.content,
+    submittedByUserId: t.submittedByUserId,
+    createdAt: t.createdAt ? t.createdAt.toISOString() : null,
+    username: t.user?.username || t.user?.name || "Anonymous",
+  }));
 }
 
-export async function findLatestTrivia(limit = 3): Promise<DBTriviaFact[]> {
-  return query<DBTriviaFact>(
-    `SELECT t.*, 
-            COALESCE(NULLIF(u.username, ''), NULLIF(u.name, ''), 'Anonymous') as username
-     FROM ${TABLES.triviaFacts} t
-     JOIN ${TABLES.users} u ON t.submitted_by_user_id = u.id
-     ORDER BY t.created_at DESC
-     LIMIT $1`,
-    [limit]
-  );
+export async function findLatestTrivia(limit = 3): Promise<TriviaWithUser[]> {
+  const trivia = await prisma.triviaFact.findMany({
+    take: limit,
+    include: {
+      user: {
+        select: {
+          username: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return trivia.map((t) => ({
+    id: t.id,
+    relatedEntityType: t.relatedEntityType,
+    relatedEntityId: t.relatedEntityId,
+    content: t.content,
+    submittedByUserId: t.submittedByUserId,
+    createdAt: t.createdAt ? t.createdAt.toISOString() : null,
+    username: t.user?.username || t.user?.name || "Anonymous",
+  }));
 }
 
 // ============================================
@@ -130,16 +202,30 @@ export async function findLatestTrivia(limit = 3): Promise<DBTriviaFact[]> {
 
 export async function findDiaryEntriesByUser(
   userId: string
-): Promise<DBDiaryEntry[]> {
-  return query<DBDiaryEntry>(
-    `SELECT d.*, c.name as character_name, l.name as location_name 
-     FROM ${TABLES.diaryEntries} d
-     JOIN ${TABLES.characters} c ON d.character_id = c.id
-     JOIN ${TABLES.locations} l ON d.location_id = l.id
-     WHERE d.user_id = $1
-     ORDER BY d.entry_date DESC, d.id DESC`,
-    [userId]
-  );
+): Promise<DiaryEntryWithRelations[]> {
+  const entries = await prisma.diaryEntry.findMany({
+    where: { userId },
+    include: {
+      character: {
+        select: { name: true },
+      },
+      location: {
+        select: { name: true },
+      },
+    },
+    orderBy: [{ entryDate: "desc" }, { id: "desc" }],
+  });
+
+  return entries.map((e) => ({
+    id: e.id,
+    userId: e.userId,
+    characterId: e.characterId,
+    locationId: e.locationId,
+    activityDescription: e.activityDescription,
+    entryDate: e.entryDate ? new Date(e.entryDate).toISOString() : null,
+    characterName: e.character?.name ?? null,
+    locationName: e.location?.name ?? null,
+  }));
 }
 
 // ============================================
@@ -149,33 +235,33 @@ export async function findDiaryEntriesByUser(
 export async function findEpisodeProgressByUser(
   userId: string,
   episodeId: number
-): Promise<DBEpisodeProgress | null> {
-  return queryOne<DBEpisodeProgress>(
-    `SELECT * FROM ${TABLES.userEpisodeProgress} WHERE user_id = $1 AND episode_id = $2`,
-    [userId, episodeId]
-  );
+) {
+  return prisma.userEpisodeProgress.findUnique({
+    where: {
+      userId_episodeId: {
+        userId,
+        episodeId,
+      },
+    },
+  });
 }
 
 // ============================================
 // Collections
 // ============================================
 
-export async function findCollectionsByUser(
-  userId: string
-): Promise<DBQuoteCollection[]> {
-  return query<DBQuoteCollection>(
-    `SELECT * FROM ${TABLES.quoteCollections} WHERE user_id = $1 ORDER BY id DESC`,
-    [userId]
-  );
+export async function findCollectionsByUser(userId: string) {
+  return prisma.quoteCollection.findMany({
+    where: { userId },
+    orderBy: { id: "desc" },
+  });
 }
 
-export async function findQuotesByCollection(
-  collectionId: number
-): Promise<DBCollectionQuote[]> {
-  return query<DBCollectionQuote>(
-    `SELECT * FROM ${TABLES.collectionQuotes} WHERE collection_id = $1 ORDER BY id DESC`,
-    [collectionId]
-  );
+export async function findQuotesByCollection(collectionId: number) {
+  return prisma.collectionQuote.findMany({
+    where: { collectionId },
+    orderBy: { id: "desc" },
+  });
 }
 
 // ============================================
@@ -186,11 +272,15 @@ export async function isUserFollowingCharacter(
   userId: string,
   characterId: number
 ): Promise<boolean> {
-  const result = await queryOne<{ exists: boolean }>(
-    `SELECT EXISTS(SELECT 1 FROM ${TABLES.characterFollows} WHERE user_id = $1 AND character_id = $2) as exists`,
-    [userId, characterId]
-  );
-  return result?.exists ?? false;
+  const follow = await prisma.characterFollow.findUnique({
+    where: {
+      userId_characterId: {
+        userId,
+        characterId,
+      },
+    },
+  });
+  return follow !== null;
 }
 
 // ============================================
@@ -202,21 +292,15 @@ export async function getStats(): Promise<{
   episodes: number;
   trivia: number;
 }> {
-  const [charCount, epCount, triviaCount] = await Promise.all([
-    queryOne<{ count: string }>(
-      `SELECT COUNT(*) as count FROM ${TABLES.characters}`
-    ),
-    queryOne<{ count: string }>(
-      `SELECT COUNT(*) as count FROM ${TABLES.episodes}`
-    ),
-    queryOne<{ count: string }>(
-      `SELECT COUNT(*) as count FROM ${TABLES.triviaFacts}`
-    ),
+  const [characters, episodes, trivia] = await Promise.all([
+    prisma.character.count(),
+    prisma.episode.count(),
+    prisma.triviaFact.count(),
   ]);
 
   return {
-    characters: parseInt(charCount?.count ?? "0"),
-    episodes: parseInt(epCount?.count ?? "0"),
-    trivia: parseInt(triviaCount?.count ?? "0"),
+    characters,
+    episodes,
+    trivia,
   };
 }
