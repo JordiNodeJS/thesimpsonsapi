@@ -1,11 +1,12 @@
 "use server";
 
-import { prisma } from "@/app/_lib/prisma";
-import { getCurrentUser } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { findTriviaByEntity } from "@/app/_lib/repositories";
+import { getCurrentUser } from "@/app/_lib/auth";
+import { UseCaseFactory } from "@/infrastructure/factories";
+import { ValidationException } from "@/core/domain/exceptions";
 
+// Zod schemas for input validation
 const SubmitTriviaSchema = z.object({
   entityType: z.enum(["CHARACTER", "EPISODE"]),
   entityId: z.number().int().positive(),
@@ -15,6 +16,10 @@ const SubmitTriviaSchema = z.object({
     .max(1000),
 });
 
+/**
+ * Server Action: Submit Trivia
+ * Thin controller that delegates to use case
+ */
 export async function submitTrivia(
   entityType: "CHARACTER" | "EPISODE",
   entityId: number,
@@ -24,31 +29,45 @@ export async function submitTrivia(
   const user = await getCurrentUser();
 
   try {
-    await prisma.triviaFact.create({
-      data: {
-        relatedEntityType: validated.entityType,
-        relatedEntityId: validated.entityId,
+    const useCase = UseCaseFactory.createSubmitTriviaUseCase();
+    await useCase.execute(
+      {
+        entityType: validated.entityType,
+        entityId: validated.entityId,
         content: validated.content,
-        submittedByUserId: user.id,
       },
-    });
+      user.id,
+      user.name || user.email || "Anonymous",
+    );
 
     // Revalidate paths based on entity type
-    if (validated.entityType === "CHARACTER")
+    if (validated.entityType === "CHARACTER") {
       revalidatePath(`/characters/${validated.entityId}`);
-    if (validated.entityType === "EPISODE")
+    }
+    if (validated.entityType === "EPISODE") {
       revalidatePath(`/episodes/${validated.entityId}`);
+    }
 
     return { success: true };
   } catch (error) {
     console.error("[submitTrivia] Error:", error);
+
+    if (error instanceof ValidationException) {
+      throw new Error(error.message);
+    }
+
     throw new Error("Failed to submit trivia");
   }
 }
 
+/**
+ * Server Action: Get Trivia
+ */
 export async function getTrivia(
   entityType: "CHARACTER" | "EPISODE",
   entityId: number,
 ) {
-  return findTriviaByEntity(entityType, entityId);
+  const useCase = UseCaseFactory.createListTriviaUseCase();
+  const result = await useCase.execute(entityType, entityId);
+  return result.trivia;
 }

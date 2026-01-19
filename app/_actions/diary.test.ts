@@ -1,16 +1,21 @@
 /**
- * Tests for Diary Server Actions
+ * Tests for Diary Server Actions (Clean Architecture)
  * @module diary.test.ts
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { prismaMock } from "@/__mocks__/prisma";
 import { mockGetCurrentUser } from "@/__mocks__/auth";
+import { createMockUser } from "@/__tests__/factories";
 import {
-  createMockUser,
-  createMockDiaryEntry,
-  createMockLocation,
-} from "@/__tests__/factories";
+  mockCreateDiaryEntryExecute,
+  mockDeleteDiaryEntryExecute,
+  mockListDiaryEntriesExecute,
+  resetAllMocks,
+} from "@/__mocks__/infrastructure/factories/UseCaseFactory";
+import {
+  AuthorizationException,
+  NotFoundException,
+} from "@/core/domain/exceptions";
 
 // Import after mocks are setup
 import { createDiaryEntry, getDiaryEntries, deleteDiaryEntry } from "./diary";
@@ -25,30 +30,28 @@ describe("Diary Server Actions", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    resetAllMocks();
   });
 
   describe("createDiaryEntry", () => {
     it("should create a diary entry when authenticated", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
-      prismaMock.diaryEntry.create.mockResolvedValue(
-        createMockDiaryEntry({ userId: mockUser.id }),
-      );
+      mockCreateDiaryEntryExecute.mockResolvedValue({ success: true });
 
       const result = await createDiaryEntry(1, 1, "Had a great time at Moe's");
 
-      expect(prismaMock.diaryEntry.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          userId: mockUser.id,
+      expect(mockCreateDiaryEntryExecute).toHaveBeenCalledWith(
+        {
           characterId: 1,
           locationId: 1,
-          activityDescription: "Had a great time at Moe's",
-        }),
-      });
+          description: "Had a great time at Moe's",
+        },
+        mockUser.id,
+      );
       expect(result).toEqual({ success: true });
     });
 
     it("should throw error when not authenticated", async () => {
-      // getCurrentUser throws when not authenticated
       mockGetCurrentUser.mockRejectedValue(new Error("Unauthorized"));
 
       await expect(createDiaryEntry(1, 1, "Test entry")).rejects.toThrow(
@@ -71,7 +74,7 @@ describe("Diary Server Actions", () => {
 
     it("should handle database errors gracefully", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
-      prismaMock.diaryEntry.create.mockRejectedValue(
+      mockCreateDiaryEntryExecute.mockRejectedValue(
         new Error("Database connection failed"),
       );
 
@@ -84,27 +87,29 @@ describe("Diary Server Actions", () => {
   describe("getDiaryEntries", () => {
     it("should return diary entries for authenticated user", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
-
-      const mockEntries = [
-        createMockDiaryEntry({ id: 1, userId: mockUser.id }),
-        createMockDiaryEntry({ id: 2, userId: mockUser.id }),
-      ];
-
-      prismaMock.diaryEntry.findMany.mockResolvedValue(
-        mockEntries.map((e) => ({
-          ...e,
-          character: { name: "Homer Simpson" },
-          location: { name: "Moe's Tavern" },
-        })) as any,
-      );
+      mockListDiaryEntriesExecute.mockResolvedValue({
+        entries: [
+          {
+            id: 1,
+            activityDescription: "Entry 1",
+            characterName: "Homer",
+            locationName: "Moe's",
+            entryDate: null,
+          },
+          {
+            id: 2,
+            activityDescription: "Entry 2",
+            characterName: "Bart",
+            locationName: "School",
+            entryDate: null,
+          },
+        ],
+        total: 2,
+      });
 
       const result = await getDiaryEntries();
 
-      expect(prismaMock.diaryEntry.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { userId: mockUser.id },
-        }),
-      );
+      expect(mockListDiaryEntriesExecute).toHaveBeenCalledWith(mockUser.id);
       expect(result).toHaveLength(2);
     });
 
@@ -118,33 +123,32 @@ describe("Diary Server Actions", () => {
   describe("deleteDiaryEntry", () => {
     it("should delete user's own diary entry", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
-      prismaMock.diaryEntry.deleteMany.mockResolvedValue({ count: 1 });
+      mockDeleteDiaryEntryExecute.mockResolvedValue({ success: true });
 
       const result = await deleteDiaryEntry(1);
 
-      expect(prismaMock.diaryEntry.deleteMany).toHaveBeenCalledWith({
-        where: {
-          id: 1,
-          userId: mockUser.id,
-        },
-      });
+      expect(mockDeleteDiaryEntryExecute).toHaveBeenCalledWith(1, mockUser.id);
       expect(result).toEqual({ success: true });
     });
 
     it("should throw error when entry not found", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
-      prismaMock.diaryEntry.deleteMany.mockResolvedValue({ count: 0 });
-
-      await expect(deleteDiaryEntry(999)).rejects.toThrow(
-        "Entry not found or you don't have permission to delete it",
+      mockDeleteDiaryEntryExecute.mockRejectedValue(
+        new NotFoundException("DiaryEntry", 999),
       );
+
+      await expect(deleteDiaryEntry(999)).rejects.toThrow("Entry not found");
     });
 
     it("should prevent deletion of other user's entries", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
-      prismaMock.diaryEntry.deleteMany.mockResolvedValue({ count: 0 });
+      mockDeleteDiaryEntryExecute.mockRejectedValue(
+        new AuthorizationException("Not authorized"),
+      );
 
-      await expect(deleteDiaryEntry(1)).rejects.toThrow();
+      await expect(deleteDiaryEntry(1)).rejects.toThrow(
+        "You don't have permission to delete this entry",
+      );
     });
 
     it("should validate entry ID with Zod", async () => {

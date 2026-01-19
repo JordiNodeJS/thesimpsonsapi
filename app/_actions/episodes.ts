@@ -1,60 +1,80 @@
 "use server";
 
-import { prisma } from "@/app/_lib/prisma";
-import { getCurrentUserOptional } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { findEpisodeProgressByUser } from "@/app/_lib/repositories";
+import { getCurrentUserOptional } from "@/app/_lib/auth";
+import { UseCaseFactory } from "@/infrastructure/factories";
+import {
+  NotFoundException,
+  ValidationException,
+} from "@/core/domain/exceptions";
 
+// Zod schemas for input validation at delivery layer
 const TrackEpisodeSchema = z.object({
   episodeId: z.number().int().positive(),
   rating: z.number().int().min(1).max(5),
   notes: z.string().max(1000).optional(),
 });
 
+/**
+ * Server Action: Track Episode
+ * Thin controller that delegates to use case
+ */
 export async function trackEpisode(
   episodeId: number,
   rating: number,
-  notes: string,
+  notes: string = "",
 ) {
+  // 1. Validate input
   const validated = TrackEpisodeSchema.parse({ episodeId, rating, notes });
+
+  // 2. Get authenticated user
   const user = await getCurrentUserOptional();
   if (!user) {
     throw new Error("Please log in to track episodes");
   }
 
   try {
-    await prisma.userEpisodeProgress.upsert({
-      where: {
-        userId_episodeId: {
-          userId: user.id,
-          episodeId: validated.episodeId,
-        },
-      },
-      update: {
-        rating: validated.rating,
-        notes: validated.notes || "",
-        watchedAt: new Date(),
-      },
-      create: {
-        userId: user.id,
+    // 3. Create and execute use case
+    const useCase = UseCaseFactory.createTrackEpisodeUseCase();
+    await useCase.execute(
+      {
         episodeId: validated.episodeId,
         rating: validated.rating,
-        notes: validated.notes || "",
-        watchedAt: new Date(),
+        notes: validated.notes,
       },
-    });
+      user.id,
+    );
+
+    // 4. Handle framework-specific concerns
     revalidatePath(`/episodes/${validated.episodeId}`);
     revalidatePath("/episodes");
+
     return { success: true };
   } catch (error) {
     console.error("[trackEpisode] Error:", error);
+
+    if (error instanceof NotFoundException) {
+      throw new Error("Episode not found");
+    }
+    if (error instanceof ValidationException) {
+      throw new Error(error.message);
+    }
+
     throw new Error("Failed to track episode");
   }
 }
 
+/**
+ * Server Action: Get Episode Progress
+ * Retrieves user's progress for an episode
+ */
 export async function getEpisodeProgress(episodeId: number) {
   const user = await getCurrentUserOptional();
   if (!user) return null;
-  return findEpisodeProgressByUser(user.id, episodeId);
+
+  const useCase = UseCaseFactory.createGetEpisodeDetailsUseCase();
+  const result = await useCase.execute(episodeId, user.id);
+
+  return result.userProgress;
 }

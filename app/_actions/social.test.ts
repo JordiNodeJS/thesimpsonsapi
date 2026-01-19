@@ -1,15 +1,18 @@
 /**
- * Tests for Social Server Actions (Follow & Comments)
+ * Tests for Social Server Actions (Clean Architecture)
  * @module social.test.ts
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { prismaMock } from "@/__mocks__/prisma";
 import { mockGetCurrentUserOptional } from "@/__mocks__/auth";
+import { createMockUser } from "@/__tests__/factories";
 import {
-  createMockUser,
-  createMockCommentWithUser,
-} from "@/__tests__/factories";
+  mockToggleFollowExecute,
+  mockPostCommentExecute,
+  mockGetCharacterDetailsExecute,
+  mockCharacterRepoIsFollowing,
+  resetAllMocks,
+} from "@/__mocks__/infrastructure/factories/UseCaseFactory";
 
 // Import after mocks are setup
 import { toggleFollow, isFollowing, postComment, getComments } from "./social";
@@ -24,52 +27,27 @@ describe("Social Server Actions", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    resetAllMocks();
   });
 
   describe("toggleFollow", () => {
     it("should follow a character when not currently following", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.characterFollow.findUnique.mockResolvedValue(null);
-      prismaMock.characterFollow.create.mockResolvedValue({
-        userId: mockUser.id,
-        characterId: 1,
-        createdAt: new Date(),
-      });
+      mockToggleFollowExecute.mockResolvedValue({ isFollowing: true });
 
       const result = await toggleFollow(1);
 
-      expect(prismaMock.characterFollow.create).toHaveBeenCalledWith({
-        data: {
-          userId: mockUser.id,
-          characterId: 1,
-        },
-      });
+      expect(mockToggleFollowExecute).toHaveBeenCalledWith(1, mockUser.id);
       expect(result).toEqual({ success: true, isFollowing: true });
     });
 
     it("should unfollow a character when currently following", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.characterFollow.findUnique.mockResolvedValue({
-        userId: mockUser.id,
-        characterId: 1,
-        createdAt: new Date(),
-      });
-      prismaMock.characterFollow.delete.mockResolvedValue({
-        userId: mockUser.id,
-        characterId: 1,
-        createdAt: new Date(),
-      });
+      mockToggleFollowExecute.mockResolvedValue({ isFollowing: false });
 
       const result = await toggleFollow(1);
 
-      expect(prismaMock.characterFollow.delete).toHaveBeenCalledWith({
-        where: {
-          userId_characterId: {
-            userId: mockUser.id,
-            characterId: 1,
-          },
-        },
-      });
+      expect(mockToggleFollowExecute).toHaveBeenCalledWith(1, mockUser.id);
       expect(result).toEqual({ success: true, isFollowing: false });
     });
 
@@ -93,9 +71,7 @@ describe("Social Server Actions", () => {
 
     it("should handle database errors", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.characterFollow.findUnique.mockRejectedValue(
-        new Error("Database error"),
-      );
+      mockToggleFollowExecute.mockRejectedValue(new Error("Database error"));
 
       const result = await toggleFollow(1);
 
@@ -107,11 +83,7 @@ describe("Social Server Actions", () => {
   describe("isFollowing", () => {
     it("should return true when user is following", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.characterFollow.findUnique.mockResolvedValue({
-        userId: mockUser.id,
-        characterId: 1,
-        createdAt: new Date(),
-      });
+      mockCharacterRepoIsFollowing.mockResolvedValue(true);
 
       const result = await isFollowing(1);
 
@@ -120,7 +92,7 @@ describe("Social Server Actions", () => {
 
     it("should return false when user is not following", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.characterFollow.findUnique.mockResolvedValue(null);
+      mockCharacterRepoIsFollowing.mockResolvedValue(false);
 
       const result = await isFollowing(1);
 
@@ -139,23 +111,15 @@ describe("Social Server Actions", () => {
   describe("postComment", () => {
     it("should create a comment for authenticated user", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.characterComment.create.mockResolvedValue({
-        id: 1,
-        userId: mockUser.id,
-        characterId: 1,
-        content: "Great character!",
-        createdAt: new Date(),
-      });
+      mockPostCommentExecute.mockResolvedValue({ success: true });
 
       const result = await postComment(1, "Great character!");
 
-      expect(prismaMock.characterComment.create).toHaveBeenCalledWith({
-        data: {
-          userId: mockUser.id,
-          characterId: 1,
-          content: "Great character!",
-        },
-      });
+      expect(mockPostCommentExecute).toHaveBeenCalledWith(
+        { characterId: 1, content: "Great character!" },
+        mockUser.id,
+        expect.any(String),
+      );
       expect(result).toEqual({ success: true });
     });
 
@@ -192,9 +156,7 @@ describe("Social Server Actions", () => {
 
     it("should handle database errors", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.characterComment.create.mockRejectedValue(
-        new Error("Database error"),
-      );
+      mockPostCommentExecute.mockRejectedValue(new Error("Database error"));
 
       const result = await postComment(1, "Test");
 
@@ -205,41 +167,41 @@ describe("Social Server Actions", () => {
 
   describe("getComments", () => {
     it("should return comments for a character", async () => {
-      const mockComments = [
-        {
-          id: 1,
-          userId: mockUser.id,
-          characterId: 1,
-          content: "Comment 1",
-          createdAt: new Date(),
-          user: { username: "user1", name: "User One" },
-        },
-        {
-          id: 2,
-          userId: "other-user",
-          characterId: 1,
-          content: "Comment 2",
-          createdAt: new Date(),
-          user: { username: "user2", name: "User Two" },
-        },
-      ];
-
-      prismaMock.characterComment.findMany.mockResolvedValue(
-        mockComments as any,
-      );
+      mockGetCharacterDetailsExecute.mockResolvedValue({
+        character: { id: 1, name: "Homer" },
+        comments: [
+          {
+            id: 1,
+            userId: mockUser.id,
+            characterId: 1,
+            content: "Comment 1",
+            username: "user1",
+            createdAt: null,
+          },
+          {
+            id: 2,
+            userId: "other",
+            characterId: 1,
+            content: "Comment 2",
+            username: "user2",
+            createdAt: null,
+          },
+        ],
+        social: { isFollowing: false, followerCount: 0 },
+      });
 
       const result = await getComments(1);
 
-      expect(prismaMock.characterComment.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { characterId: 1 },
-        }),
-      );
+      expect(mockGetCharacterDetailsExecute).toHaveBeenCalledWith(1);
       expect(result).toHaveLength(2);
     });
 
     it("should return empty array when no comments exist", async () => {
-      prismaMock.characterComment.findMany.mockResolvedValue([]);
+      mockGetCharacterDetailsExecute.mockResolvedValue({
+        character: { id: 999, name: "Unknown" },
+        comments: [],
+        social: { isFollowing: false, followerCount: 0 },
+      });
 
       const result = await getComments(999);
 

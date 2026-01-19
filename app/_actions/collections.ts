@@ -1,43 +1,16 @@
 "use server";
 
-import { prisma } from "@/app/_lib/prisma";
-import { getCurrentUser } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import {
-  findCollectionsByUser,
-  findQuotesByCollection,
-} from "@/app/_lib/repositories";
+import { getCurrentUser } from "@/app/_lib/auth";
+import { UseCaseFactory } from "@/infrastructure/factories";
+import { ValidationException } from "@/core/domain/exceptions";
 
+// Zod schemas for input validation
 const CreateCollectionSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   description: z.string().max(500).optional(),
 });
-
-export async function createCollection(name: string, description: string) {
-  const validated = CreateCollectionSchema.parse({ name, description });
-  const user = await getCurrentUser();
-
-  try {
-    await prisma.quoteCollection.create({
-      data: {
-        userId: user.id,
-        name: validated.name,
-        description: validated.description || "",
-      },
-    });
-    revalidatePath("/collections");
-    return { success: true };
-  } catch (error) {
-    console.error("[createCollection] Error:", error);
-    throw new Error("Failed to create collection");
-  }
-}
-
-export async function getCollections() {
-  const user = await getCurrentUser();
-  return findCollectionsByUser(user.id);
-}
 
 const AddQuoteSchema = z.object({
   collectionId: z.number().int().positive(),
@@ -46,6 +19,51 @@ const AddQuoteSchema = z.object({
   episode: z.string().max(200),
 });
 
+/**
+ * Server Action: Create Collection
+ * Thin controller that delegates to use case
+ */
+export async function createCollection(name: string, description: string) {
+  const validated = CreateCollectionSchema.parse({ name, description });
+  const user = await getCurrentUser();
+
+  try {
+    const useCase = UseCaseFactory.createCreateCollectionUseCase();
+    await useCase.execute(
+      {
+        name: validated.name,
+        description: validated.description || "",
+      },
+      user.id,
+    );
+
+    revalidatePath("/collections");
+    return { success: true };
+  } catch (error) {
+    console.error("[createCollection] Error:", error);
+
+    if (error instanceof ValidationException) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to create collection");
+  }
+}
+
+/**
+ * Server Action: Get Collections
+ */
+export async function getCollections() {
+  const user = await getCurrentUser();
+  const useCase = UseCaseFactory.createListCollectionsUseCase();
+  const result = await useCase.execute(user.id);
+  return result.collections;
+}
+
+/**
+ * Server Action: Add Quote to Collection
+ * Thin controller that delegates to use case
+ */
 export async function addQuote(
   collectionId: number,
   text: string,
@@ -58,24 +76,38 @@ export async function addQuote(
     character,
     episode,
   });
+  const user = await getCurrentUser();
 
   try {
-    await prisma.collectionQuote.create({
-      data: {
+    const useCase = UseCaseFactory.createAddQuoteUseCase();
+    await useCase.execute(
+      {
         collectionId: validated.collectionId,
-        quoteText: validated.text,
-        characterName: validated.character,
-        sourceEpisode: validated.episode || "",
+        text: validated.text,
+        character: validated.character,
+        episode: validated.episode || "",
       },
-    });
+      user.id,
+    );
+
     revalidatePath("/collections");
     return { success: true };
   } catch (error) {
     console.error("[addQuote] Error:", error);
+
+    if (error instanceof ValidationException) {
+      throw new Error(error.message);
+    }
+
     throw new Error("Failed to add quote to collection");
   }
 }
 
+/**
+ * Server Action: Get Collection Quotes
+ */
 export async function getCollectionQuotes(collectionId: number) {
-  return findQuotesByCollection(collectionId);
+  const useCase = UseCaseFactory.createGetCollectionQuotesUseCase();
+  const result = await useCase.execute(collectionId);
+  return result.quotes;
 }

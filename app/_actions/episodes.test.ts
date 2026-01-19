@@ -1,12 +1,16 @@
 /**
- * Tests for Episodes Server Actions
+ * Tests for Episodes Server Actions (Clean Architecture)
  * @module episodes.test.ts
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { prismaMock } from "@/__mocks__/prisma";
 import { mockGetCurrentUserOptional } from "@/__mocks__/auth";
 import { createMockUser } from "@/__tests__/factories";
+import {
+  mockTrackEpisodeExecute,
+  mockGetEpisodeDetailsExecute,
+  resetAllMocks,
+} from "@/__mocks__/infrastructure/factories/UseCaseFactory";
 
 // Import after mocks are setup
 import { trackEpisode, getEpisodeProgress } from "./episodes";
@@ -21,39 +25,28 @@ describe("Episodes Server Actions", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    resetAllMocks();
   });
 
   describe("trackEpisode", () => {
     it("should track episode for authenticated user", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.userEpisodeProgress.upsert.mockResolvedValue({
-        userId: mockUser.id,
-        episodeId: 1,
-        rating: 5,
-        notes: "Great episode!",
-        watchedAt: new Date(),
+      mockTrackEpisodeExecute.mockResolvedValue({
+        success: true,
+        progress: {
+          episodeId: 1,
+          rating: 5,
+          notes: "Great episode!",
+          hasWatched: true,
+        },
       });
 
       const result = await trackEpisode(1, 5, "Great episode!");
 
-      expect(prismaMock.userEpisodeProgress.upsert).toHaveBeenCalledWith({
-        where: {
-          userId_episodeId: {
-            userId: mockUser.id,
-            episodeId: 1,
-          },
-        },
-        update: expect.objectContaining({
-          rating: 5,
-          notes: "Great episode!",
-        }),
-        create: expect.objectContaining({
-          userId: mockUser.id,
-          episodeId: 1,
-          rating: 5,
-          notes: "Great episode!",
-        }),
-      });
+      expect(mockTrackEpisodeExecute).toHaveBeenCalledWith(
+        { episodeId: 1, rating: 5, notes: "Great episode!" },
+        mockUser.id,
+      );
       expect(result).toEqual({ success: true });
     });
 
@@ -84,47 +77,46 @@ describe("Episodes Server Actions", () => {
 
     it("should handle empty notes", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.userEpisodeProgress.upsert.mockResolvedValue({
-        userId: mockUser.id,
-        episodeId: 1,
-        rating: 4,
-        notes: "",
-        watchedAt: new Date(),
+      mockTrackEpisodeExecute.mockResolvedValue({
+        success: true,
+        progress: {
+          episodeId: 1,
+          rating: 4,
+          notes: "",
+          hasWatched: true,
+        },
       });
 
       const result = await trackEpisode(1, 4, "");
 
-      expect(prismaMock.userEpisodeProgress.upsert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          create: expect.objectContaining({
-            notes: "",
-          }),
-        }),
+      expect(mockTrackEpisodeExecute).toHaveBeenCalledWith(
+        expect.objectContaining({ notes: "" }),
+        mockUser.id,
       );
       expect(result).toEqual({ success: true });
     });
 
     it("should update existing progress", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.userEpisodeProgress.upsert.mockResolvedValue({
-        userId: mockUser.id,
-        episodeId: 1,
-        rating: 3,
-        notes: "Updated notes",
-        watchedAt: new Date(),
+      mockTrackEpisodeExecute.mockResolvedValue({
+        success: true,
+        progress: {
+          episodeId: 1,
+          rating: 3,
+          notes: "Updated notes",
+          hasWatched: true,
+        },
       });
 
       const result = await trackEpisode(1, 3, "Updated notes");
 
-      expect(prismaMock.userEpisodeProgress.upsert).toHaveBeenCalled();
+      expect(mockTrackEpisodeExecute).toHaveBeenCalled();
       expect(result).toEqual({ success: true });
     });
 
     it("should handle database errors gracefully", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.userEpisodeProgress.upsert.mockRejectedValue(
-        new Error("Database error"),
-      );
+      mockTrackEpisodeExecute.mockRejectedValue(new Error("Database error"));
 
       await expect(trackEpisode(1, 5, "Notes")).rejects.toThrow(
         "Failed to track episode",
@@ -136,42 +128,43 @@ describe("Episodes Server Actions", () => {
     it("should return progress for authenticated user", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
       const mockProgress = {
-        id: 1,
-        userId: mockUser.id,
         episodeId: 1,
+        userId: mockUser.id,
         rating: 4,
         notes: "Good episode",
         watchedAt: new Date(),
       };
-      prismaMock.userEpisodeProgress.findUnique.mockResolvedValue(mockProgress);
+      mockGetEpisodeDetailsExecute.mockResolvedValue({
+        episode: { id: 1, title: "Test" },
+        userProgress: mockProgress,
+      });
 
       const result = await getEpisodeProgress(1);
 
-      expect(prismaMock.userEpisodeProgress.findUnique).toHaveBeenCalledWith({
-        where: {
-          userId_episodeId: {
-            userId: mockUser.id,
-            episodeId: 1,
-          },
-        },
-      });
+      expect(mockGetEpisodeDetailsExecute).toHaveBeenCalledWith(1, mockUser.id);
       expect(result).toEqual(mockProgress);
     });
 
     it("should return null when not authenticated", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(null);
+      mockGetEpisodeDetailsExecute.mockResolvedValue({
+        episode: { id: 1, title: "Test" },
+        userProgress: null,
+      });
 
       const result = await getEpisodeProgress(1);
 
       expect(result).toBeNull();
-      expect(prismaMock.userEpisodeProgress.findUnique).not.toHaveBeenCalled();
     });
 
     it("should return null when no progress exists", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(mockUser);
-      prismaMock.userEpisodeProgress.findUnique.mockResolvedValue(null);
+      mockGetEpisodeDetailsExecute.mockResolvedValue({
+        episode: { id: 1, title: "Test" },
+        userProgress: null,
+      });
 
-      const result = await getEpisodeProgress(999);
+      const result = await getEpisodeProgress(1);
 
       expect(result).toBeNull();
     });
