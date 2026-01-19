@@ -34,6 +34,12 @@ vi.mock("next/cache", () => ({
   revalidateTag: vi.fn(),
 }));
 
+// Mock UseCaseFactory for Clean Architecture
+vi.mock("@/infrastructure/factories", async () => {
+  const actual = await import("./__mocks__/infrastructure/factories/UseCaseFactory");
+  return actual;
+});
+
 // Suppress console errors in tests (optional)
 global.console = {
   ...console,

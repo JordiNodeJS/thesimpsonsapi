@@ -1,24 +1,30 @@
 "use server";
 
-import { prisma } from "@/app/_lib/prisma";
-import { getCurrentUser } from "@/app/_lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import {
-  findDiaryEntriesByUser,
-  findAllLocations,
-} from "@/app/_lib/repositories";
+import { getCurrentUser } from "@/app/_lib/auth";
+import { UseCaseFactory } from "@/infrastructure/factories";
+import { AuthorizationException, NotFoundException, ValidationException } from "@/core/domain/exceptions";
 
+// Zod schemas for input validation
 const CreateDiaryEntrySchema = z.object({
   characterId: z.number().int().positive(),
   locationId: z.number().int().positive(),
   description: z.string().min(1, "Description is required").max(1000),
 });
 
+const DeleteDiaryEntrySchema = z.object({
+  id: z.number().int().positive(),
+});
+
+/**
+ * Server Action: Create Diary Entry
+ * Thin controller that delegates to use case
+ */
 export async function createDiaryEntry(
   characterId: number,
   locationId: number,
-  description: string,
+  description: string
 ) {
   const validated = CreateDiaryEntrySchema.parse({
     characterId,
@@ -28,60 +34,79 @@ export async function createDiaryEntry(
   const user = await getCurrentUser();
 
   try {
-    await prisma.diaryEntry.create({
-      data: {
-        userId: user.id,
+    const useCase = UseCaseFactory.createCreateDiaryEntryUseCase();
+    await useCase.execute(
+      {
         characterId: validated.characterId,
         locationId: validated.locationId,
-        activityDescription: validated.description,
-        entryDate: new Date(),
+        description: validated.description,
       },
-    });
+      user.id
+    );
+
     revalidatePath("/diary");
     return { success: true };
   } catch (error) {
     console.error("[createDiaryEntry] Error:", error);
+
+    if (error instanceof NotFoundException) {
+      throw new Error(error.message);
+    }
+    if (error instanceof ValidationException) {
+      throw new Error(error.message);
+    }
+
     throw new Error("Failed to create diary entry");
   }
 }
 
+/**
+ * Server Action: Get Diary Entries
+ */
 export async function getDiaryEntries() {
   const user = await getCurrentUser();
-  return findDiaryEntriesByUser(user.id);
+  const useCase = UseCaseFactory.createListDiaryEntriesUseCase();
+  const result = await useCase.execute(user.id);
+  return result.entries;
 }
 
+/**
+ * Server Action: Get Locations
+ */
 export async function getLocations() {
-  return findAllLocations();
+  const locationRepo = UseCaseFactory.getLocationRepository();
+  const locations = await locationRepo.findAll();
+  return locations.map((loc) => loc.toJSON());
 }
 
-const DeleteDiaryEntrySchema = z.object({
-  id: z.number().int().positive(),
-});
-
+/**
+ * Server Action: Delete Diary Entry
+ * Thin controller that delegates to use case
+ */
 export async function deleteDiaryEntry(id: number) {
   const validated = DeleteDiaryEntrySchema.parse({ id });
   const user = await getCurrentUser();
 
   try {
-    const result = await prisma.diaryEntry.deleteMany({
-      where: {
-        id: validated.id,
-        userId: user.id,
-      },
-    });
-
-    if (result.count === 0) {
-      throw new Error(
-        "Entry not found or you don't have permission to delete it",
-      );
-    }
+    const useCase = UseCaseFactory.createDeleteDiaryEntryUseCase();
+    await useCase.execute(validated.id, user.id);
 
     revalidatePath("/diary");
     return { success: true };
   } catch (error) {
     console.error("[deleteDiaryEntry] Error:", error);
-    throw error instanceof Error
-      ? error
-      : new Error("Failed to delete diary entry");
+
+    // Check by error code (more reliable than instanceof in test environments)
+    if (error instanceof Error) {
+      const errorCode = (error as { code?: string }).code;
+      if (errorCode === "NOT_FOUND" || error instanceof NotFoundException) {
+        throw new Error("Entry not found");
+      }
+      if (errorCode === "UNAUTHORIZED" || error instanceof AuthorizationException) {
+        throw new Error("You don't have permission to delete this entry");
+      }
+    }
+
+    throw new Error("Failed to delete diary entry");
   }
 }
