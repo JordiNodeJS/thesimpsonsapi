@@ -10,6 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "test:unit": "vitest run --exclude **/*integration.test.ts --exclude **/*rls-isolation.test.ts",
+    "test:integration": "vitest run __tests__/rls-isolation.test.ts",
     "test:coverage": "vitest run --coverage",
     "test:all": "vitest run && tsc --noEmit"
   },
