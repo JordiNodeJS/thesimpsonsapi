@@ -1,3 +1,30 @@
+/**
+ * Episodes Server Actions - HYBRID PATTERN
+ *
+ * 🎓 EDUCATIONAL NOTE: Why Full DDD for Mutations?
+ * ================================================
+ * This file demonstrates the HYBRID approach:
+ *
+ * READ operations (Simple Pattern):
+ * - Episode listing → Use app/_lib/repositories.ts directly
+ * - No business rules, just data retrieval
+ *
+ * WRITE operations (Full DDD Pattern):
+ * - trackEpisode → Uses TrackEpisodeUseCase
+ * - Business rules: validate rating (1-5), check episode exists
+ * - User state: manages watch history, timestamps
+ * - RLS protection: ensures user owns their progress
+ *
+ * The UseCase layer is NOT overkill here because:
+ * 1. Rating validation is a business rule (1-5 range)
+ * 2. Episode existence check prevents orphan records
+ * 3. Progress tracking involves state management
+ * 4. Unit testing business logic in isolation is valuable
+ *
+ * Compare with app/_lib/repositories.ts for SIMPLE pattern examples.
+ * See docs/ARCHITECTURE_DECISION_MATRIX.md for the decision guide.
+ */
+
 "use server";
 
 import { revalidatePath } from "next/cache";

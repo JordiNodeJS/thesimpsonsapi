@@ -1,3 +1,32 @@
+/**
+ * Social Server Actions - HYBRID PATTERN
+ *
+ * 🎓 EDUCATIONAL NOTE: Mixed Simple + DDD Patterns
+ * =================================================
+ * This file shows BOTH patterns working together:
+ *
+ * SIMPLE PATTERN (Read operations):
+ * - isFollowing → Direct repository call
+ * - getComments → Simple data retrieval (see repositories.ts)
+ *
+ * FULL DDD PATTERN (Write operations):
+ * - toggleFollow → Uses ToggleFollowUseCase
+ *   • Business rule: one follow per user-character pair
+ *   • Requires authentication
+ *   • RLS protection
+ *
+ * - postComment → Uses PostCommentUseCase
+ *   • Business rules: content validation, character exists
+ *   • Username resolution
+ *   • Requires authentication
+ *
+ * WHY THIS SPLIT?
+ * Reading who you follow = simple boolean lookup
+ * Toggling follow status = mutation with validation + auth
+ *
+ * See docs/ARCHITECTURE_DECISION_MATRIX.md for the decision guide.
+ */
+
 "use server";
 
 import { revalidatePath } from "next/cache";

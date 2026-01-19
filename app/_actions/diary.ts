@@ -1,3 +1,35 @@
+/**
+ * Diary Server Actions - FULL DDD PATTERN
+ *
+ * 🎓 EDUCATIONAL NOTE: Why Full DDD Here?
+ * =======================================
+ * The Diary domain is a perfect example of where DDD adds real value:
+ *
+ * 1. BUSINESS RULES
+ *    - Character must exist (referential integrity)
+ *    - Location must exist (referential integrity)
+ *    - Description has min/max length rules
+ *
+ * 2. USER OWNERSHIP
+ *    - All entries belong to a specific user
+ *    - Users can only see/modify their own entries
+ *    - RLS enforcement at database level
+ *
+ * 3. AUTHORIZATION
+ *    - All operations require authentication
+ *    - Delete checks ownership via RLS
+ *
+ * 4. TESTABILITY
+ *    - UseCase layer can be unit tested with mocked repos
+ *    - Domain entity validates data independently
+ *
+ * CONTRAST WITH SIMPLE PATTERN:
+ * - Characters list → No business rules, public data
+ * - Episode list → No business rules, public data
+ *
+ * See docs/ARCHITECTURE_DECISION_MATRIX.md for the decision guide.
+ */
+
 "use server";
 
 import { revalidatePath } from "next/cache";
