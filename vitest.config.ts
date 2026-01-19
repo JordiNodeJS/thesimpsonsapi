@@ -9,7 +9,15 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     include: ["**/*.{test,spec}.{ts,tsx}"],
-    exclude: ["node_modules", ".next", "e2e/**", ".traces/**", "scripts/**"],
+    exclude: [
+      "node_modules",
+      ".next",
+      "e2e/**",
+      ".traces/**",
+      "scripts/**",
+      "**/*.integration.test.ts", // Exclude integration tests from unit test run
+      "**/*-integration.test.ts",
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

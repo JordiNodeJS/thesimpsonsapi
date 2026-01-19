@@ -51,6 +51,12 @@ vi.mock("next/cache", () => ({
   revalidateTag: vi.fn(),
 }));
 
+// Mock Prisma client
+vi.mock("@/app/_lib/prisma", async () => {
+  const actual = await import("./__mocks__/prisma");
+  return actual;
+});
+
 // Mock Prisma RLS helpers
 vi.mock("@/app/_lib/prisma-rls", async () => {
   const actual = await import("./__mocks__/prisma-rls");
