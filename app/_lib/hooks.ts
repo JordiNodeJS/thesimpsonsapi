@@ -1,29 +1,23 @@
 "use client";
 
-import { useState, useCallback, useTransition, useEffect } from "react";
+import { useState, useCallback, useTransition } from "react";
 
 /**
- * Hook para persistir estado en localStorage (SSR-safe).
- * Evita hydration mismatch usando patron de "mounted" para acceder a localStorage.
+ * Hook para persistir estado en localStorage.
  */
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  // Estado con valor inicial seguro para SSR
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-  const [mounted, setMounted] = useState(false);
-
-  // Efecto para cargar desde localStorage después de montaje en cliente
-  useEffect(() => {
-    try {
-      if (typeof window !== "undefined") {
-        const item = window.localStorage.getItem(key);
-        const value = item ? JSON.parse(item) : initialValue;
-        setStoredValue(value);
-      }
-    } catch (error) {
-      console.error("Error reading from localStorage:", error);
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") {
+      return initialValue;
     }
-    setMounted(true);
-  }, [key, initialValue]);
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(error);
+      return initialValue;
+    }
+  });
 
   const setValue = useCallback(
     (value: T | ((val: T) => T)) => {
@@ -36,15 +30,13 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
           return valueToStore;
         });
       } catch (error) {
-        console.error("Error writing to localStorage:", error);
+        console.error(error);
       }
     },
-    [key],
+    [key]
   );
 
-  // Retornar el valor inicial hasta que el componente esté montado
-  // Esto evita hydration mismatch
-  return [mounted ? storedValue : initialValue, setValue] as const;
+  return [storedValue, setValue] as const;
 }
 
 /**
@@ -56,7 +48,7 @@ export function useFormAction<TArgs extends unknown[], TResult>(
   options?: {
     onSuccess?: (result: TResult) => void;
     onError?: (error: Error) => void;
-  },
+  }
 ) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<Error | null>(null);
@@ -76,7 +68,7 @@ export function useFormAction<TArgs extends unknown[], TResult>(
         }
       });
     },
-    [action, options],
+    [action, options]
   );
 
   return { execute, isPending, error };

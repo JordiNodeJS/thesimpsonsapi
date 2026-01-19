@@ -4,10 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  mockGetCurrentUser,
-  mockGetCurrentUserOptional,
-} from "@/__mocks__/auth";
+import { mockGetCurrentUser } from "@/__mocks__/auth";
 import { createMockUser } from "@/__tests__/factories";
 import {
   mockSubmitTriviaExecute,
@@ -89,7 +86,7 @@ describe("Trivia Server Actions", () => {
     });
 
     it("should throw error when not authenticated", async () => {
-      mockGetCurrentUserOptional.mockResolvedValue(null);
+      mockGetCurrentUser.mockRejectedValue(new Error("Unauthorized"));
 
       await expect(
         submitTrivia("CHARACTER", 1, "Some trivia fact"),

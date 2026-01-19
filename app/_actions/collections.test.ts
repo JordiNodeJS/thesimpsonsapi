@@ -4,10 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  mockGetCurrentUser,
-  mockGetCurrentUserOptional,
-} from "@/__mocks__/auth";
+import { mockGetCurrentUser } from "@/__mocks__/auth";
 import { createMockUser } from "@/__tests__/factories";
 import {
   mockCreateCollectionExecute,
@@ -56,7 +53,7 @@ describe("Collections Server Actions", () => {
     });
 
     it("should throw error when not authenticated", async () => {
-      mockGetCurrentUserOptional.mockResolvedValue(null);
+      mockGetCurrentUser.mockRejectedValue(new Error("Unauthorized"));
 
       await expect(
         createCollection("Test Collection", "Description"),
@@ -122,7 +119,7 @@ describe("Collections Server Actions", () => {
     });
 
     it("should throw error when not authenticated", async () => {
-      mockGetCurrentUserOptional.mockResolvedValue(null);
+      mockGetCurrentUser.mockRejectedValue(new Error("Unauthorized"));
 
       await expect(getCollections()).rejects.toThrow("Unauthorized");
     });

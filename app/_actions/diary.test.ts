@@ -4,10 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  mockGetCurrentUser,
-  mockGetCurrentUserOptional,
-} from "@/__mocks__/auth";
+import { mockGetCurrentUser } from "@/__mocks__/auth";
 import { createMockUser } from "@/__tests__/factories";
 import {
   mockCreateDiaryEntryExecute,
@@ -55,7 +52,7 @@ describe("Diary Server Actions", () => {
     });
 
     it("should throw error when not authenticated", async () => {
-      mockGetCurrentUserOptional.mockResolvedValue(null);
+      mockGetCurrentUser.mockRejectedValue(new Error("Unauthorized"));
 
       await expect(createDiaryEntry(1, 1, "Test entry")).rejects.toThrow(
         "Unauthorized",
@@ -117,7 +114,7 @@ describe("Diary Server Actions", () => {
     });
 
     it("should throw error when not authenticated", async () => {
-      mockGetCurrentUserOptional.mockResolvedValue(null);
+      mockGetCurrentUser.mockRejectedValue(new Error("Unauthorized"));
 
       await expect(getDiaryEntries()).rejects.toThrow("Unauthorized");
     });

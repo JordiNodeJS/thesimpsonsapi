@@ -1,27 +1,10 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterEach, beforeEach, vi } from "vitest";
-
-// Set dummy DATABASE_URL for tests (mocked anyway)
-process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
-
-// Import mocks
-import {
-  mockGetCurrentUser,
-  mockGetCurrentUserOptional,
-  mockUser,
-} from "./__mocks__/auth";
+import { afterEach, vi } from "vitest";
 
 // Cleanup after each test
 afterEach(() => {
   cleanup();
-});
-
-// Setup default auth mock behavior before each test
-beforeEach(() => {
-  // By default, assume user is authenticated
-  mockGetCurrentUser.mockResolvedValue(mockUser);
-  mockGetCurrentUserOptional.mockResolvedValue(mockUser);
 });
 
 // Mock Next.js router
@@ -50,12 +33,6 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
   revalidateTag: vi.fn(),
 }));
-
-// Mock Prisma RLS helpers
-vi.mock("@/app/_lib/prisma-rls", async () => {
-  const actual = await import("./__mocks__/prisma-rls");
-  return actual;
-});
 
 // Mock UseCaseFactory for Clean Architecture
 vi.mock("@/infrastructure/factories", async () => {
