@@ -28,9 +28,16 @@ export interface CreateCollectionOutput {
 export class CreateCollectionUseCase {
   constructor(private collectionRepository: CollectionRepository) {}
 
-  async execute(input: CreateCollectionInput, userId: string): Promise<CreateCollectionOutput> {
+  async execute(
+    input: CreateCollectionInput,
+    userId: string,
+  ): Promise<CreateCollectionOutput> {
     // 1. Create collection entity (validates name)
-    const collection = QuoteCollection.createNew(userId, input.name, input.description);
+    const collection = QuoteCollection.createNew(
+      userId,
+      input.name,
+      input.description,
+    );
 
     // 2. Persist collection
     const savedCollection = await this.collectionRepository.create(collection);

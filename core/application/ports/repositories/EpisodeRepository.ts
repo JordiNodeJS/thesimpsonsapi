@@ -24,7 +24,10 @@ export interface EpisodeRepository {
   /**
    * Get user's progress for an episode
    */
-  getProgress(userId: string, episodeId: number): Promise<EpisodeProgress | null>;
+  getProgress(
+    userId: string,
+    episodeId: number,
+  ): Promise<EpisodeProgress | null>;
 
   /**
    * Save user's progress for an episode (upsert)

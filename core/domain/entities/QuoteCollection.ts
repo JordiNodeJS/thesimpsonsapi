@@ -17,7 +17,7 @@ export class QuoteCollection {
     public readonly id: number,
     public readonly userId: string | null,
     private readonly _name: Content,
-    public readonly description: string | null
+    public readonly description: string | null,
   ) {}
 
   /**
@@ -28,19 +28,23 @@ export class QuoteCollection {
       data.id,
       data.userId,
       Content.createName(data.name),
-      data.description
+      data.description,
     );
   }
 
   /**
    * Creates a new collection for submission
    */
-  static createNew(userId: string, name: string, description?: string): QuoteCollection {
+  static createNew(
+    userId: string,
+    name: string,
+    description?: string,
+  ): QuoteCollection {
     return new QuoteCollection(
       0, // ID will be assigned by database
       userId,
       Content.createName(name),
-      description ?? null
+      description ?? null,
     );
   }
 
@@ -103,7 +107,7 @@ export class CollectionQuote {
     public readonly collectionId: number | null,
     private readonly _quoteText: Content,
     public readonly characterName: string | null,
-    public readonly sourceEpisode: string | null
+    public readonly sourceEpisode: string | null,
   ) {}
 
   /**
@@ -115,7 +119,7 @@ export class CollectionQuote {
       data.collectionId,
       Content.quote(data.quoteText),
       data.characterName,
-      data.sourceEpisode
+      data.sourceEpisode,
     );
   }
 
@@ -126,14 +130,14 @@ export class CollectionQuote {
     collectionId: number,
     quoteText: string,
     characterName: string,
-    sourceEpisode?: string
+    sourceEpisode?: string,
   ): CollectionQuote {
     return new CollectionQuote(
       0, // ID will be assigned by database
       collectionId,
       Content.quote(quoteText),
       characterName,
-      sourceEpisode ?? null
+      sourceEpisode ?? null,
     );
   }
 

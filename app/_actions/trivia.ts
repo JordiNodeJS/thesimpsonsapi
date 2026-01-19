@@ -23,7 +23,7 @@ const SubmitTriviaSchema = z.object({
 export async function submitTrivia(
   entityType: "CHARACTER" | "EPISODE",
   entityId: number,
-  content: string
+  content: string,
 ) {
   const validated = SubmitTriviaSchema.parse({ entityType, entityId, content });
   const user = await getCurrentUser();
@@ -37,7 +37,7 @@ export async function submitTrivia(
         content: validated.content,
       },
       user.id,
-      user.name || user.email || "Anonymous"
+      user.name || user.email || "Anonymous",
     );
 
     // Revalidate paths based on entity type
@@ -65,7 +65,7 @@ export async function submitTrivia(
  */
 export async function getTrivia(
   entityType: "CHARACTER" | "EPISODE",
-  entityId: number
+  entityId: number,
 ) {
   const useCase = UseCaseFactory.createListTriviaUseCase();
   const result = await useCase.execute(entityType, entityId);

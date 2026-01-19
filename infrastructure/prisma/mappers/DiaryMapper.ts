@@ -1,4 +1,9 @@
-import { Location, DiaryEntry, LocationData, DiaryEntryData } from "@/core/domain/entities";
+import {
+  Location,
+  DiaryEntry,
+  LocationData,
+  DiaryEntryData,
+} from "@/core/domain/entities";
 
 type PrismaLocation = {
   id: number;

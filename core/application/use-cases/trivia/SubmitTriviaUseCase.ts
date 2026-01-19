@@ -1,5 +1,9 @@
 import { TriviaFact } from "@/core/domain/entities";
-import { TriviaRepository, CharacterRepository, EpisodeRepository } from "@/core/application/ports/repositories";
+import {
+  TriviaRepository,
+  CharacterRepository,
+  EpisodeRepository,
+} from "@/core/application/ports/repositories";
 import { NotFoundException } from "@/core/domain/exceptions";
 
 /**
@@ -32,10 +36,14 @@ export class SubmitTriviaUseCase {
   constructor(
     private triviaRepository: TriviaRepository,
     private characterRepository: CharacterRepository,
-    private episodeRepository: EpisodeRepository
+    private episodeRepository: EpisodeRepository,
   ) {}
 
-  async execute(input: SubmitTriviaInput, userId: string, username: string): Promise<SubmitTriviaOutput> {
+  async execute(
+    input: SubmitTriviaInput,
+    userId: string,
+    username: string,
+  ): Promise<SubmitTriviaOutput> {
     // 1. Validate entity exists
     if (input.entityType === "CHARACTER") {
       const character = await this.characterRepository.findById(input.entityId);
@@ -55,7 +63,7 @@ export class SubmitTriviaUseCase {
       input.entityId,
       input.content,
       userId,
-      username
+      username,
     );
 
     // 3. Persist trivia

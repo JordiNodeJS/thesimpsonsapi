@@ -1,5 +1,9 @@
 import { Character } from "@/core/domain/entities";
-import { CharacterRepository, CommentRepository, FollowRepository } from "@/core/application/ports/repositories";
+import {
+  CharacterRepository,
+  CommentRepository,
+  FollowRepository,
+} from "@/core/application/ports/repositories";
 import { NotFoundException } from "@/core/domain/exceptions";
 
 /**
@@ -36,10 +40,13 @@ export class GetCharacterDetailsUseCase {
   constructor(
     private characterRepository: CharacterRepository,
     private commentRepository: CommentRepository,
-    private followRepository: FollowRepository
+    private followRepository: FollowRepository,
   ) {}
 
-  async execute(characterId: number, userId?: string): Promise<CharacterDetailsOutput> {
+  async execute(
+    characterId: number,
+    userId?: string,
+  ): Promise<CharacterDetailsOutput> {
     // 1. Get character
     const character = await this.characterRepository.findById(characterId);
     if (!character) {
@@ -52,9 +59,13 @@ export class GetCharacterDetailsUseCase {
     // 3. Get follow status and count
     let isFollowing = false;
     if (userId) {
-      isFollowing = await this.followRepository.isFollowing(userId, characterId);
+      isFollowing = await this.followRepository.isFollowing(
+        userId,
+        characterId,
+      );
     }
-    const followerCount = await this.characterRepository.getFollowerCount(characterId);
+    const followerCount =
+      await this.characterRepository.getFollowerCount(characterId);
 
     // 4. Return enriched data (comments include userId/characterId for CommentWithUser compatibility)
     return {

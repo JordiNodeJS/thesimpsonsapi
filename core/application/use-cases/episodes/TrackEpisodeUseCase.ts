@@ -1,6 +1,9 @@
 import { EpisodeProgress } from "@/core/domain/entities";
 import { EpisodeRepository } from "@/core/application/ports/repositories";
-import { AuthorizationException, NotFoundException } from "@/core/domain/exceptions";
+import {
+  AuthorizationException,
+  NotFoundException,
+} from "@/core/domain/exceptions";
 
 /**
  * Input DTO for TrackEpisodeUseCase
@@ -28,7 +31,10 @@ export interface TrackEpisodeOutput {
 export class TrackEpisodeUseCase {
   constructor(private episodeRepository: EpisodeRepository) {}
 
-  async execute(input: TrackEpisodeInput, userId: string): Promise<TrackEpisodeOutput> {
+  async execute(
+    input: TrackEpisodeInput,
+    userId: string,
+  ): Promise<TrackEpisodeOutput> {
     // 1. Validate episode exists
     const episode = await this.episodeRepository.findById(input.episodeId);
     if (!episode) {

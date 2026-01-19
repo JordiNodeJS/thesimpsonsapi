@@ -20,13 +20,23 @@ export class Content {
    * Creates a new Content value object with custom length limits
    * @throws InvalidContentException if content is outside length bounds
    */
-  static create(value: string, minLength: number, maxLength: number, fieldName: string = "Content"): Content {
+  static create(
+    value: string,
+    minLength: number,
+    maxLength: number,
+    fieldName: string = "Content",
+  ): Content {
     const trimmed = value.trim();
-    
+
     if (trimmed.length < minLength || trimmed.length > maxLength) {
-      throw new InvalidContentException(fieldName, minLength, maxLength, trimmed.length);
+      throw new InvalidContentException(
+        fieldName,
+        minLength,
+        maxLength,
+        trimmed.length,
+      );
     }
-    
+
     return new Content(trimmed, minLength, maxLength);
   }
 

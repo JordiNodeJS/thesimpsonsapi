@@ -33,7 +33,10 @@ export interface EpisodeDetailsOutput {
 export class GetEpisodeDetailsUseCase {
   constructor(private episodeRepository: EpisodeRepository) {}
 
-  async execute(episodeId: number, userId?: string): Promise<EpisodeDetailsOutput> {
+  async execute(
+    episodeId: number,
+    userId?: string,
+  ): Promise<EpisodeDetailsOutput> {
     // 1. Get episode
     const episode = await this.episodeRepository.findById(episodeId);
     if (!episode) {
@@ -43,7 +46,10 @@ export class GetEpisodeDetailsUseCase {
     // 2. Get user progress if authenticated
     let userProgress = null;
     if (userId) {
-      const progress = await this.episodeRepository.getProgress(userId, episodeId);
+      const progress = await this.episodeRepository.getProgress(
+        userId,
+        episodeId,
+      );
       if (progress) {
         userProgress = {
           episodeId: progress.episodeId,

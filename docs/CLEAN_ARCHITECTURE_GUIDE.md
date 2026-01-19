@@ -88,6 +88,7 @@ thesimpsonsapi/
 The innermost layer containing pure business logic. **NO framework dependencies**.
 
 #### Entities
+
 Objects with unique identity that persist over time.
 
 ```typescript
@@ -100,7 +101,7 @@ export class Episode {
     public readonly episodeNumber: number,
     public readonly airDate: Date | null,
     public readonly description: string | null,
-    public readonly imageUrl: string | null
+    public readonly imageUrl: string | null,
   ) {}
 
   // Business logic methods
@@ -120,6 +121,7 @@ export class Episode {
 ```
 
 #### Value Objects
+
 Immutable objects defined by their attributes, not identity.
 
 ```typescript
@@ -141,6 +143,7 @@ export class Rating {
 ```
 
 #### Domain Exceptions
+
 Business rule violations.
 
 ```typescript
@@ -159,6 +162,7 @@ export class NotFoundException extends DomainException {
 Contains use cases (application-specific business rules) and port definitions.
 
 #### Use Cases
+
 Each use case represents one application action.
 
 ```typescript
@@ -166,32 +170,36 @@ Each use case represents one application action.
 export class TrackEpisodeUseCase {
   constructor(
     private readonly episodeRepo: IEpisodeRepository,
-    private readonly progressRepo: IUserEpisodeProgressRepository
+    private readonly progressRepo: IUserEpisodeProgressRepository,
   ) {}
 
-  async execute(userId: string, input: TrackEpisodeInput): Promise<TrackEpisodeOutput> {
+  async execute(
+    userId: string,
+    input: TrackEpisodeInput,
+  ): Promise<TrackEpisodeOutput> {
     // 1. Validate domain rules
     const rating = Rating.create(input.rating);
-    
+
     // 2. Check episode exists
     const episode = await this.episodeRepo.findById(input.episodeId);
     if (!episode) {
       throw new NotFoundException("Episode", input.episodeId);
     }
-    
+
     // 3. Execute business logic
     await this.progressRepo.upsert(userId, input.episodeId, {
       rating: rating.value,
       notes: input.notes,
       watchedAt: new Date(),
     });
-    
+
     return { success: true };
   }
 }
 ```
 
 #### Ports (Interfaces)
+
 Contracts that infrastructure must implement.
 
 ```typescript
@@ -199,7 +207,10 @@ Contracts that infrastructure must implement.
 export interface IEpisodeRepository {
   findById(id: number): Promise<Episode | null>;
   findAll(options?: { season?: number; limit?: number }): Promise<Episode[]>;
-  findBySeasonAndNumber(season: number, number: number): Promise<Episode | null>;
+  findBySeasonAndNumber(
+    season: number,
+    number: number,
+  ): Promise<Episode | null>;
 }
 ```
 
@@ -210,6 +221,7 @@ export interface IEpisodeRepository {
 Implements ports using concrete technologies (Prisma, external APIs, etc.).
 
 #### Mappers
+
 Convert between Prisma models and domain entities.
 
 ```typescript
@@ -223,13 +235,14 @@ export class EpisodeMapper {
       prismaEpisode.episode_number,
       prismaEpisode.air_date,
       prismaEpisode.description,
-      prismaEpisode.image_url
+      prismaEpisode.image_url,
     );
   }
 }
 ```
 
 #### Repository Implementations
+
 Implement ports using Prisma.
 
 ```typescript
@@ -245,6 +258,7 @@ export class PrismaEpisodeRepository implements IEpisodeRepository {
 ```
 
 #### UseCaseFactory (Composition Root)
+
 Creates use cases with all dependencies wired up.
 
 ```typescript
@@ -270,14 +284,18 @@ Next.js-specific code. Server Actions are thin controllers.
 // app/_actions/episodes.ts
 "use server";
 
-export async function trackEpisode(episodeId: number, rating: number, notes?: string) {
+export async function trackEpisode(
+  episodeId: number,
+  rating: number,
+  notes?: string,
+) {
   // 1. Validate input (Zod)
   const validated = TrackEpisodeSchema.parse({ episodeId, rating, notes });
-  
+
   // 2. Get authenticated user
   const user = await getCurrentUserOptional();
   if (!user) throw new Error("Please log in");
-  
+
   // 3. Delegate to use case
   const useCase = UseCaseFactory.createTrackEpisodeUseCase();
   return useCase.execute(user.id, validated);
@@ -298,7 +316,7 @@ export class UserEpisodeFavorite {
   constructor(
     public readonly userId: string,
     public readonly episodeId: number,
-    public readonly favoritedAt: Date
+    public readonly favoritedAt: Date,
   ) {}
 }
 ```
@@ -317,15 +335,18 @@ export interface IUserFavoriteRepository {
 export class ToggleFavoriteUseCase {
   constructor(
     private readonly favoriteRepo: IUserFavoriteRepository,
-    private readonly episodeRepo: IEpisodeRepository
+    private readonly episodeRepo: IEpisodeRepository,
   ) {}
 
-  async execute(userId: string, episodeId: number): Promise<{ isFavorite: boolean }> {
+  async execute(
+    userId: string,
+    episodeId: number,
+  ): Promise<{ isFavorite: boolean }> {
     const episode = await this.episodeRepo.findById(episodeId);
     if (!episode) throw new NotFoundException("Episode", episodeId);
 
     const isFavorite = await this.favoriteRepo.isFavorite(userId, episodeId);
-    
+
     if (isFavorite) {
       await this.favoriteRepo.removeFavorite(userId, episodeId);
       return { isFavorite: false };
@@ -361,7 +382,7 @@ static createToggleFavoriteUseCase(): ToggleFavoriteUseCase {
 export async function toggleFavorite(episodeId: number) {
   const user = await getCurrentUserOptional();
   if (!user) throw new Error("Please log in");
-  
+
   const useCase = UseCaseFactory.createToggleFavoriteUseCase();
   return useCase.execute(user.id, episodeId);
 }
@@ -379,12 +400,15 @@ Mock the repository ports to test business logic in isolation.
 // __tests__/use-cases/ToggleFavoriteUseCase.test.ts
 describe("ToggleFavoriteUseCase", () => {
   it("should add favorite when not favorited", async () => {
-    const favoriteRepo = { isFavorite: vi.fn().mockResolvedValue(false), addFavorite: vi.fn() };
+    const favoriteRepo = {
+      isFavorite: vi.fn().mockResolvedValue(false),
+      addFavorite: vi.fn(),
+    };
     const episodeRepo = { findById: vi.fn().mockResolvedValue(mockEpisode) };
-    
+
     const useCase = new ToggleFavoriteUseCase(favoriteRepo, episodeRepo);
     const result = await useCase.execute("user-1", 1);
-    
+
     expect(favoriteRepo.addFavorite).toHaveBeenCalledWith("user-1", 1);
     expect(result.isFavorite).toBe(true);
   });
@@ -407,9 +431,9 @@ describe("toggleFavorite", () => {
   it("should call use case with user id", async () => {
     mockGetCurrentUserOptional.mockResolvedValue(mockUser);
     mockExecute.mockResolvedValue({ isFavorite: true });
-    
+
     await toggleFavorite(1);
-    
+
     expect(mockExecute).toHaveBeenCalledWith(mockUser.id, 1);
   });
 });
@@ -421,15 +445,15 @@ describe("toggleFavorite", () => {
 
 ### Naming Conventions
 
-| Layer | Convention | Example |
-|-------|------------|---------|
-| Entity | PascalCase | `Episode`, `DiaryEntry` |
-| Value Object | PascalCase | `Rating`, `Content` |
-| Use Case | PascalCase + "UseCase" | `TrackEpisodeUseCase` |
-| Repository Interface | "I" + PascalCase + "Repository" | `IEpisodeRepository` |
-| Repository Impl | "Prisma" + PascalCase + "Repository" | `PrismaEpisodeRepository` |
-| Mapper | PascalCase + "Mapper" | `EpisodeMapper` |
-| Server Action | camelCase | `trackEpisode`, `toggleFavorite` |
+| Layer                | Convention                           | Example                          |
+| -------------------- | ------------------------------------ | -------------------------------- |
+| Entity               | PascalCase                           | `Episode`, `DiaryEntry`          |
+| Value Object         | PascalCase                           | `Rating`, `Content`              |
+| Use Case             | PascalCase + "UseCase"               | `TrackEpisodeUseCase`            |
+| Repository Interface | "I" + PascalCase + "Repository"      | `IEpisodeRepository`             |
+| Repository Impl      | "Prisma" + PascalCase + "Repository" | `PrismaEpisodeRepository`        |
+| Mapper               | PascalCase + "Mapper"                | `EpisodeMapper`                  |
+| Server Action        | camelCase                            | `trackEpisode`, `toggleFavorite` |
 
 ### File Organization
 
@@ -481,6 +505,7 @@ No. Components → Server Actions → Use Cases → Repositories
 ### Q: When to create a new Use Case vs. add to existing?
 
 Create new when:
+
 - New feature with different business rules
 - Different authorization requirements
 - Different input/output structures

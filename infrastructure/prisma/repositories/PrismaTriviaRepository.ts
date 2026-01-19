@@ -7,7 +7,10 @@ import { TriviaMapper } from "../mappers";
  * Prisma implementation of TriviaRepository
  */
 export class PrismaTriviaRepository implements TriviaRepository {
-  async findByEntity(entityType: "CHARACTER" | "EPISODE", entityId: number): Promise<TriviaFact[]> {
+  async findByEntity(
+    entityType: "CHARACTER" | "EPISODE",
+    entityId: number,
+  ): Promise<TriviaFact[]> {
     const records = await prisma.triviaFact.findMany({
       where: {
         relatedEntityType: entityType,

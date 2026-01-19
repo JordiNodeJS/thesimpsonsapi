@@ -33,15 +33,28 @@ describe("Trivia Server Actions", () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
       mockSubmitTriviaExecute.mockResolvedValue({
         success: true,
-        trivia: { id: 1, content: "Homer's middle name is Jay", entityType: "CHARACTER", entityId: 1 },
+        trivia: {
+          id: 1,
+          content: "Homer's middle name is Jay",
+          entityType: "CHARACTER",
+          entityId: 1,
+        },
       });
 
-      const result = await submitTrivia("CHARACTER", 1, "Homer's middle name is Jay");
+      const result = await submitTrivia(
+        "CHARACTER",
+        1,
+        "Homer's middle name is Jay",
+      );
 
       expect(mockSubmitTriviaExecute).toHaveBeenCalledWith(
-        { entityType: "CHARACTER", entityId: 1, content: "Homer's middle name is Jay" },
+        {
+          entityType: "CHARACTER",
+          entityId: 1,
+          content: "Homer's middle name is Jay",
+        },
         mockUser.id,
-        expect.any(String)
+        expect.any(String),
       );
       expect(result).toEqual({ success: true });
     });
@@ -50,15 +63,24 @@ describe("Trivia Server Actions", () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
       mockSubmitTriviaExecute.mockResolvedValue({
         success: true,
-        trivia: { id: 1, content: "First episode aired December 17, 1989", entityType: "EPISODE", entityId: 1 },
+        trivia: {
+          id: 1,
+          content: "First episode aired December 17, 1989",
+          entityType: "EPISODE",
+          entityId: 1,
+        },
       });
 
-      const result = await submitTrivia("EPISODE", 1, "First episode aired December 17, 1989");
+      const result = await submitTrivia(
+        "EPISODE",
+        1,
+        "First episode aired December 17, 1989",
+      );
 
       expect(mockSubmitTriviaExecute).toHaveBeenCalledWith(
         expect.objectContaining({ entityType: "EPISODE" }),
         mockUser.id,
-        expect.any(String)
+        expect.any(String),
       );
       expect(result).toEqual({ success: true });
     });
@@ -66,9 +88,9 @@ describe("Trivia Server Actions", () => {
     it("should throw error when not authenticated", async () => {
       mockGetCurrentUser.mockRejectedValue(new Error("Unauthorized"));
 
-      await expect(submitTrivia("CHARACTER", 1, "Some trivia fact")).rejects.toThrow(
-        "Unauthorized"
-      );
+      await expect(
+        submitTrivia("CHARACTER", 1, "Some trivia fact"),
+      ).rejects.toThrow("Unauthorized");
     });
 
     it("should validate trivia minimum length (10)", async () => {
@@ -88,7 +110,7 @@ describe("Trivia Server Actions", () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
 
       await expect(
-        submitTrivia("INVALID" as any, 1, "Some trivia content here")
+        submitTrivia("INVALID" as any, 1, "Some trivia content here"),
       ).rejects.toThrow();
     });
 
@@ -96,11 +118,11 @@ describe("Trivia Server Actions", () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
 
       await expect(
-        submitTrivia("CHARACTER", -1, "Some trivia content here")
+        submitTrivia("CHARACTER", -1, "Some trivia content here"),
       ).rejects.toThrow();
 
       await expect(
-        submitTrivia("CHARACTER", 0, "Some trivia content here")
+        submitTrivia("CHARACTER", 0, "Some trivia content here"),
       ).rejects.toThrow();
     });
 
@@ -109,7 +131,7 @@ describe("Trivia Server Actions", () => {
       mockSubmitTriviaExecute.mockRejectedValue(new Error("Database error"));
 
       await expect(
-        submitTrivia("CHARACTER", 1, "Some trivia content here")
+        submitTrivia("CHARACTER", 1, "Some trivia content here"),
       ).rejects.toThrow("Failed to submit trivia");
     });
   });
@@ -132,7 +154,14 @@ describe("Trivia Server Actions", () => {
 
     it("should return trivia for an episode", async () => {
       mockListTriviaExecute.mockResolvedValue({
-        trivia: [{ id: 1, content: "Episode fact", username: "user1", createdAt: null }],
+        trivia: [
+          {
+            id: 1,
+            content: "Episode fact",
+            username: "user1",
+            createdAt: null,
+          },
+        ],
         total: 1,
       });
 

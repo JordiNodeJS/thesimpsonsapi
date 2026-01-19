@@ -44,7 +44,9 @@ export class PrismaCharacterRepository implements CharacterRepository {
     return records.map(CharacterMapper.toDomain);
   }
 
-  async findNames(): Promise<Array<{ id: number; name: string; imageUrl: string | null }>> {
+  async findNames(): Promise<
+    Array<{ id: number; name: string; imageUrl: string | null }>
+  > {
     const records = await prisma.character.findMany({
       select: {
         id: true,

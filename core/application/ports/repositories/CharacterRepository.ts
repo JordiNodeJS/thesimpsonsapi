@@ -24,7 +24,9 @@ export interface CharacterRepository {
   /**
    * Find character names for dropdown/autocomplete
    */
-  findNames(): Promise<Array<{ id: number; name: string; imageUrl: string | null }>>;
+  findNames(): Promise<
+    Array<{ id: number; name: string; imageUrl: string | null }>
+  >;
 
   /**
    * Check if user is following a character

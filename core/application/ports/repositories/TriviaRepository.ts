@@ -8,7 +8,10 @@ export interface TriviaRepository {
   /**
    * Find trivia for an entity
    */
-  findByEntity(entityType: "CHARACTER" | "EPISODE", entityId: number): Promise<TriviaFact[]>;
+  findByEntity(
+    entityType: "CHARACTER" | "EPISODE",
+    entityId: number,
+  ): Promise<TriviaFact[]>;
 
   /**
    * Find a trivia fact by ID

@@ -20,8 +20,14 @@ export interface TriviaListOutput {
 export class ListTriviaUseCase {
   constructor(private triviaRepository: TriviaRepository) {}
 
-  async execute(entityType: "CHARACTER" | "EPISODE", entityId: number): Promise<TriviaListOutput> {
-    const trivia = await this.triviaRepository.findByEntity(entityType, entityId);
+  async execute(
+    entityType: "CHARACTER" | "EPISODE",
+    entityId: number,
+  ): Promise<TriviaListOutput> {
+    const trivia = await this.triviaRepository.findByEntity(
+      entityType,
+      entityId,
+    );
 
     return {
       trivia: trivia.map((t) => ({

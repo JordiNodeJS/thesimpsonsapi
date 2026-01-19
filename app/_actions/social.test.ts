@@ -118,7 +118,7 @@ describe("Social Server Actions", () => {
       expect(mockPostCommentExecute).toHaveBeenCalledWith(
         { characterId: 1, content: "Great character!" },
         mockUser.id,
-        expect.any(String)
+        expect.any(String),
       );
       expect(result).toEqual({ success: true });
     });
@@ -170,8 +170,22 @@ describe("Social Server Actions", () => {
       mockGetCharacterDetailsExecute.mockResolvedValue({
         character: { id: 1, name: "Homer" },
         comments: [
-          { id: 1, userId: mockUser.id, characterId: 1, content: "Comment 1", username: "user1", createdAt: null },
-          { id: 2, userId: "other", characterId: 1, content: "Comment 2", username: "user2", createdAt: null },
+          {
+            id: 1,
+            userId: mockUser.id,
+            characterId: 1,
+            content: "Comment 1",
+            username: "user1",
+            createdAt: null,
+          },
+          {
+            id: 2,
+            userId: "other",
+            characterId: 1,
+            content: "Comment 2",
+            username: "user2",
+            createdAt: null,
+          },
         ],
         social: { isFollowing: false, followerCount: 0 },
       });

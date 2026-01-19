@@ -72,7 +72,7 @@ export class UseCaseFactory {
     return new GetCharacterDetailsUseCase(
       this.characterRepo,
       this.commentRepo,
-      this.followRepo
+      this.followRepo,
     );
   }
 
@@ -85,7 +85,7 @@ export class UseCaseFactory {
     return new CreateDiaryEntryUseCase(
       this.diaryRepo,
       this.characterRepo,
-      this.locationRepo
+      this.locationRepo,
     );
   }
 
@@ -119,7 +119,7 @@ export class UseCaseFactory {
     return new SubmitTriviaUseCase(
       this.triviaRepo,
       this.characterRepo,
-      this.episodeRepo
+      this.episodeRepo,
     );
   }
 

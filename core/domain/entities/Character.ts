@@ -17,7 +17,7 @@ export class Character {
     public readonly externalId: number,
     public readonly name: string,
     public readonly occupation: string | null,
-    public readonly imageUrl: string | null
+    public readonly imageUrl: string | null,
   ) {}
 
   /**
@@ -29,7 +29,7 @@ export class Character {
       data.externalId,
       data.name,
       data.occupation ?? null,
-      data.imageUrl ?? null
+      data.imageUrl ?? null,
     );
   }
 

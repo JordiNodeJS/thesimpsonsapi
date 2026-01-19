@@ -17,20 +17,14 @@ export class User {
     public readonly email: string | null,
     public readonly name: string | null,
     public readonly username: string | null,
-    public readonly image: string | null
+    public readonly image: string | null,
   ) {}
 
   /**
    * Creates a User entity from raw data
    */
   static create(data: UserData): User {
-    return new User(
-      data.id,
-      data.email,
-      data.name,
-      data.username,
-      data.image
-    );
+    return new User(data.id, data.email, data.name, data.username, data.image);
   }
 
   /**

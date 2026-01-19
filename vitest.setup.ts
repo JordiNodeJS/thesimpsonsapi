@@ -36,7 +36,8 @@ vi.mock("next/cache", () => ({
 
 // Mock UseCaseFactory for Clean Architecture
 vi.mock("@/infrastructure/factories", async () => {
-  const actual = await import("./__mocks__/infrastructure/factories/UseCaseFactory");
+  const actual =
+    await import("./__mocks__/infrastructure/factories/UseCaseFactory");
   return actual;
 });
 

@@ -34,7 +34,7 @@ export async function createCollection(name: string, description: string) {
         name: validated.name,
         description: validated.description || "",
       },
-      user.id
+      user.id,
     );
 
     revalidatePath("/collections");
@@ -68,7 +68,7 @@ export async function addQuote(
   collectionId: number,
   text: string,
   character: string,
-  episode: string
+  episode: string,
 ) {
   const validated = AddQuoteSchema.parse({
     collectionId,
@@ -87,7 +87,7 @@ export async function addQuote(
         character: validated.character,
         episode: validated.episode || "",
       },
-      user.id
+      user.id,
     );
 
     revalidatePath("/collections");

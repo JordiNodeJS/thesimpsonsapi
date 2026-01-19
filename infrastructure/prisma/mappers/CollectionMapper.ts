@@ -1,4 +1,9 @@
-import { QuoteCollection, CollectionQuote, QuoteCollectionData, CollectionQuoteData } from "@/core/domain/entities";
+import {
+  QuoteCollection,
+  CollectionQuote,
+  QuoteCollectionData,
+  CollectionQuoteData,
+} from "@/core/domain/entities";
 
 type PrismaQuoteCollection = {
   id: number;

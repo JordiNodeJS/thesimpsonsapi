@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUserOptional } from "@/app/_lib/auth";
 import { UseCaseFactory } from "@/infrastructure/factories";
-import { NotFoundException, ValidationException } from "@/core/domain/exceptions";
+import {
+  NotFoundException,
+  ValidationException,
+} from "@/core/domain/exceptions";
 
 // Zod schemas for input validation at delivery layer
 const TrackEpisodeSchema = z.object({
@@ -20,7 +23,7 @@ const TrackEpisodeSchema = z.object({
 export async function trackEpisode(
   episodeId: number,
   rating: number,
-  notes: string = ""
+  notes: string = "",
 ) {
   // 1. Validate input
   const validated = TrackEpisodeSchema.parse({ episodeId, rating, notes });
@@ -40,7 +43,7 @@ export async function trackEpisode(
         rating: validated.rating,
         notes: validated.notes,
       },
-      user.id
+      user.id,
     );
 
     // 4. Handle framework-specific concerns

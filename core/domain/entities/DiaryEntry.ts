@@ -14,7 +14,7 @@ export class Location {
   private constructor(
     public readonly id: number,
     public readonly externalId: number,
-    public readonly name: string
+    public readonly name: string,
   ) {}
 
   /**
@@ -68,7 +68,7 @@ export class DiaryEntry {
     private readonly _description: Content,
     public readonly entryDate: Date | null,
     public readonly characterName: string | null,
-    public readonly locationName: string | null
+    public readonly locationName: string | null,
   ) {}
 
   /**
@@ -83,7 +83,7 @@ export class DiaryEntry {
       Content.description(data.activityDescription),
       data.entryDate,
       data.characterName ?? null,
-      data.locationName ?? null
+      data.locationName ?? null,
     );
   }
 
@@ -94,7 +94,7 @@ export class DiaryEntry {
     userId: string,
     characterId: number,
     locationId: number,
-    description: string
+    description: string,
   ): DiaryEntry {
     return new DiaryEntry(
       0, // ID will be assigned by database
@@ -104,7 +104,7 @@ export class DiaryEntry {
       Content.description(description),
       new Date(),
       null,
-      null
+      null,
     );
   }
 

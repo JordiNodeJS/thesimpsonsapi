@@ -34,7 +34,10 @@ export class PrismaEpisodeRepository implements EpisodeRepository {
     return records.map(EpisodeMapper.toDomain);
   }
 
-  async getProgress(userId: string, episodeId: number): Promise<EpisodeProgress | null> {
+  async getProgress(
+    userId: string,
+    episodeId: number,
+  ): Promise<EpisodeProgress | null> {
     const record = await prisma.userEpisodeProgress.findUnique({
       where: {
         userId_episodeId: {

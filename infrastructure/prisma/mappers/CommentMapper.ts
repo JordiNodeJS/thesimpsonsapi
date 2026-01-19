@@ -1,4 +1,9 @@
-import { Comment, CommentData, CharacterFollow, CharacterFollowData } from "@/core/domain/entities";
+import {
+  Comment,
+  CommentData,
+  CharacterFollow,
+  CharacterFollowData,
+} from "@/core/domain/entities";
 
 type PrismaComment = {
   id: number;

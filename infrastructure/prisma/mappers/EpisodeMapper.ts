@@ -1,4 +1,9 @@
-import { Episode, EpisodeProgress, EpisodeData, EpisodeProgressData } from "@/core/domain/entities";
+import {
+  Episode,
+  EpisodeProgress,
+  EpisodeData,
+  EpisodeProgressData,
+} from "@/core/domain/entities";
 
 type PrismaEpisode = {
   id: number;

@@ -1,4 +1,7 @@
-import { CommentRepository, FollowRepository } from "@/core/application/ports/repositories";
+import {
+  CommentRepository,
+  FollowRepository,
+} from "@/core/application/ports/repositories";
 import { Comment, CharacterFollow } from "@/core/domain/entities";
 import { prisma } from "@/app/_lib/prisma";
 import { CommentMapper, FollowMapper } from "../mappers";

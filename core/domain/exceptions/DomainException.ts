@@ -64,7 +64,11 @@ export class ConflictException extends DomainException {
  */
 export class InvalidRatingException extends ValidationException {
   constructor(rating: number) {
-    super(`Rating must be between 1 and 5, received: ${rating}`, "rating", rating);
+    super(
+      `Rating must be between 1 and 5, received: ${rating}`,
+      "rating",
+      rating,
+    );
   }
 }
 
@@ -72,11 +76,16 @@ export class InvalidRatingException extends ValidationException {
  * Invalid Content Exception
  */
 export class InvalidContentException extends ValidationException {
-  constructor(field: string, minLength: number, maxLength: number, actualLength: number) {
+  constructor(
+    field: string,
+    minLength: number,
+    maxLength: number,
+    actualLength: number,
+  ) {
     super(
       `${field} must be between ${minLength} and ${maxLength} characters, received ${actualLength}`,
       field,
-      actualLength
+      actualLength,
     );
   }
 }

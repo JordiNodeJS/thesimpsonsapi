@@ -23,7 +23,7 @@ export class TriviaFact {
     private readonly _content: Content,
     public readonly submittedByUserId: string | null,
     public readonly createdAt: Date | null,
-    public readonly username: string
+    public readonly username: string,
   ) {}
 
   /**
@@ -41,7 +41,7 @@ export class TriviaFact {
       Content.trivia(data.content),
       data.submittedByUserId,
       data.createdAt,
-      data.username ?? "Anonymous"
+      data.username ?? "Anonymous",
     );
   }
 
@@ -53,7 +53,7 @@ export class TriviaFact {
     entityId: number,
     content: string,
     userId: string,
-    username: string
+    username: string,
   ): TriviaFact {
     return new TriviaFact(
       0, // ID will be assigned by database
@@ -62,7 +62,7 @@ export class TriviaFact {
       Content.trivia(content),
       userId,
       new Date(),
-      username
+      username,
     );
   }
 

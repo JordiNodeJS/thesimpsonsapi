@@ -20,7 +20,7 @@ export class Comment {
     public readonly characterId: number | null,
     private readonly _content: Content,
     public readonly createdAt: Date | null,
-    public readonly username: string
+    public readonly username: string,
   ) {}
 
   /**
@@ -33,21 +33,26 @@ export class Comment {
       data.characterId,
       Content.comment(data.content),
       data.createdAt,
-      data.username ?? "Anonymous"
+      data.username ?? "Anonymous",
     );
   }
 
   /**
    * Creates a new comment for submission
    */
-  static createNew(userId: string, characterId: number, content: string, username: string): Comment {
+  static createNew(
+    userId: string,
+    characterId: number,
+    content: string,
+    username: string,
+  ): Comment {
     return new Comment(
       0, // ID will be assigned by database
       userId,
       characterId,
       Content.comment(content),
       new Date(),
-      username
+      username,
     );
   }
 
@@ -116,7 +121,7 @@ export class CharacterFollow {
   private constructor(
     public readonly userId: string,
     public readonly characterId: number,
-    public readonly createdAt: Date | null
+    public readonly createdAt: Date | null,
   ) {}
 
   /**
@@ -126,7 +131,7 @@ export class CharacterFollow {
     return new CharacterFollow(
       data.userId,
       data.characterId,
-      data.createdAt ?? null
+      data.createdAt ?? null,
     );
   }
 

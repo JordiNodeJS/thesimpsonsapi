@@ -1,5 +1,9 @@
 import { DiaryEntry } from "@/core/domain/entities";
-import { DiaryRepository, LocationRepository, CharacterRepository } from "@/core/application/ports/repositories";
+import {
+  DiaryRepository,
+  LocationRepository,
+  CharacterRepository,
+} from "@/core/application/ports/repositories";
 import { NotFoundException } from "@/core/domain/exceptions";
 
 /**
@@ -33,12 +37,17 @@ export class CreateDiaryEntryUseCase {
   constructor(
     private diaryRepository: DiaryRepository,
     private characterRepository: CharacterRepository,
-    private locationRepository: LocationRepository
+    private locationRepository: LocationRepository,
   ) {}
 
-  async execute(input: CreateDiaryEntryInput, userId: string): Promise<CreateDiaryEntryOutput> {
+  async execute(
+    input: CreateDiaryEntryInput,
+    userId: string,
+  ): Promise<CreateDiaryEntryOutput> {
     // 1. Validate character exists
-    const character = await this.characterRepository.findById(input.characterId);
+    const character = await this.characterRepository.findById(
+      input.characterId,
+    );
     if (!character) {
       throw new NotFoundException("Character", input.characterId);
     }
@@ -54,7 +63,7 @@ export class CreateDiaryEntryUseCase {
       userId,
       input.characterId,
       input.locationId,
-      input.description
+      input.description,
     );
 
     // 4. Persist entry

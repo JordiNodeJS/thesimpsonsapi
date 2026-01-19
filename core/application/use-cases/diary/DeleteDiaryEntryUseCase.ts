@@ -1,5 +1,8 @@
 import { DiaryRepository } from "@/core/application/ports/repositories";
-import { AuthorizationException, NotFoundException } from "@/core/domain/exceptions";
+import {
+  AuthorizationException,
+  NotFoundException,
+} from "@/core/domain/exceptions";
 
 /**
  * Output DTO for DeleteDiaryEntryUseCase
@@ -16,7 +19,10 @@ export interface DeleteDiaryEntryOutput {
 export class DeleteDiaryEntryUseCase {
   constructor(private diaryRepository: DiaryRepository) {}
 
-  async execute(entryId: number, userId: string): Promise<DeleteDiaryEntryOutput> {
+  async execute(
+    entryId: number,
+    userId: string,
+  ): Promise<DeleteDiaryEntryOutput> {
     // 1. Verify entry exists and belongs to user
     const entry = await this.diaryRepository.findById(entryId);
     if (!entry) {
@@ -24,7 +30,9 @@ export class DeleteDiaryEntryUseCase {
     }
 
     if (!entry.belongsTo(userId)) {
-      throw new AuthorizationException("You can only delete your own diary entries");
+      throw new AuthorizationException(
+        "You can only delete your own diary entries",
+      );
     }
 
     // 2. Delete entry

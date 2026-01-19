@@ -12,7 +12,10 @@ import {
   mockListDiaryEntriesExecute,
   resetAllMocks,
 } from "@/__mocks__/infrastructure/factories/UseCaseFactory";
-import { AuthorizationException, NotFoundException } from "@/core/domain/exceptions";
+import {
+  AuthorizationException,
+  NotFoundException,
+} from "@/core/domain/exceptions";
 
 // Import after mocks are setup
 import { createDiaryEntry, getDiaryEntries, deleteDiaryEntry } from "./diary";
@@ -38,8 +41,12 @@ describe("Diary Server Actions", () => {
       const result = await createDiaryEntry(1, 1, "Had a great time at Moe's");
 
       expect(mockCreateDiaryEntryExecute).toHaveBeenCalledWith(
-        { characterId: 1, locationId: 1, description: "Had a great time at Moe's" },
-        mockUser.id
+        {
+          characterId: 1,
+          locationId: 1,
+          description: "Had a great time at Moe's",
+        },
+        mockUser.id,
       );
       expect(result).toEqual({ success: true });
     });
@@ -48,7 +55,7 @@ describe("Diary Server Actions", () => {
       mockGetCurrentUser.mockRejectedValue(new Error("Unauthorized"));
 
       await expect(createDiaryEntry(1, 1, "Test entry")).rejects.toThrow(
-        "Unauthorized"
+        "Unauthorized",
       );
     });
 
@@ -68,11 +75,11 @@ describe("Diary Server Actions", () => {
     it("should handle database errors gracefully", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
       mockCreateDiaryEntryExecute.mockRejectedValue(
-        new Error("Database connection failed")
+        new Error("Database connection failed"),
       );
 
       await expect(createDiaryEntry(1, 1, "Test entry")).rejects.toThrow(
-        "Failed to create diary entry"
+        "Failed to create diary entry",
       );
     });
   });
@@ -82,8 +89,20 @@ describe("Diary Server Actions", () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
       mockListDiaryEntriesExecute.mockResolvedValue({
         entries: [
-          { id: 1, activityDescription: "Entry 1", characterName: "Homer", locationName: "Moe's", entryDate: null },
-          { id: 2, activityDescription: "Entry 2", characterName: "Bart", locationName: "School", entryDate: null },
+          {
+            id: 1,
+            activityDescription: "Entry 1",
+            characterName: "Homer",
+            locationName: "Moe's",
+            entryDate: null,
+          },
+          {
+            id: 2,
+            activityDescription: "Entry 2",
+            characterName: "Bart",
+            locationName: "School",
+            entryDate: null,
+          },
         ],
         total: 2,
       });
@@ -115,7 +134,7 @@ describe("Diary Server Actions", () => {
     it("should throw error when entry not found", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
       mockDeleteDiaryEntryExecute.mockRejectedValue(
-        new NotFoundException("DiaryEntry", 999)
+        new NotFoundException("DiaryEntry", 999),
       );
 
       await expect(deleteDiaryEntry(999)).rejects.toThrow("Entry not found");
@@ -124,11 +143,11 @@ describe("Diary Server Actions", () => {
     it("should prevent deletion of other user's entries", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
       mockDeleteDiaryEntryExecute.mockRejectedValue(
-        new AuthorizationException("Not authorized")
+        new AuthorizationException("Not authorized"),
       );
 
       await expect(deleteDiaryEntry(1)).rejects.toThrow(
-        "You don't have permission to delete this entry"
+        "You don't have permission to delete this entry",
       );
     });
 

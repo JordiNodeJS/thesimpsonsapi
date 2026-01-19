@@ -1,6 +1,9 @@
 import { CollectionQuote } from "@/core/domain/entities";
 import { CollectionRepository } from "@/core/application/ports/repositories";
-import { AuthorizationException, NotFoundException } from "@/core/domain/exceptions";
+import {
+  AuthorizationException,
+  NotFoundException,
+} from "@/core/domain/exceptions";
 
 /**
  * Input DTO for AddQuoteUseCase
@@ -34,13 +37,17 @@ export class AddQuoteUseCase {
 
   async execute(input: AddQuoteInput, userId: string): Promise<AddQuoteOutput> {
     // 1. Validate collection exists and belongs to user
-    const collection = await this.collectionRepository.findById(input.collectionId);
+    const collection = await this.collectionRepository.findById(
+      input.collectionId,
+    );
     if (!collection) {
       throw new NotFoundException("Collection", input.collectionId);
     }
 
     if (!collection.belongsTo(userId)) {
-      throw new AuthorizationException("You can only add quotes to your own collections");
+      throw new AuthorizationException(
+        "You can only add quotes to your own collections",
+      );
     }
 
     // 2. Create quote entity (validates content)
@@ -48,7 +55,7 @@ export class AddQuoteUseCase {
       input.collectionId,
       input.text,
       input.character,
-      input.episode
+      input.episode,
     );
 
     // 3. Persist quote

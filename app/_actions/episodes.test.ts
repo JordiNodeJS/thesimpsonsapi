@@ -45,7 +45,7 @@ describe("Episodes Server Actions", () => {
 
       expect(mockTrackEpisodeExecute).toHaveBeenCalledWith(
         { episodeId: 1, rating: 5, notes: "Great episode!" },
-        mockUser.id
+        mockUser.id,
       );
       expect(result).toEqual({ success: true });
     });
@@ -54,7 +54,7 @@ describe("Episodes Server Actions", () => {
       mockGetCurrentUserOptional.mockResolvedValue(null);
 
       await expect(trackEpisode(1, 5, "Notes")).rejects.toThrow(
-        "Please log in to track episodes"
+        "Please log in to track episodes",
       );
     });
 
@@ -91,7 +91,7 @@ describe("Episodes Server Actions", () => {
 
       expect(mockTrackEpisodeExecute).toHaveBeenCalledWith(
         expect.objectContaining({ notes: "" }),
-        mockUser.id
+        mockUser.id,
       );
       expect(result).toEqual({ success: true });
     });
@@ -119,7 +119,7 @@ describe("Episodes Server Actions", () => {
       mockTrackEpisodeExecute.mockRejectedValue(new Error("Database error"));
 
       await expect(trackEpisode(1, 5, "Notes")).rejects.toThrow(
-        "Failed to track episode"
+        "Failed to track episode",
       );
     });
   });

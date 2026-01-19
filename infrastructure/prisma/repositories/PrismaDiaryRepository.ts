@@ -1,4 +1,7 @@
-import { DiaryRepository, LocationRepository } from "@/core/application/ports/repositories";
+import {
+  DiaryRepository,
+  LocationRepository,
+} from "@/core/application/ports/repositories";
 import { DiaryEntry, Location } from "@/core/domain/entities";
 import { prisma } from "@/app/_lib/prisma";
 import { DiaryEntryMapper, LocationMapper } from "../mappers";

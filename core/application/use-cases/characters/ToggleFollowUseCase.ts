@@ -1,5 +1,8 @@
 import { CharacterFollow } from "@/core/domain/entities";
-import { CharacterRepository, FollowRepository } from "@/core/application/ports/repositories";
+import {
+  CharacterRepository,
+  FollowRepository,
+} from "@/core/application/ports/repositories";
 import { NotFoundException } from "@/core/domain/exceptions";
 
 /**
@@ -18,10 +21,13 @@ export interface ToggleFollowOutput {
 export class ToggleFollowUseCase {
   constructor(
     private characterRepository: CharacterRepository,
-    private followRepository: FollowRepository
+    private followRepository: FollowRepository,
   ) {}
 
-  async execute(characterId: number, userId: string): Promise<ToggleFollowOutput> {
+  async execute(
+    characterId: number,
+    userId: string,
+  ): Promise<ToggleFollowOutput> {
     // 1. Validate character exists
     const character = await this.characterRepository.findById(characterId);
     if (!character) {
@@ -29,7 +35,10 @@ export class ToggleFollowUseCase {
     }
 
     // 2. Check current follow status
-    const isCurrentlyFollowing = await this.followRepository.isFollowing(userId, characterId);
+    const isCurrentlyFollowing = await this.followRepository.isFollowing(
+      userId,
+      characterId,
+    );
 
     // 3. Toggle follow status
     if (isCurrentlyFollowing) {

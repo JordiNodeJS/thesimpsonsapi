@@ -23,7 +23,7 @@ export class Episode {
     public readonly season: number,
     public readonly episodeNumber: number,
     public readonly synopsis: string | null,
-    public readonly imageUrl: string | null
+    public readonly imageUrl: string | null,
   ) {}
 
   /**
@@ -37,7 +37,7 @@ export class Episode {
       data.season,
       data.episodeNumber,
       data.synopsis ?? null,
-      data.imageUrl ?? null
+      data.imageUrl ?? null,
     );
   }
 
@@ -112,7 +112,7 @@ export class EpisodeProgress {
     public readonly episodeId: number,
     private _rating: Rating | null,
     public readonly notes: string | null,
-    public readonly watchedAt: Date | null
+    public readonly watchedAt: Date | null,
   ) {}
 
   /**
@@ -125,7 +125,7 @@ export class EpisodeProgress {
       data.episodeId,
       rating,
       data.notes,
-      data.watchedAt
+      data.watchedAt,
     );
   }
 
@@ -173,7 +173,7 @@ export class EpisodeProgress {
       this.episodeId,
       Rating.create(newRating),
       this.notes,
-      new Date()
+      new Date(),
     );
   }
 
@@ -186,7 +186,7 @@ export class EpisodeProgress {
       this.episodeId,
       this._rating,
       newNotes,
-      this.watchedAt
+      this.watchedAt,
     );
   }
 

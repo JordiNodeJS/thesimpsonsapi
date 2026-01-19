@@ -40,11 +40,14 @@ describe("Collections Server Actions", () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
       mockCreateCollectionExecute.mockResolvedValue({ success: true });
 
-      const result = await createCollection("Best Quotes", "My favorite quotes");
+      const result = await createCollection(
+        "Best Quotes",
+        "My favorite quotes",
+      );
 
       expect(mockCreateCollectionExecute).toHaveBeenCalledWith(
         { name: "Best Quotes", description: "My favorite quotes" },
-        mockUser.id
+        mockUser.id,
       );
       expect(result).toEqual({ success: true });
     });
@@ -53,7 +56,7 @@ describe("Collections Server Actions", () => {
       mockGetCurrentUser.mockRejectedValue(new Error("Unauthorized"));
 
       await expect(
-        createCollection("Test Collection", "Description")
+        createCollection("Test Collection", "Description"),
       ).rejects.toThrow("Unauthorized");
     });
 
@@ -88,10 +91,12 @@ describe("Collections Server Actions", () => {
 
     it("should handle database errors", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
-      mockCreateCollectionExecute.mockRejectedValue(new Error("Database error"));
+      mockCreateCollectionExecute.mockRejectedValue(
+        new Error("Database error"),
+      );
 
       await expect(createCollection("Test", "Description")).rejects.toThrow(
-        "Failed to create collection"
+        "Failed to create collection",
       );
     });
   });
@@ -125,14 +130,24 @@ describe("Collections Server Actions", () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
       mockAddQuoteExecute.mockResolvedValue({
         success: true,
-        quote: { id: 1, quoteText: "D'oh!", characterName: "Homer Simpson", sourceEpisode: "S01E01" },
+        quote: {
+          id: 1,
+          quoteText: "D'oh!",
+          characterName: "Homer Simpson",
+          sourceEpisode: "S01E01",
+        },
       });
 
       const result = await addQuote(1, "D'oh!", "Homer Simpson", "S01E01");
 
       expect(mockAddQuoteExecute).toHaveBeenCalledWith(
-        { collectionId: 1, text: "D'oh!", character: "Homer Simpson", episode: "S01E01" },
-        mockUser.id
+        {
+          collectionId: 1,
+          text: "D'oh!",
+          character: "Homer Simpson",
+          episode: "S01E01",
+        },
+        mockUser.id,
       );
       expect(result).toEqual({ success: true });
     });
@@ -157,7 +172,12 @@ describe("Collections Server Actions", () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
       mockAddQuoteExecute.mockResolvedValue({
         success: true,
-        quote: { id: 1, quoteText: "D'oh!", characterName: "Homer Simpson", sourceEpisode: "" },
+        quote: {
+          id: 1,
+          quoteText: "D'oh!",
+          characterName: "Homer Simpson",
+          sourceEpisode: "",
+        },
       });
 
       const result = await addQuote(1, "D'oh!", "Homer Simpson", "");
@@ -170,7 +190,7 @@ describe("Collections Server Actions", () => {
       mockAddQuoteExecute.mockRejectedValue(new Error("Database error"));
 
       await expect(addQuote(1, "Quote", "Homer", "")).rejects.toThrow(
-        "Failed to add quote to collection"
+        "Failed to add quote to collection",
       );
     });
   });
@@ -179,8 +199,20 @@ describe("Collections Server Actions", () => {
     it("should return quotes for a collection", async () => {
       mockGetCollectionQuotesExecute.mockResolvedValue({
         quotes: [
-          { id: 1, quoteText: "D'oh!", characterName: "Homer", sourceEpisode: "S01E01", attribution: "Homer - S01E01" },
-          { id: 2, quoteText: "Ay caramba!", characterName: "Bart", sourceEpisode: "S01E02", attribution: "Bart - S01E02" },
+          {
+            id: 1,
+            quoteText: "D'oh!",
+            characterName: "Homer",
+            sourceEpisode: "S01E01",
+            attribution: "Homer - S01E01",
+          },
+          {
+            id: 2,
+            quoteText: "Ay caramba!",
+            characterName: "Bart",
+            sourceEpisode: "S01E02",
+            attribution: "Bart - S01E02",
+          },
         ],
         total: 2,
       });

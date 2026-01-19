@@ -4,7 +4,11 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUser } from "@/app/_lib/auth";
 import { UseCaseFactory } from "@/infrastructure/factories";
-import { AuthorizationException, NotFoundException, ValidationException } from "@/core/domain/exceptions";
+import {
+  AuthorizationException,
+  NotFoundException,
+  ValidationException,
+} from "@/core/domain/exceptions";
 
 // Zod schemas for input validation
 const CreateDiaryEntrySchema = z.object({
@@ -24,7 +28,7 @@ const DeleteDiaryEntrySchema = z.object({
 export async function createDiaryEntry(
   characterId: number,
   locationId: number,
-  description: string
+  description: string,
 ) {
   const validated = CreateDiaryEntrySchema.parse({
     characterId,
@@ -41,7 +45,7 @@ export async function createDiaryEntry(
         locationId: validated.locationId,
         description: validated.description,
       },
-      user.id
+      user.id,
     );
 
     revalidatePath("/diary");
@@ -102,7 +106,10 @@ export async function deleteDiaryEntry(id: number) {
       if (errorCode === "NOT_FOUND" || error instanceof NotFoundException) {
         throw new Error("Entry not found");
       }
-      if (errorCode === "UNAUTHORIZED" || error instanceof AuthorizationException) {
+      if (
+        errorCode === "UNAUTHORIZED" ||
+        error instanceof AuthorizationException
+      ) {
         throw new Error("You don't have permission to delete this entry");
       }
     }
