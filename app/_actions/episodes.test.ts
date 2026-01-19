@@ -53,9 +53,7 @@ describe("Episodes Server Actions", () => {
     it("should throw error when not authenticated", async () => {
       mockGetCurrentUserOptional.mockResolvedValue(null);
 
-      await expect(trackEpisode(1, 5, "Notes")).rejects.toThrow(
-        "Please log in to track episodes",
-      );
+      await expect(trackEpisode(1, 5, "Notes")).rejects.toThrow("Unauthorized");
     });
 
     it("should validate rating range (1-5)", async () => {

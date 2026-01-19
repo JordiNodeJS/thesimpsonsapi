@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUser } from "@/app/_lib/auth";
+import { prisma } from "@/app/_lib/prisma";
+import { withAuthenticatedRLS } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";
 import { ValidationException } from "@/core/domain/exceptions";
 
@@ -21,48 +23,52 @@ const AddQuoteSchema = z.object({
 
 /**
  * Server Action: Create Collection
- * Thin controller that delegates to use case
+ * Thin controller that delegates to use case with RLS
  */
 export async function createCollection(name: string, description: string) {
   const validated = CreateCollectionSchema.parse({ name, description });
-  const user = await getCurrentUser();
 
-  try {
-    const useCase = UseCaseFactory.createCreateCollectionUseCase();
-    await useCase.execute(
-      {
-        name: validated.name,
-        description: validated.description || "",
-      },
-      user.id,
-    );
+  return withAuthenticatedRLS(prisma, async (tx, user) => {
+    try {
+      const useCase = UseCaseFactory.createCreateCollectionUseCase();
+      await useCase.execute(
+        {
+          name: validated.name,
+          description: validated.description || "",
+        },
+        user.id,
+      );
 
-    revalidatePath("/collections");
-    return { success: true };
-  } catch (error) {
-    console.error("[createCollection] Error:", error);
+      revalidatePath("/collections");
+      return { success: true };
+    } catch (error) {
+      console.error("[createCollection] Error:", error);
 
-    if (error instanceof ValidationException) {
-      throw new Error(error.message);
+      if (error instanceof ValidationException) {
+        throw new Error(error.message);
+      }
+
+      throw new Error("Failed to create collection");
     }
-
-    throw new Error("Failed to create collection");
-  }
+  });
 }
 
 /**
  * Server Action: Get Collections
+ * RLS automatically filters collections by current user
  */
 export async function getCollections() {
-  const user = await getCurrentUser();
-  const useCase = UseCaseFactory.createListCollectionsUseCase();
-  const result = await useCase.execute(user.id);
-  return result.collections;
+  return withAuthenticatedRLS(prisma, async (tx, user) => {
+    const useCase = UseCaseFactory.createListCollectionsUseCase();
+    const result = await useCase.execute(user.id);
+    return result.collections;
+  });
 }
 
 /**
  * Server Action: Add Quote to Collection
- * Thin controller that delegates to use case
+ * Thin controller that delegates to use case with RLS
+ * RLS ensures users can only add quotes to their own collections
  */
 export async function addQuote(
   collectionId: number,
@@ -76,31 +82,32 @@ export async function addQuote(
     character,
     episode,
   });
-  const user = await getCurrentUser();
 
-  try {
-    const useCase = UseCaseFactory.createAddQuoteUseCase();
-    await useCase.execute(
-      {
-        collectionId: validated.collectionId,
-        text: validated.text,
-        character: validated.character,
-        episode: validated.episode || "",
-      },
-      user.id,
-    );
+  return withAuthenticatedRLS(prisma, async (tx, user) => {
+    try {
+      const useCase = UseCaseFactory.createAddQuoteUseCase();
+      await useCase.execute(
+        {
+          collectionId: validated.collectionId,
+          text: validated.text,
+          character: validated.character,
+          episode: validated.episode || "",
+        },
+        user.id,
+      );
 
-    revalidatePath("/collections");
-    return { success: true };
-  } catch (error) {
-    console.error("[addQuote] Error:", error);
+      revalidatePath("/collections");
+      return { success: true };
+    } catch (error) {
+      console.error("[addQuote] Error:", error);
 
-    if (error instanceof ValidationException) {
-      throw new Error(error.message);
+      if (error instanceof ValidationException) {
+        throw new Error(error.message);
+      }
+
+      throw new Error("Failed to add quote to collection");
     }
-
-    throw new Error("Failed to add quote to collection");
-  }
+  });
 }
 
 /**

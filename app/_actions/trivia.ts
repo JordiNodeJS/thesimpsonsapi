@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentUser } from "@/app/_lib/auth";
+import { prisma } from "@/app/_lib/prisma";
+import { withAuthenticatedRLS, withoutRLS } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";
 import { ValidationException } from "@/core/domain/exceptions";
 
@@ -18,7 +20,7 @@ const SubmitTriviaSchema = z.object({
 
 /**
  * Server Action: Submit Trivia
- * Thin controller that delegates to use case
+ * Thin controller that delegates to use case with RLS
  */
 export async function submitTrivia(
   entityType: "CHARACTER" | "EPISODE",
@@ -26,48 +28,52 @@ export async function submitTrivia(
   content: string,
 ) {
   const validated = SubmitTriviaSchema.parse({ entityType, entityId, content });
-  const user = await getCurrentUser();
 
-  try {
-    const useCase = UseCaseFactory.createSubmitTriviaUseCase();
-    await useCase.execute(
-      {
-        entityType: validated.entityType,
-        entityId: validated.entityId,
-        content: validated.content,
-      },
-      user.id,
-      user.name || user.email || "Anonymous",
-    );
+  return withAuthenticatedRLS(prisma, async (tx, user) => {
+    try {
+      const useCase = UseCaseFactory.createSubmitTriviaUseCase();
+      await useCase.execute(
+        {
+          entityType: validated.entityType,
+          entityId: validated.entityId,
+          content: validated.content,
+        },
+        user.id,
+        user.name || user.email || "Anonymous",
+      );
 
-    // Revalidate paths based on entity type
-    if (validated.entityType === "CHARACTER") {
-      revalidatePath(`/characters/${validated.entityId}`);
+      // Revalidate paths based on entity type
+      if (validated.entityType === "CHARACTER") {
+        revalidatePath(`/characters/${validated.entityId}`);
+      }
+      if (validated.entityType === "EPISODE") {
+        revalidatePath(`/episodes/${validated.entityId}`);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("[submitTrivia] Error:", error);
+
+      if (error instanceof ValidationException) {
+        throw new Error(error.message);
+      }
+
+      throw new Error("Failed to submit trivia");
     }
-    if (validated.entityType === "EPISODE") {
-      revalidatePath(`/episodes/${validated.entityId}`);
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error("[submitTrivia] Error:", error);
-
-    if (error instanceof ValidationException) {
-      throw new Error(error.message);
-    }
-
-    throw new Error("Failed to submit trivia");
-  }
+  });
 }
 
 /**
  * Server Action: Get Trivia
+ * Public read operation (RLS policy allows public SELECT)
  */
 export async function getTrivia(
   entityType: "CHARACTER" | "EPISODE",
   entityId: number,
 ) {
-  const useCase = UseCaseFactory.createListTriviaUseCase();
-  const result = await useCase.execute(entityType, entityId);
-  return result.trivia;
+  return withoutRLS(prisma, async (tx) => {
+    const useCase = UseCaseFactory.createListTriviaUseCase();
+    const result = await useCase.execute(entityType, entityId);
+    return result.trivia;
+  });
 }
