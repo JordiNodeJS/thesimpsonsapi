@@ -114,7 +114,11 @@ describe("Trivia Server Actions", () => {
 
       // Test: Invalid entity type should be caught by Zod validation
       await expect(
-        submitTrivia("INVALID" as "CHARACTER" | "EPISODE", 1, "Some trivia content here"),
+        submitTrivia(
+          "INVALID" as "CHARACTER" | "EPISODE",
+          1,
+          "Some trivia content here",
+        ),
       ).rejects.toThrow();
     });
 

@@ -5,9 +5,7 @@
 
 import { vi } from "vitest";
 import type { PrismaClient } from "@prisma/client";
-import {
-  mockGetCurrentUserOptional,
-} from "./auth";
+import { mockGetCurrentUserOptional } from "./auth";
 
 // Type for Prisma transaction
 export type PrismaTransaction = Omit<

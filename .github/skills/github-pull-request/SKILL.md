@@ -317,6 +317,7 @@ gh pr review <pr-number> --request-review JordiNodeJS
 #### Why This Matters
 
 SonarQube detects:
+
 - Type safety issues (`any` types, implicit conversions)
 - Error handling problems (wrong exception types, untyped catch blocks)
 - Security hotspots
@@ -327,13 +328,13 @@ SonarQube detects:
 
 #### Severity Matrix (Pre-Merge Decision Tree)
 
-| Severity | Examples | Action | Timeline |
-|----------|----------|--------|----------|
-| 🔴 **BLOCKER** | Unused imports, type mismatches, `any` types | **MUST FIX** | Before merge |
-| 🟠 **CRITICAL** | Untyped `catch` blocks, missing error handling | **MUST FIX** | Before merge |
-| 🟡 **MAJOR** | `instanceof` checks, hardcoded strings | **Should fix** | Before merge (can defer with justification) |
-| 🔵 **MINOR** | Code style, naming conventions | **Can defer** | In next iteration |
-| ⚪ **INFO** | Documentation, comments | **Optional** | Per team preference |
+| Severity        | Examples                                       | Action         | Timeline                                    |
+| --------------- | ---------------------------------------------- | -------------- | ------------------------------------------- |
+| 🔴 **BLOCKER**  | Unused imports, type mismatches, `any` types   | **MUST FIX**   | Before merge                                |
+| 🟠 **CRITICAL** | Untyped `catch` blocks, missing error handling | **MUST FIX**   | Before merge                                |
+| 🟡 **MAJOR**    | `instanceof` checks, hardcoded strings         | **Should fix** | Before merge (can defer with justification) |
+| 🔵 **MINOR**    | Code style, naming conventions                 | **Can defer**  | In next iteration                           |
+| ⚪ **INFO**     | Documentation, comments                        | **Optional**   | Per team preference                         |
 
 #### Quick SonarLint Analysis Workflow
 
@@ -358,6 +359,7 @@ git diff --name-only main...$(git rev-parse --abbrev-ref HEAD) | grep -E "\.(ts|
 #### Common Issues and Fast Fixes
 
 **Issue: `as any` type casting**
+
 ```typescript
 // ❌ WRONG - SonarQube: "Avoid using 'any' type"
 prismaMock.character.findMany.mockResolvedValue(mockNames as any);
@@ -370,6 +372,7 @@ prismaMock.character.findMany.mockResolvedValue(mockNames as unknown as Characte
 ```
 
 **Issue: Untyped `catch` block**
+
 ```typescript
 // ❌ WRONG - SonarQube: "Catch block missing error type"
 } catch (error) {
@@ -385,6 +388,7 @@ prismaMock.character.findMany.mockResolvedValue(mockNames as unknown as Characte
 ```
 
 **Issue: Window object without globalThis**
+
 ```typescript
 // ❌ WRONG - SonarQube: "Prefer globalThis over window"
 if (typeof window !== "undefined") {
@@ -398,6 +402,7 @@ if (globalThis.window !== undefined) {
 ```
 
 **Issue: Wrong error type**
+
 ```typescript
 // ❌ WRONG - SonarQube: "Use TypeError for type checks"
 if (typeof x !== "number") {
@@ -411,6 +416,7 @@ if (typeof x !== "number") {
 ```
 
 **Issue: Unused imports**
+
 ```typescript
 // ❌ WRONG - SonarQube: "Remove unused import"
 import { getCurrentUser } from "@/auth"; // Not used in this file
@@ -429,7 +435,7 @@ When creating mock data for tests, ensure ALL required fields match the schema:
 const mockCharacter = {
   id: 1,
   name: "Homer",
-  imageUrl: null
+  imageUrl: null,
 };
 // Error: "Property 'externalId' is missing"
 
@@ -439,7 +445,7 @@ const mockCharacter = {
   name: "Homer",
   externalId: 1,
   occupation: null,
-  imageUrl: null
+  imageUrl: null,
 };
 ```
 

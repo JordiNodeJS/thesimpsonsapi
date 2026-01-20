@@ -123,9 +123,27 @@ describe("Repository Functions", () => {
     describe("findCharacterNames", () => {
       it("should return character names ordered alphabetically", async () => {
         const mockNames = [
-          { id: 3, name: "Bart Simpson", externalId: 3, occupation: null, imageUrl: null },
-          { id: 1, name: "Homer Simpson", externalId: 1, occupation: null, imageUrl: null },
-          { id: 2, name: "Marge Simpson", externalId: 2, occupation: null, imageUrl: null },
+          {
+            id: 3,
+            name: "Bart Simpson",
+            externalId: 3,
+            occupation: null,
+            imageUrl: null,
+          },
+          {
+            id: 1,
+            name: "Homer Simpson",
+            externalId: 1,
+            occupation: null,
+            imageUrl: null,
+          },
+          {
+            id: 2,
+            name: "Marge Simpson",
+            externalId: 2,
+            occupation: null,
+            imageUrl: null,
+          },
         ];
         prismaMock.character.findMany.mockResolvedValue(mockNames);
 
@@ -207,9 +225,7 @@ describe("Repository Functions", () => {
             createdAt: new Date("2026-01-15"),
           },
         ];
-        prismaMock.characterComment.findMany.mockResolvedValue(
-          mockComments,
-        );
+        prismaMock.characterComment.findMany.mockResolvedValue(mockComments);
 
         const result = await findCommentsByCharacter(1);
 
@@ -232,9 +248,7 @@ describe("Repository Functions", () => {
           createdAt: new Date(),
           user: null,
         };
-        prismaMock.characterComment.findMany.mockResolvedValue([
-          mockComment,
-        ]);
+        prismaMock.characterComment.findMany.mockResolvedValue([mockComment]);
 
         const result = await findCommentsByCharacter(1);
 
@@ -383,12 +397,20 @@ describe("Repository Functions", () => {
     describe("findCollectionsByUser", () => {
       it("should return user collections", async () => {
         const mockCollections = [
-          { id: 2, userId: "user-123", name: "Collection 2", description: null },
-          { id: 1, userId: "user-123", name: "Collection 1", description: null },
+          {
+            id: 2,
+            userId: "user-123",
+            name: "Collection 2",
+            description: null,
+          },
+          {
+            id: 1,
+            userId: "user-123",
+            name: "Collection 1",
+            description: null,
+          },
         ];
-        prismaMock.quoteCollection.findMany.mockResolvedValue(
-          mockCollections,
-        );
+        prismaMock.quoteCollection.findMany.mockResolvedValue(mockCollections);
 
         const result = await findCollectionsByUser("user-123");
 
@@ -403,12 +425,22 @@ describe("Repository Functions", () => {
     describe("findQuotesByCollection", () => {
       it("should return quotes for collection", async () => {
         const mockQuotes = [
-          { id: 1, collectionId: 1, quoteText: "D'oh!", characterName: null, sourceEpisode: null },
-          { id: 2, collectionId: 1, quoteText: "Ay caramba!", characterName: null, sourceEpisode: null },
+          {
+            id: 1,
+            collectionId: 1,
+            quoteText: "D'oh!",
+            characterName: null,
+            sourceEpisode: null,
+          },
+          {
+            id: 2,
+            collectionId: 1,
+            quoteText: "Ay caramba!",
+            characterName: null,
+            sourceEpisode: null,
+          },
         ];
-        prismaMock.collectionQuote.findMany.mockResolvedValue(
-          mockQuotes,
-        );
+        prismaMock.collectionQuote.findMany.mockResolvedValue(mockQuotes);
 
         const result = await findQuotesByCollection(1);
 
