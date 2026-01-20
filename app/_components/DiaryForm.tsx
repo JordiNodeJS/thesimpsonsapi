@@ -14,7 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { useLocalStorage, useFormAction } from "@/app/_lib/hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, User, Loader2 } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
 
 interface DiaryFormProps {
   characters: Array<{ id: number; name: string; imageUrl: string | null }>;

@@ -15,14 +15,3 @@ export const mockUser = {
 // Mock auth functions
 export const mockGetCurrentUser = vi.fn();
 export const mockGetCurrentUserOptional = vi.fn();
-
-// Mock the auth module
-vi.mock("@/app/_lib/auth", () => ({
-  getCurrentUser: mockGetCurrentUser,
-  getCurrentUserOptional: mockGetCurrentUserOptional,
-  auth: {
-    api: {
-      getSession: vi.fn(),
-    },
-  },
-}));

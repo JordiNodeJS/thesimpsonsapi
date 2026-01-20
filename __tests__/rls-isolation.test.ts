@@ -69,8 +69,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
 
       // Mock queries to return only user-specific data
       // @ts-expect-error - Mock implementation doesn't need exact Prisma return type
-      prismaMock.diaryEntry.findMany.mockImplementation((args?: any) => {
-        const where = args?.where;
+      prismaMock.diaryEntry.findMany.mockImplementation((args?: unknown) => {
+        const queryArgs = args as { where?: { userId?: string } }; const where = queryArgs?.where;
         if (where?.userId === userId1) return Promise.resolve([entry1]);
         if (where?.userId === userId2) return Promise.resolve([entry2]);
         return Promise.resolve([]);
@@ -116,8 +116,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
 
       // Mock: Only return if BOTH id AND userId match
       // @ts-expect-error - Mock implementation simplified for testing
-      prismaMock.diaryEntry.findFirst.mockImplementation((args?: any) => {
-        const where = args?.where;
+      prismaMock.diaryEntry.findFirst.mockImplementation((args?: unknown) => {
+        const queryArgs = args as { where?: { userId?: string } }; const where = queryArgs?.where;
         if (where?.id === 1 && where?.userId === userId1)
           return Promise.resolve(entry);
         return Promise.resolve(null); // User 2 trying to access User 1's entry
@@ -151,8 +151,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
 
       // Mock: Only find if userId matches (ownership check)
       // @ts-expect-error - Mock implementation simplified for testing
-      prismaMock.diaryEntry.findFirst.mockImplementation((args?: any) => {
-        const where = args?.where;
+      prismaMock.diaryEntry.findFirst.mockImplementation((args?: unknown) => {
+        const queryArgs = args as { where?: { userId?: string } }; const where = queryArgs?.where;
         if (where?.id === 1 && where?.userId === userId1)
           return Promise.resolve(entry);
         return Promise.resolve(null);
@@ -200,8 +200,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
       };
 
       // @ts-expect-error - Mock implementation simplified for testing
-      prismaMock.quoteCollection.findMany.mockImplementation((args?: any) => {
-        const where = args?.where;
+      prismaMock.quoteCollection.findMany.mockImplementation((args?: unknown) => {
+        const queryArgs = args as { where?: { userId?: string } }; const where = queryArgs?.where;
         if (where?.userId === userId1) return Promise.resolve([collection1]);
         if (where?.userId === userId2) return Promise.resolve([collection2]);
         return Promise.resolve([]);
@@ -232,8 +232,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
       };
 
       // @ts-expect-error - Mock implementation simplified for testing
-      prismaMock.quoteCollection.findFirst.mockImplementation((args?: any) => {
-        const where = args?.where;
+      prismaMock.quoteCollection.findFirst.mockImplementation((args?: unknown) => {
+        const queryArgs = args as { where?: { userId?: string } }; const where = queryArgs?.where;
         if (where?.id === 1 && where?.userId === userId1)
           return Promise.resolve(collection);
         return Promise.resolve(null);
@@ -268,8 +268,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
       };
 
       // @ts-expect-error - Mock implementation simplified for testing
-      prismaMock.characterFollow.findMany.mockImplementation((args?: any) => {
-        const where = args?.where;
+      prismaMock.characterFollow.findMany.mockImplementation((args?: unknown) => {
+        const queryArgs = args as { where?: { userId?: string } }; const where = queryArgs?.where;
         if (where?.userId === userId1) return Promise.resolve([follow1]);
         if (where?.userId === userId2) return Promise.resolve([follow2]);
         return Promise.resolve([]);
@@ -298,8 +298,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
       };
 
       // @ts-expect-error - Mock implementation simplified for testing
-      prismaMock.characterFollow.findFirst.mockImplementation((args?: any) => {
-        const where = args?.where;
+      prismaMock.characterFollow.findFirst.mockImplementation((args?: unknown) => {
+        const queryArgs = args as { where?: { userId?: string } }; const where = queryArgs?.where;
         if (where?.userId === userId1 && where?.characterId === 2)
           return Promise.resolve(follow);
         return Promise.resolve(null);
@@ -354,8 +354,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
 
       // Ownership check for updates
       // @ts-expect-error - Mock implementation simplified for testing
-      prismaMock.characterComment.findFirst.mockImplementation((args?: any) => {
-        const where = args?.where;
+      prismaMock.characterComment.findFirst.mockImplementation((args?: unknown) => {
+        const queryArgs = args as { where?: { userId?: string } }; const where = queryArgs?.where;
         if (where?.id === 1 && where?.userId === userId1)
           return Promise.resolve(comment1);
         if (where?.id === 2 && where?.userId === userId2)
@@ -365,8 +365,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
 
       // Mock update to require ownership
       // @ts-expect-error - Mock implementation simplified for testing
-      prismaMock.characterComment.update.mockImplementation((args: any) => {
-        const { where, data } = args;
+      prismaMock.characterComment.update.mockImplementation((args: unknown) => {
+        const { where, data } = args as { where: { id: number }, data: { content: string } };
         // In real app, this would be wrapped in ownership check
         if (where.id === 1) {
           return Promise.resolve({

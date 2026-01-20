@@ -1,6 +1,20 @@
 "use client";
 
-import { useState, useCallback, useTransition, useEffect } from "react";
+import { useState, useCallback, useTransition, useEffect, useSyncExternalStore } from "react";
+
+const emptySubscribe = () => () => {};
+
+/**
+ * Hook para determinar si el código se está ejecutando en el cliente.
+ * Usa useSyncExternalStore para evitar hydration mismatches sin causar renders en cascada.
+ */
+export function useIsClient() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+}
 
 /**
  * Hook para persistir estado en localStorage (SSR-safe).
@@ -14,23 +28,26 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   // Efecto para cargar desde localStorage después de montaje en cliente
   useEffect(() => {
     try {
-      if (globalThis.window !== undefined) {
-        const item = globalThis.window.localStorage.getItem(key);
-        const value = item ? JSON.parse(item) : initialValue;
-        setStoredValue(value);
+      if (typeof window !== "undefined") {
+        const item = window.localStorage.getItem(key);
+        if (item) {
+          setStoredValue(JSON.parse(item));
+        }
       }
     } catch (error) {
       console.error("Error reading from localStorage:", error);
     }
     setMounted(true);
-  }, [key, initialValue]);
+  }, [key]);
 
   const setValue = useCallback(
     (value: T | ((val: T) => T)) => {
       try {
         setStoredValue((prev) => {
           const valueToStore =
-            typeof value === "function" ? value(prev) : value;
+            typeof value === "function"
+              ? (value as (val: T) => T)(prev)
+              : value;
           if (globalThis.window !== undefined) {
             globalThis.window.localStorage.setItem(
               key,

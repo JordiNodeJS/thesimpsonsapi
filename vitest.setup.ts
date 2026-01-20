@@ -51,6 +51,21 @@ vi.mock("next/cache", () => ({
   revalidateTag: vi.fn(),
 }));
 
+// Mock auth module
+vi.mock("@/app/_lib/auth", async () => {
+  const actual = await import("./__mocks__/auth");
+  return {
+    ...actual,
+    getCurrentUser: actual.mockGetCurrentUser,
+    getCurrentUserOptional: actual.mockGetCurrentUserOptional,
+    auth: {
+      api: {
+        getSession: vi.fn(),
+      },
+    },
+  };
+});
+
 // Mock Prisma client
 vi.mock("@/app/_lib/prisma", async () => {
   const actual = await import("./__mocks__/prisma");

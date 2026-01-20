@@ -1,9 +1,8 @@
 "use client";
 
-import { useLocalStorage } from "@/app/_lib/hooks";
+import { useLocalStorage, useIsClient } from "@/app/_lib/hooks";
 import Link from "next/link";
 import CharacterImage from "@/app/_components/CharacterImage";
-import { useEffect, useState } from "react";
 
 interface ViewedCharacter {
   id: number;
@@ -16,18 +15,7 @@ export default function RecentlyViewedList() {
     "recently-viewed-characters",
     [],
   );
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    // Patron correcto: solo marcar que el componente está montado
-    let mounted = true;
-    if (mounted) {
-      setIsClient(true);
-    }
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const isClient = useIsClient();
 
   // Only render on client after hydration
   if (!isClient || recentlyViewed.length === 0) return null;

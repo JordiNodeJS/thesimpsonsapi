@@ -82,7 +82,7 @@ export async function toggleFollow(characterId: number) {
 
       return { success: false, error: "Failed to update follow status" };
     }
-  }).catch((authError) => {
+  }).catch(() => {
     // Handle auth error from withAuthenticatedRLS
     return { success: false, error: "Please log in to follow characters" };
   });
@@ -93,7 +93,7 @@ export async function toggleFollow(characterId: number) {
  * Works with/without authentication using RLS
  */
 export async function isFollowing(characterId: number) {
-  return withOptionalRLS(prisma, async (tx, user) => {
+  return withOptionalRLS(prisma, async (_tx, user) => {
     if (!user) return false;
 
     const characterRepo = UseCaseFactory.getCharacterRepository();
@@ -138,7 +138,7 @@ export async function postComment(characterId: number, content: string) {
           error instanceof Error ? error.message : "Failed to post comment",
       };
     }
-  }).catch((authError) => {
+  }).catch(() => {
     return { success: false, error: "Please log in to post comments" };
   });
 }
@@ -148,7 +148,7 @@ export async function postComment(characterId: number, content: string) {
  * Public read operation (RLS policy allows public SELECT)
  */
 export async function getComments(characterId: number) {
-  return withoutRLS(prisma, async (tx) => {
+  return withoutRLS(prisma, async (_tx) => {
     const useCase = UseCaseFactory.createGetCharacterDetailsUseCase();
     const result = await useCase.execute(characterId);
     return result.comments;

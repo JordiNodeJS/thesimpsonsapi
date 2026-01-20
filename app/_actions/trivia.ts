@@ -28,7 +28,7 @@ export async function submitTrivia(
 ) {
   const validated = SubmitTriviaSchema.parse({ entityType, entityId, content });
 
-  return withAuthenticatedRLS(prisma, async (tx, user) => {
+  return withAuthenticatedRLS(prisma, async (_tx, user) => {
     try {
       const useCase = UseCaseFactory.createSubmitTriviaUseCase();
       await useCase.execute(
@@ -70,7 +70,7 @@ export async function getTrivia(
   entityType: "CHARACTER" | "EPISODE",
   entityId: number,
 ) {
-  return withoutRLS(prisma, async (tx) => {
+  return withoutRLS(prisma, async (_tx) => {
     const useCase = UseCaseFactory.createListTriviaUseCase();
     const result = await useCase.execute(entityType, entityId);
     return result.trivia;

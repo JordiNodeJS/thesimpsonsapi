@@ -117,7 +117,7 @@ describe("Episodes Server Actions", () => {
       mockTrackEpisodeExecute.mockRejectedValue(new Error("Database error"));
 
       await expect(trackEpisode(1, 5, "Notes")).rejects.toThrow(
-        "Failed to track episode",
+        "Database error",
       );
     });
   });

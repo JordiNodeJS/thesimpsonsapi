@@ -192,7 +192,18 @@ pnpm tsx scripts/verify-db.ts
    vercel --prod
    ```
 
-## 📂 Architecture Overview
+## � Reports & Documentation (.traces)
+
+**MANDATORY:** All reports, audits, summaries, and AI-generated documentation MUST be stored in the `.traces/` directory.
+
+- **NEVER** create reports in the project root.
+- **ALWAYS** update `.traces/README.md` index when adding a new report.
+- **Naming Convention:** Use prefixes like `AUDIT_`, `QA_`, `DEPLOYMENT_`, `BUG_FIXES_`, or `CODE_REVIEW_`.
+- **Purpose:** Maintain a chronological and organized record of project milestones and technical decisions.
+
+Refers to [.github/instructions/reports-organization.instructions.md](.github/instructions/reports-organization.instructions.md) for full details.
+
+## �📂 Architecture Overview
 
 ### 🎯 Pattern Selection Strategy (YAGNI Principle)
 

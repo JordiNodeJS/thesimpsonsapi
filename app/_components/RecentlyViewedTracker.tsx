@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface ViewedCharacter {
   id: number;
@@ -17,16 +17,8 @@ export default function RecentlyViewedTracker({
 }: {
   character: ViewedCharacter;
 }) {
-  // Estado que marca si el componente ya se hidrataron en el cliente
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
-    // Solo ejecutar después de que el componente esté montado en el cliente
-    if (!mounted) {
-      setMounted(true);
-      return;
-    }
-
+    // Solo ejecutar en el cliente (useEffect no corre en el servidor)
     try {
       const stored = localStorage.getItem("recently-viewed-characters");
       const viewed = stored ? JSON.parse(stored) : [];
@@ -41,7 +33,7 @@ export default function RecentlyViewedTracker({
     } catch (error) {
       console.error("Failed to update recently viewed:", error);
     }
-  }, [character, mounted]);
+  }, [character]);
 
   // No renderiza nada - solo efecto secundario
   return null;

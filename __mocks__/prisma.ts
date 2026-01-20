@@ -4,6 +4,7 @@ import type { PrismaClient } from "@prisma/client";
 
 // Create deep mock of PrismaClient
 export const prismaMock = mockDeep<PrismaClient>();
+export const prisma = prismaMock;
 
 // Mock $transaction to support RLS helpers
 // This allows withRLS and other RLS helpers to work in tests
@@ -33,11 +34,6 @@ Object.defineProperty(prismaMock, "$queryRawUnsafe", {
   value: vi.fn().mockResolvedValue([]),
   configurable: true,
 });
-
-// Mock the prisma module
-vi.mock("@/app/_lib/prisma", () => ({
-  prisma: prismaMock,
-}));
 
 // Reset mocks before each test
 beforeEach(() => {

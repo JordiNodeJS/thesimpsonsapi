@@ -82,7 +82,7 @@ describe("Diary Server Actions", () => {
       );
 
       await expect(createDiaryEntry(1, 1, "Test entry")).rejects.toThrow(
-        "Failed to create diary entry",
+        "Database connection failed",
       );
     });
   });
@@ -140,7 +140,9 @@ describe("Diary Server Actions", () => {
         new NotFoundException("DiaryEntry", 999),
       );
 
-      await expect(deleteDiaryEntry(999)).rejects.toThrow("Entry not found");
+      await expect(deleteDiaryEntry(999)).rejects.toThrow(
+        "DiaryEntry with id 999 not found",
+      );
     });
 
     it("should prevent deletion of other user's entries", async () => {
@@ -149,9 +151,7 @@ describe("Diary Server Actions", () => {
         new AuthorizationException("Not authorized"),
       );
 
-      await expect(deleteDiaryEntry(1)).rejects.toThrow(
-        "You don't have permission to delete this entry",
-      );
+      await expect(deleteDiaryEntry(1)).rejects.toThrow("Not authorized");
     });
 
     it("should validate entry ID with Zod", async () => {

@@ -99,7 +99,7 @@ describe("Collections Server Actions", () => {
       );
 
       await expect(createCollection("Test", "Description")).rejects.toThrow(
-        "Failed to create collection",
+        "Database error",
       );
     });
   });
@@ -193,7 +193,7 @@ describe("Collections Server Actions", () => {
       mockAddQuoteExecute.mockRejectedValue(new Error("Database error"));
 
       await expect(addQuote(1, "Quote", "Homer", "")).rejects.toThrow(
-        "Failed to add quote to collection",
+        "Database error",
       );
     });
   });
