@@ -87,7 +87,11 @@ export async function createDiaryEntry(
     } catch (error) {
       console.error("[createDiaryEntry] Error:", error);
 
-      if (error instanceof NotFoundException || error instanceof ValidationException || error instanceof DomainException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ValidationException ||
+        error instanceof DomainException
+      ) {
         throw error;
       }
       if (error instanceof Error) {
@@ -138,7 +142,11 @@ export async function deleteDiaryEntry(id: number) {
     } catch (error) {
       console.error("[deleteDiaryEntry] Error:", error);
 
-      if (error instanceof NotFoundException || error instanceof AuthorizationException || error instanceof DomainException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof AuthorizationException ||
+        error instanceof DomainException
+      ) {
         throw error;
       }
       if (error instanceof Error) {

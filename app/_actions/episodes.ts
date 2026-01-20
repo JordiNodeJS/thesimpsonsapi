@@ -78,7 +78,11 @@ export async function trackEpisode(
     } catch (error) {
       console.error("[trackEpisode] Error:", error);
 
-      if (error instanceof NotFoundException || error instanceof ValidationException || error instanceof DomainException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ValidationException ||
+        error instanceof DomainException
+      ) {
         throw error;
       }
       if (error instanceof Error) {

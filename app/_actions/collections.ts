@@ -43,7 +43,10 @@ export async function createCollection(name: string, description: string) {
     } catch (error) {
       console.error("[createCollection] Error:", error);
 
-      if (error instanceof ValidationException || error instanceof DomainException) {
+      if (
+        error instanceof ValidationException ||
+        error instanceof DomainException
+      ) {
         throw error;
       }
       if (error instanceof Error) {
@@ -103,7 +106,10 @@ export async function addQuote(
     } catch (error) {
       console.error("[addQuote] Error:", error);
 
-      if (error instanceof ValidationException || error instanceof DomainException) {
+      if (
+        error instanceof ValidationException ||
+        error instanceof DomainException
+      ) {
         throw error;
       }
       if (error instanceof Error) {
