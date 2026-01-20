@@ -123,11 +123,11 @@ describe("Repository Functions", () => {
     describe("findCharacterNames", () => {
       it("should return character names ordered alphabetically", async () => {
         const mockNames = [
-          { id: 3, name: "Bart Simpson", imageUrl: null },
-          { id: 1, name: "Homer Simpson", imageUrl: null },
-          { id: 2, name: "Marge Simpson", imageUrl: null },
+          { id: 3, name: "Bart Simpson", externalId: 3, occupation: null, imageUrl: null },
+          { id: 1, name: "Homer Simpson", externalId: 1, occupation: null, imageUrl: null },
+          { id: 2, name: "Marge Simpson", externalId: 2, occupation: null, imageUrl: null },
         ];
-        prismaMock.character.findMany.mockResolvedValue(mockNames as any);
+        prismaMock.character.findMany.mockResolvedValue(mockNames);
 
         const result = await findCharacterNames();
 
@@ -208,7 +208,7 @@ describe("Repository Functions", () => {
           },
         ];
         prismaMock.characterComment.findMany.mockResolvedValue(
-          mockComments as any,
+          mockComments,
         );
 
         const result = await findCommentsByCharacter(1);
@@ -233,7 +233,7 @@ describe("Repository Functions", () => {
           user: null,
         };
         prismaMock.characterComment.findMany.mockResolvedValue([
-          mockComment as any,
+          mockComment,
         ]);
 
         const result = await findCommentsByCharacter(1);
@@ -253,7 +253,7 @@ describe("Repository Functions", () => {
             user: { username: "testuser", name: "Test User" },
           },
         ];
-        prismaMock.triviaFact.findMany.mockResolvedValue(mockTrivia as any);
+        prismaMock.triviaFact.findMany.mockResolvedValue(mockTrivia);
 
         const result = await findTriviaByEntity("CHARACTER", 1);
 
@@ -323,7 +323,7 @@ describe("Repository Functions", () => {
             location: { name: "Moe's Tavern" },
           },
         ];
-        prismaMock.diaryEntry.findMany.mockResolvedValue(mockEntries as any);
+        prismaMock.diaryEntry.findMany.mockResolvedValue(mockEntries);
 
         const result = await findDiaryEntriesByUser("user-123");
 
@@ -383,11 +383,11 @@ describe("Repository Functions", () => {
     describe("findCollectionsByUser", () => {
       it("should return user collections", async () => {
         const mockCollections = [
-          { id: 2, userId: "user-123", name: "Collection 2" },
-          { id: 1, userId: "user-123", name: "Collection 1" },
+          { id: 2, userId: "user-123", name: "Collection 2", description: null },
+          { id: 1, userId: "user-123", name: "Collection 1", description: null },
         ];
         prismaMock.quoteCollection.findMany.mockResolvedValue(
-          mockCollections as any,
+          mockCollections,
         );
 
         const result = await findCollectionsByUser("user-123");
@@ -403,11 +403,11 @@ describe("Repository Functions", () => {
     describe("findQuotesByCollection", () => {
       it("should return quotes for collection", async () => {
         const mockQuotes = [
-          { id: 1, collectionId: 1, quoteText: "D'oh!" },
-          { id: 2, collectionId: 1, quoteText: "Ay caramba!" },
+          { id: 1, collectionId: 1, quoteText: "D'oh!", characterName: null, sourceEpisode: null },
+          { id: 2, collectionId: 1, quoteText: "Ay caramba!", characterName: null, sourceEpisode: null },
         ];
         prismaMock.collectionQuote.findMany.mockResolvedValue(
-          mockQuotes as any,
+          mockQuotes,
         );
 
         const result = await findQuotesByCollection(1);

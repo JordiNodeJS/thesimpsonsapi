@@ -6,8 +6,6 @@
 import { vi } from "vitest";
 import type { PrismaClient } from "@prisma/client";
 import {
-  mockUser,
-  mockGetCurrentUser,
   mockGetCurrentUserOptional,
 } from "./auth";
 
@@ -40,7 +38,7 @@ export const withAuthenticatedRLS = vi.fn(
     }
 
     // Execute callback with mock transaction and user
-    return callback(prisma as any, user);
+    return callback(prisma as unknown as PrismaTransaction, user);
   },
 );
 
@@ -60,7 +58,7 @@ export const withOptionalRLS = vi.fn(
     const user = await mockGetCurrentUserOptional();
 
     // Execute callback with mock transaction and user (or null)
-    return callback(prisma as any, user);
+    return callback(prisma as unknown as PrismaTransaction, user);
   },
 );
 
@@ -74,7 +72,7 @@ export const withoutRLS = vi.fn(
     callback: (tx: PrismaTransaction) => Promise<T>,
   ): Promise<T> => {
     // Execute callback with mock transaction (no user context)
-    return callback(prisma as any);
+    return callback(prisma as unknown as PrismaTransaction);
   },
 );
 
@@ -88,6 +86,6 @@ export const withRLS = vi.fn(
     callback: (tx: PrismaTransaction) => Promise<T>,
   ): Promise<T> => {
     // Execute callback with mock transaction
-    return callback(prisma as any);
+    return callback(prisma as unknown as PrismaTransaction);
   },
 );

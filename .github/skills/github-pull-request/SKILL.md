@@ -308,6 +308,151 @@ gh pr review <pr-number> --request-review JordiNodeJS
 
 ---
 
+## Pre-Merge Code Quality Checklist
+
+### ⚠️ SonarQube/Code Quality Validation (CRITICAL GATE)
+
+**Before creating a PR or merging, ALWAYS run SonarLint analysis on modified files:**
+
+#### Why This Matters
+
+SonarQube detects:
+- Type safety issues (`any` types, implicit conversions)
+- Error handling problems (wrong exception types, untyped catch blocks)
+- Security hotspots
+- Performance issues
+- Maintainability concerns
+
+**Lesson learned**: PR #14 had 9 SonarQube issues that delayed merge. Type errors in test mocks and hooks violated code quality gates.
+
+#### Severity Matrix (Pre-Merge Decision Tree)
+
+| Severity | Examples | Action | Timeline |
+|----------|----------|--------|----------|
+| 🔴 **BLOCKER** | Unused imports, type mismatches, `any` types | **MUST FIX** | Before merge |
+| 🟠 **CRITICAL** | Untyped `catch` blocks, missing error handling | **MUST FIX** | Before merge |
+| 🟡 **MAJOR** | `instanceof` checks, hardcoded strings | **Should fix** | Before merge (can defer with justification) |
+| 🔵 **MINOR** | Code style, naming conventions | **Can defer** | In next iteration |
+| ⚪ **INFO** | Documentation, comments | **Optional** | Per team preference |
+
+#### Quick SonarLint Analysis Workflow
+
+```bash
+# 1. Get modified files in your PR
+git diff --name-only main...$(git rev-parse --abbrev-ref HEAD) | grep -E "\.(ts|tsx)$"
+
+# 2. Run SonarLint analysis on each file
+# - Open VS Code
+# - Open each modified file
+# - Use SonarLint extension to see issues (Problems panel)
+# OR use the sonarqube_analyze_file tool
+
+# 3. Fix all BLOCKER and CRITICAL issues before PR
+
+# 4. If MAJOR issues can't be fixed:
+#    - Add comment in PR explaining why
+#    - Get approval from reviewer
+#    - Add label "tech-debt/approved" to PR
+```
+
+#### Common Issues and Fast Fixes
+
+**Issue: `as any` type casting**
+```typescript
+// ❌ WRONG - SonarQube: "Avoid using 'any' type"
+prismaMock.character.findMany.mockResolvedValue(mockNames as any);
+
+// ✅ CORRECT - Use type-safe casting
+const mockNames: Character[] = [{ id: 1, name: "Homer", ... }];
+prismaMock.character.findMany.mockResolvedValue(mockNames);
+// OR if impossible:
+prismaMock.character.findMany.mockResolvedValue(mockNames as unknown as Character[]);
+```
+
+**Issue: Untyped `catch` block**
+```typescript
+// ❌ WRONG - SonarQube: "Catch block missing error type"
+} catch (error) {
+  console.error("Error:", error); // error is untyped
+}
+
+// ✅ CORRECT - Type the error
+} catch (error) {
+  if (error instanceof Error) {
+    console.error("Error:", error.message);
+  }
+}
+```
+
+**Issue: Window object without globalThis**
+```typescript
+// ❌ WRONG - SonarQube: "Prefer globalThis over window"
+if (typeof window !== "undefined") {
+  window.localStorage.setItem(key, value);
+}
+
+// ✅ CORRECT - Use globalThis
+if (globalThis.window !== undefined) {
+  globalThis.window.localStorage.setItem(key, value);
+}
+```
+
+**Issue: Wrong error type**
+```typescript
+// ❌ WRONG - SonarQube: "Use TypeError for type checks"
+if (typeof x !== "number") {
+  throw new Error("Expected number");
+}
+
+// ✅ CORRECT - Use specific error type
+if (typeof x !== "number") {
+  throw new TypeError(`Expected number, got ${typeof x}`);
+}
+```
+
+**Issue: Unused imports**
+```typescript
+// ❌ WRONG - SonarQube: "Remove unused import"
+import { getCurrentUser } from "@/auth"; // Not used in this file
+import { getCurrentUserOptional } from "@/auth";
+
+// ✅ CORRECT - Remove only what's not used
+import { getCurrentUserOptional } from "@/auth";
+```
+
+#### Mock Data Type Correctness
+
+When creating mock data for tests, ensure ALL required fields match the schema:
+
+```typescript
+// ❌ WRONG - Missing required fields
+const mockCharacter = {
+  id: 1,
+  name: "Homer",
+  imageUrl: null
+};
+// Error: "Property 'externalId' is missing"
+
+// ✅ CORRECT - Include all required fields
+const mockCharacter = {
+  id: 1,
+  name: "Homer",
+  externalId: 1,
+  occupation: null,
+  imageUrl: null
+};
+```
+
+#### PR Label for Code Quality
+
+Add `quality/verified` label after SonarLint passes:
+
+```bash
+gh pr edit <pr-number> --add-label "quality/verified"
+```
+
+---
+
 ## Part 2: Merging Pull Requests
 
 ### Step 1: Verify PR State

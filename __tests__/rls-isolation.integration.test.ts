@@ -78,7 +78,9 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
         createdIds.quoteCollections = [];
       }
     } catch (error) {
-      console.error("[RLS Tests afterEach Cleanup] Error:", error);
+      if (error instanceof Error) {
+        console.error("[RLS Tests afterEach Cleanup]", error.message);
+      }
     }
   });
 
@@ -118,8 +120,9 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
         },
       });
     } catch (error) {
-      console.error("[RLS Tests afterAll Cleanup] Error:", error);
-      // No fallar el test si el cleanup falla
+      if (error instanceof Error) {
+        console.error("[RLS Tests afterAll Cleanup]", error.message);
+      }
     }
   });
 
