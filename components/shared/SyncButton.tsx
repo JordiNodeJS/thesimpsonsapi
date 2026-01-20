@@ -1,0 +1,43 @@
+"use client";
+
+import { useState } from "react";
+import { syncExternalData, SyncResult } from "@/actions/sync";
+import { useFormAction } from "@/lib/hooks";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+
+export default function SyncButton() {
+  const [status, setStatus] = useState<string | null>(null);
+
+  const { execute, isPending } = useFormAction(
+    async () => {
+      setStatus("Syncing...");
+      const result: SyncResult = await syncExternalData();
+      if (result.success && result.counts) {
+        setStatus(
+          `Synced! Chars: ${result.counts.characters}, Eps: ${result.counts.episodes}, Locs: ${result.counts.locations}`
+        );
+      } else {
+        setStatus("Sync failed. Check console.");
+      }
+      return result;
+    },
+    { onError: () => setStatus("Error invoking sync.") }
+  );
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <Button onClick={() => execute()} disabled={isPending}>
+        {isPending ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Syncing...
+          </>
+        ) : (
+          "Sync Data from API"
+        )}
+      </Button>
+      {status && <p className="text-sm text-gray-500">{status}</p>}
+    </div>
+  );
+}

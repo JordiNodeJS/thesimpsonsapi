@@ -57,9 +57,9 @@ await pool.query(`SELECT * FROM characters WHERE id = $1`, [id]);
 
 ### Database Utilities
 
-- **Prisma Client:** Import from [app/\_lib/prisma.ts](app/_lib/prisma.ts)
-- **Repositories:** Centralize data access in [app/\_lib/repositories.ts](app/_lib/repositories.ts)
-- **Server Actions:** Place mutations in [app/\_actions/](app/_actions/)
+- **Prisma Client:** Import from [lib/db/prisma.ts](lib/db/prisma.ts)
+- **Repositories:** Centralize data access in [lib/db/repositories.ts](lib/db/repositories.ts)
+- **Server Actions:** Place mutations in [actions/](actions/)
 - **Types:** Use Prisma-generated types from `@prisma/client`
 
 ### Neon MCP Integration
@@ -74,7 +74,9 @@ Use natural language for database operations (e.g., "List tables in neondb"). Se
 
 ## 🔐 Authentication (Better Auth)
 
-- **Provider:** Better Auth integrated into [app/\_lib/auth.ts](app/_lib/auth.ts) and [lib/auth.ts](lib/auth.ts)
+- **Provider:** Better Auth integrated in [lib/auth/](lib/auth/)
+- **Server-side:** [lib/auth/server.ts](lib/auth/server.ts) and [lib/auth/session.ts](lib/auth/session.ts)
+- **Client-side:** [lib/auth/client.ts](lib/auth/client.ts)
 - **Session Management:** Sessions stored in `the_simpson` schema (PostgreSQL)
 - **Protected Routes:** Use `getCurrentUser()` to enforce authentication
 - **Optional Auth:** Use `getCurrentUserOptional()` for pages that work with/without login
@@ -85,7 +87,7 @@ Use natural language for database operations (e.g., "List tables in neondb"). Se
 
 ```typescript
 // ✅ Server Actions - Enforce auth
-import { getCurrentUser, getCurrentUserOptional } from "@/app/_lib/auth";
+import { getCurrentUser, getCurrentUserOptional } from "@/lib/auth";
 
 export async function trackEpisode(episodeId: number, rating: number) {
   const user = await getCurrentUserOptional();
@@ -115,7 +117,7 @@ vercel dev
 **Pattern:** All mutations use Zod validation + `useFormAction()` hook for consistent UX
 
 ```typescript
-// ✅ Server Action (app/_actions/episodes.ts)
+// ✅ Server Action (actions/episodes.ts)
 "use server";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
@@ -140,9 +142,9 @@ export async function trackEpisode(episodeId: number, rating: number) {
   return { success: true };
 }
 
-// ✅ Client Component (app/_components/EpisodeTracker.tsx)
+// ✅ Client Component (components/shared/EpisodeTracker.tsx)
 "use client";
-import { useFormAction } from "@/app/_lib/hooks";
+import { useFormAction } from "@/lib/hooks";
 
 export function EpisodeTracker({ episodeId }: { episodeId: number }) {
   const { execute, isPending, error } = useFormAction(
@@ -205,33 +207,34 @@ Refers to [.github/instructions/reports-organization.instructions.md](.github/in
 
 ## �📂 Architecture Overview
 
-### 🎯 Pattern Selection Strategy (YAGNI Principle)
+### 🎯 Frame-centric Architecture
 
-> **Critical:** Not everything needs full DDD. Choose the right pattern for the job.
+> **This project uses Frame-centric Architecture** - a pragmatic approach that embraces Next.js conventions without unnecessary abstraction.
 
-| Pattern Type    | Use When                                            | Examples                                                                    |
-| --------------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
-| **🟢 Simple**   | Read-only public data, no business rules            | Characters list, Episodes list, Locations                                   |
-| **🟡 Hybrid**   | Read operations simple, write operations with rules | Episodes (read simple, track with DDD), Social (view simple, post with DDD) |
-| **🔴 Full DDD** | Mutations with business rules, user ownership, RLS  | Diary entries, Collections, User progress                                   |
+**Pattern Guidelines:**
 
-**Quick Decision:**
+1. **Read operations:** Use repository functions from `lib/db/repositories.ts`
+2. **Mutations:** Server Actions in `actions/` with Zod validation
+3. **Auth-required:** Use RLS helpers from `lib/db/prisma-rls.ts`
+4. **Components:** Server Components by default, Client only when needed
 
-1. **Is it read-only?** → Use simple repository ([app/\_lib/repositories.ts](app/_lib/repositories.ts))
-2. **Has business rules?** → Use DDD with UseCase ([core/application/](core/application/))
-3. **Requires auth?** → Add RLS wrapper ([app/\_lib/prisma-rls.ts](app/_lib/prisma-rls.ts))
-
-**📖 Full Guide:** See [docs/ARCHITECTURE_DECISION_MATRIX.md](docs/ARCHITECTURE_DECISION_MATRIX.md) for the complete decision matrix, flowcharts, and migration guidelines.
+**📖 Full Guide:** See [.github/skills/nextjs-frame-centric/SKILL.md](.github/skills/nextjs-frame-centric/SKILL.md) for complete Frame-centric patterns and best practices.
 
 ### Directory Structure
 
-- [app/](app/): Next.js App Router (all routes here)
-  - `_lib/`: Core utilities (DB, auth, types, hooks, utilities)
-  - `_actions/`: Server Actions for all mutations
-  - `_components/`: Shared UI components (forms, layouts, utilities)
-  - `[route]/`: Public feature pages (episodes, characters, guide)
+- [app/](app/): Next.js App Router (ROUTES ONLY)
+  - `characters/`, `episodes/`, `diary/`, `collections/`: Feature routes
   - `api/auth/`: Better Auth API routes
-- [components/ui/](components/ui/): Shadcn UI + Radix primitives
+  - `login/`, `register/`: Auth pages
+- [actions/](actions/): Server Actions for all mutations
+- [lib/](lib/): Shared utilities and configuration
+  - `db/`: Prisma client, repositories, RLS helpers
+  - `auth/`: Better Auth (server, client, session)
+  - `validators/`: Zod schemas
+  - `hooks.ts`, `types.ts`, `constants.ts`, `utils.ts`
+- [components/](components/): UI components
+  - `ui/`: Shadcn UI + Radix primitives
+  - `shared/`: Shared components (forms, layouts, utilities)
 - [prisma/](prisma/): Prisma schema (`schema.prisma`)
 - [scripts/](scripts/): Development and deployment utilities
 - [docs/](docs/): Architecture decisions and lessons learned
@@ -239,9 +242,9 @@ Refers to [.github/instructions/reports-organization.instructions.md](.github/in
 
 ### Critical Data Flow
 
-1. **Sync Layer** (`_actions/sync.ts`): Periodically syncs external Simpsons API data → `characters`, `episodes`, `locations` tables
-2. **User Interactions** (`_actions/*.ts`): Server Actions handle all mutations → user tables (`diary_entries`, `user_episode_progress`, etc.)
-3. **Data Access** (`_lib/repositories.ts`): Centralized query functions for reusable data fetching
+1. **Sync Layer** (`actions/sync.ts`): Periodically syncs external Simpsons API data → `characters`, `episodes`, `locations` tables
+2. **User Interactions** (`actions/*.ts`): Server Actions handle all mutations → user tables (`diary_entries`, `user_episode_progress`, etc.)
+3. **Data Access** (`lib/db/repositories.ts`): Centralized query functions for reusable data fetching
 4. **Route Protection** (`proxy.ts`): Next.js 16 proxy protects `/diary`, `/collections` routes
 
 ### Component Composition Patterns
@@ -290,14 +293,14 @@ Refers to [.github/instructions/reports-organization.instructions.md](.github/in
 
 ## 🔄 Data Access Patterns & Repositories
 
-**Centralized Data Access:** Use [app/\_lib/repositories.ts](app/_lib/repositories.ts) for all queries
+**Centralized Data Access:** Use [lib/db/repositories.ts](lib/db/repositories.ts) for all queries
 
 ```typescript
 // ❌ DON'T: Scattered queries throughout components
 const char = await prisma.character.findUnique(...);
 
 // ✅ DO: Use repositories for consistent, cacheable queries
-import { findCharacterById } from "@/app/_lib/repositories";
+import { findCharacterById } from "@/lib/db";
 const char = await findCharacterById(id);
 ```
 
@@ -483,9 +486,9 @@ Before creating a PR:
 
 ## �📚 Advanced Resources
 
-- [docs/ARCHITECTURE_DECISION_MATRIX.md](docs/ARCHITECTURE_DECISION_MATRIX.md): **START HERE** - Pragmatic guide for choosing between Simple and DDD patterns (YAGNI principle)
+- [.github/skills/nextjs-frame-centric/SKILL.md](.github/skills/nextjs-frame-centric/SKILL.md): **START HERE** - Frame-centric Architecture patterns for Next.js 16
+- [docs/ARCHITECTURE_DECISION_MATRIX.md](docs/ARCHITECTURE_DECISION_MATRIX.md): Pragmatic guide for choosing patterns (YAGNI principle)
+- [.traces/06-frame-centric-migration.md](.traces/06-frame-centric-migration.md): Migration from DDD to Frame-centric
 - [.github/agents/gemini-3-f-think.agent.md](.github/agents/gemini-3-f-think.agent.md): Full ULTRATHINK protocol
 - [docs/DEPLOYMENT_LESSONS.md](docs/DEPLOYMENT_LESSONS.md): Critical serverless patterns
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): System design decisions
-- [.github/skills/nextjs-ddd-architect/SKILL.md](.github/skills/nextjs-ddd-architect/SKILL.md): DDD architecture patterns
-- [.github/skills/clean-architecture-frontend/SKILL.md](.github/skills/clean-architecture-frontend/SKILL.md): Clean Architecture layer separation patterns

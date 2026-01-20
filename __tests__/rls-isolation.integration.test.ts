@@ -26,7 +26,7 @@
  */
 
 import { describe, it, expect, afterAll, afterEach } from "vitest";
-import { prisma } from "@/app/_lib/prisma";
+import { prisma } from "@/lib/db/prisma";
 
 describe("RLS Isolation Tests (Serverless Mode)", () => {
   // Tests verify RLS policies work per-query without transaction wrapper

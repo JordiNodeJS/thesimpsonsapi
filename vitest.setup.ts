@@ -52,7 +52,7 @@ vi.mock("next/cache", () => ({
 }));
 
 // Mock auth module
-vi.mock("@/app/_lib/auth", async () => {
+vi.mock("@/lib/auth", async () => {
   const actual = await import("./__mocks__/auth");
   return {
     ...actual,
@@ -67,21 +67,14 @@ vi.mock("@/app/_lib/auth", async () => {
 });
 
 // Mock Prisma client
-vi.mock("@/app/_lib/prisma", async () => {
+vi.mock("@/lib/db/prisma", async () => {
   const actual = await import("./__mocks__/prisma");
   return actual;
 });
 
 // Mock Prisma RLS helpers
-vi.mock("@/app/_lib/prisma-rls", async () => {
+vi.mock("@/lib/db/prisma-rls", async () => {
   const actual = await import("./__mocks__/prisma-rls");
-  return actual;
-});
-
-// Mock UseCaseFactory for Clean Architecture
-vi.mock("@/infrastructure/factories", async () => {
-  const actual =
-    await import("./__mocks__/infrastructure/factories/UseCaseFactory");
   return actual;
 });
 

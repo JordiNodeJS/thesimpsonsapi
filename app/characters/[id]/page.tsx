@@ -1,13 +1,14 @@
-import CharacterImage from "@/app/_components/CharacterImage";
 import { notFound } from "next/navigation";
-import FollowButton from "@/app/_components/FollowButton";
-import CommentSection from "@/app/_components/CommentSection";
-import TriviaSection from "@/app/_components/TriviaSection";
-import { isFollowing, getComments } from "@/app/_actions/social";
-import { getTrivia } from "@/app/_actions/trivia";
-import RecentlyViewedTracker from "@/app/_components/RecentlyViewedTracker";
-import { findCharacterById } from "@/app/_lib/repositories";
-import { Breadcrumbs } from "@/app/_components/Breadcrumbs";
+import {
+  CharacterImage,
+  FollowButton,
+  CommentSection,
+  TriviaSection,
+  RecentlyViewedTracker,
+  Breadcrumbs,
+} from "@/components/shared";
+import { isFollowing, getComments, getTrivia } from "@/actions";
+import { findCharacterById } from "@/lib/db";
 
 async function loadCharacterData(id: number) {
   const character = await findCharacterById(id);
@@ -16,7 +17,7 @@ async function loadCharacterData(id: number) {
   const [following, comments, trivia] = await Promise.all([
     isFollowing(id),
     getComments(id),
-    getTrivia("CHARACTER", id),
+    getTrivia("character", id),
   ]);
 
   return { character, following, comments, trivia };
@@ -24,11 +25,11 @@ async function loadCharacterData(id: number) {
 
 export default async function CharacterDetailPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<{ id: string }>;
-}) {
+}>) {
   const { id } = await params;
-  const data = await loadCharacterData(parseInt(id));
+  const data = await loadCharacterData(Number.parseInt(id));
 
   if (!data) {
     notFound();
@@ -86,7 +87,7 @@ export default async function CharacterDetailPage({
           </div>
 
           <TriviaSection
-            entityType="CHARACTER"
+            entityType="character"
             entityId={character.id}
             facts={trivia}
           />

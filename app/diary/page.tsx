@@ -1,8 +1,7 @@
-import DiaryForm from "@/app/_components/DiaryForm";
-import { getDiaryEntries, getLocations } from "@/app/_actions/diary";
-import DeleteDiaryEntryButton from "@/app/_components/DeleteDiaryEntryButton";
-import { findCharacterNames } from "@/app/_lib/repositories";
-import { getCurrentUserOptional } from "@/app/_lib/auth";
+import { DiaryForm, DeleteDiaryEntryButton } from "@/components/shared";
+import { getDiaryEntries, getLocations } from "@/actions";
+import { findCharacterNames } from "@/lib/db";
+import { getCurrentUserOptional } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -68,7 +67,7 @@ export default async function DiaryPage() {
                       at {entry.locationName}
                     </h3>
                     <p className="text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-900 p-4 rounded-lg mt-2">
-                      {entry.activityDescription}
+                      {entry.description}
                     </p>
                   </div>
                 </div>

@@ -1,16 +1,10 @@
 import Link from "next/link";
-import CharacterImage from "@/app/_components/CharacterImage";
-import IntroSection from "@/app/_components/IntroSection";
+import { CharacterImage, IntroSection, SyncButton } from "@/components/shared";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tv, Users, BookOpen, Star, ArrowRight, Quote } from "lucide-react";
-import SyncButton from "@/app/_components/SyncButton";
-import {
-  getStats,
-  findFeaturedCharacters,
-  findLatestTrivia,
-} from "@/app/_lib/repositories";
-import { CURRENT_YEAR, SITE_INFO } from "@/app/_lib/constants";
+import { getStats, findFeaturedCharacters, findLatestTrivia } from "@/lib/db";
+import { CURRENT_YEAR, SITE_INFO } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 

@@ -1,10 +1,12 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import CharacterImage from "@/app/_components/CharacterImage";
+import {
+  CharacterImage,
+  RecentlyViewedList,
+  CharacterCardSkeleton,
+} from "@/components/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import RecentlyViewedList from "@/app/_components/RecentlyViewedList";
-import { findAllCharacters } from "@/app/_lib/repositories";
-import { CharacterCardSkeleton } from "@/app/_components/Skeleton";
+import { findAllCharacters } from "@/lib/db";
 import { AlertCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -68,8 +70,8 @@ export default function CharactersPage() {
       <Suspense
         fallback={
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <CharacterCardSkeleton key={i} />
+            {Array.from({ length: 12 }).map(() => (
+              <CharacterCardSkeleton key={crypto.randomUUID()} />
             ))}
           </div>
         }

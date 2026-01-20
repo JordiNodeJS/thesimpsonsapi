@@ -3,8 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { findAllEpisodes } from "@/app/_lib/repositories";
-import { EpisodeCardSkeleton } from "@/app/_components/Skeleton";
+import { findAllEpisodes } from "@/lib/db";
+import { EpisodeCardSkeleton } from "@/components/shared";
 import { AlertCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -79,8 +79,8 @@ export default function EpisodesPage() {
       <Suspense
         fallback={
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <EpisodeCardSkeleton key={i} />
+            {Array.from({ length: 9 }).map(() => (
+              <EpisodeCardSkeleton key={crypto.randomUUID()} />
             ))}
           </div>
         }

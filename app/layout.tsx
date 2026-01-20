@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import SimpsonsHeader from "@/app/_components/SimpsonsHeader";
-import HelpButton from "@/app/_components/HelpButton";
-import { Toaster } from "@/app/_components/Toaster";
-import { MobileMenuButton } from "@/app/_components/MobileMenuButton";
-import { CURRENT_YEAR, SITE_INFO } from "@/app/_lib/constants";
-import { DesktopNav } from "@/app/_components/DesktopNav";
+import {
+  SimpsonsHeader,
+  HelpButton,
+  Toaster,
+  MobileMenuButton,
+  DesktopNav,
+} from "@/components/shared";
+import { CURRENT_YEAR, SITE_INFO } from "@/lib/constants";
 import "./globals.css";
 
 const geistSans = Geist({

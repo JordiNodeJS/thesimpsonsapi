@@ -1,11 +1,12 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import EpisodeTracker from "@/app/_components/EpisodeTracker";
-import TriviaSection from "@/app/_components/TriviaSection";
-import { getEpisodeProgress } from "@/app/_actions/episodes";
-import { getTrivia } from "@/app/_actions/trivia";
-import { findEpisodeById } from "@/app/_lib/repositories";
-import { Breadcrumbs } from "@/app/_components/Breadcrumbs";
+import {
+  EpisodeTracker,
+  TriviaSection,
+  Breadcrumbs,
+} from "@/components/shared";
+import { getEpisodeProgress, getTrivia } from "@/actions";
+import { findEpisodeById } from "@/lib/db";
 
 async function loadEpisodeData(id: number) {
   const episode = await findEpisodeById(id);
@@ -13,7 +14,7 @@ async function loadEpisodeData(id: number) {
 
   const [progress, trivia] = await Promise.all([
     getEpisodeProgress(id),
-    getTrivia("EPISODE", id),
+    getTrivia("episode", id),
   ]);
 
   return { episode, progress, trivia };
@@ -21,11 +22,11 @@ async function loadEpisodeData(id: number) {
 
 export default async function EpisodeDetailPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<{ id: string }>;
-}) {
+}>) {
   const { id } = await params;
-  const data = await loadEpisodeData(parseInt(id));
+  const data = await loadEpisodeData(Number.parseInt(id));
 
   if (!data) {
     notFound();
@@ -65,7 +66,7 @@ export default async function EpisodeDetailPage({
           </div>
 
           <TriviaSection
-            entityType="EPISODE"
+            entityType="episode"
             entityId={episode.id}
             facts={trivia}
           />

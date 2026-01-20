@@ -4,7 +4,7 @@
  * Finds and removes records that reference non-existent users
  */
 
-import { prisma } from "../app/_lib/prisma";
+import { prisma } from "../lib/db/prisma";
 
 async function fixOrphanRecords() {
   console.log("🔍 Checking for orphan records...\n");
@@ -20,7 +20,7 @@ async function fixOrphanRecords() {
       select: { id: true, userId: true },
     });
     const orphanComments = comments.filter(
-      (c) => c.userId && !userIds.has(c.userId)
+      (c) => c.userId && !userIds.has(c.userId),
     );
 
     if (orphanComments.length > 0) {
@@ -64,7 +64,7 @@ async function fixOrphanRecords() {
       select: { id: true, userId: true },
     });
     const orphanDiaries = diaries.filter(
-      (d) => d.userId && !userIds.has(d.userId)
+      (d) => d.userId && !userIds.has(d.userId),
     );
 
     if (orphanDiaries.length > 0) {
@@ -84,7 +84,7 @@ async function fixOrphanRecords() {
       select: { id: true, submittedByUserId: true },
     });
     const orphanTrivia = trivia.filter(
-      (t) => t.submittedByUserId && !userIds.has(t.submittedByUserId)
+      (t) => t.submittedByUserId && !userIds.has(t.submittedByUserId),
     );
 
     if (orphanTrivia.length > 0) {
@@ -104,12 +104,12 @@ async function fixOrphanRecords() {
       select: { id: true, userId: true },
     });
     const orphanCollections = collections.filter(
-      (c) => c.userId && !userIds.has(c.userId)
+      (c) => c.userId && !userIds.has(c.userId),
     );
 
     if (orphanCollections.length > 0) {
       console.log(
-        `\n⚠️  Found ${orphanCollections.length} orphan quote collections`
+        `\n⚠️  Found ${orphanCollections.length} orphan quote collections`,
       );
       await prisma.quoteCollection.deleteMany({
         where: {
@@ -129,7 +129,7 @@ async function fixOrphanRecords() {
 
     if (orphanProgress.length > 0) {
       console.log(
-        `\n⚠️  Found ${orphanProgress.length} orphan episode progress`
+        `\n⚠️  Found ${orphanProgress.length} orphan episode progress`,
       );
       for (const p of orphanProgress) {
         await prisma.userEpisodeProgress.delete({
@@ -155,4 +155,4 @@ async function fixOrphanRecords() {
   }
 }
 
-fixOrphanRecords();
+await fixOrphanRecords();

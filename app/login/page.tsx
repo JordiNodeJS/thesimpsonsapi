@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,7 +77,7 @@ function LoginForm() {
           onError: (ctx) => {
             setError(ctx.error.message || "Failed to sign in");
           },
-        }
+        },
       );
     } finally {
       setLoading(false);

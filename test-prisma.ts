@@ -4,7 +4,7 @@
  * Simple Prisma test to verify connection and queries
  */
 
-import { prisma } from "./app/_lib/prisma";
+import { prisma } from "./lib/db/prisma";
 
 async function test() {
   try {
@@ -55,4 +55,4 @@ async function test() {
   }
 }
 
-test();
+await test();
