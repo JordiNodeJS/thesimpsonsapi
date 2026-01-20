@@ -1,8 +1,36 @@
+/**
+ * Social Server Actions - HYBRID PATTERN
+ *
+ * 🎓 EDUCATIONAL NOTE: Mixed Simple + DDD Patterns
+ * =================================================
+ * This file shows BOTH patterns working together:
+ *
+ * SIMPLE PATTERN (Read operations):
+ * - isFollowing → Direct repository call
+ * - getComments → Simple data retrieval (see repositories.ts)
+ *
+ * FULL DDD PATTERN (Write operations):
+ * - toggleFollow → Uses ToggleFollowUseCase
+ *   • Business rule: one follow per user-character pair
+ *   • Requires authentication
+ *   • RLS protection
+ *
+ * - postComment → Uses PostCommentUseCase
+ *   • Business rules: content validation, character exists
+ *   • Username resolution
+ *   • Requires authentication
+ *
+ * WHY THIS SPLIT?
+ * Reading who you follow = simple boolean lookup
+ * Toggling follow status = mutation with validation + auth
+ *
+ * See docs/ARCHITECTURE_DECISION_MATRIX.md for the decision guide.
+ */
+
 "use server";
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentUserOptional } from "@/app/_lib/auth";
 import { prisma } from "@/app/_lib/prisma";
 import {
   withAuthenticatedRLS,
@@ -11,6 +39,7 @@ import {
 } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";
 import {
+  DomainException,
   NotFoundException,
   ValidationException,
 } from "@/core/domain/exceptions";
@@ -44,17 +73,14 @@ export async function toggleFollow(characterId: number) {
     } catch (error) {
       console.error("[toggleFollow] Error:", error);
 
-      if (error instanceof NotFoundException) {
-        return { success: false, error: "Character not found" };
+      if (error instanceof DomainException) {
+        return { success: false, error: error.message };
+      }
+      if (error instanceof Error) {
+        return { success: false, error: error.message };
       }
 
-      return {
-        success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to update follow status",
-      };
+      return { success: false, error: "Failed to update follow status" };
     }
   }).catch((authError) => {
     // Handle auth error from withAuthenticatedRLS

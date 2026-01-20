@@ -1,3 +1,25 @@
+/**
+ * Repository Functions - Simple Data Access Pattern
+ *
+ * 🎓 EDUCATIONAL NOTE: Why Simple Pattern Here?
+ * ============================================
+ * These functions use DIRECT Prisma queries without Use Case abstraction.
+ * This is intentional and follows the YAGNI (You Ain't Gonna Need It) principle.
+ *
+ * When to use this SIMPLE pattern:
+ * ✅ Read-only operations (no business rules to enforce)
+ * ✅ Public data (no RLS/authorization needed)
+ * ✅ Simple transformations (or none at all)
+ * ✅ Static reference data (characters, episodes, locations)
+ *
+ * When to use FULL DDD pattern instead:
+ * ❌ Mutations with business rules → Use UseCaseFactory
+ * ❌ User-owned data with RLS → Use withAuthenticatedRLS + UseCase
+ * ❌ Complex validation → Use Domain Entities
+ *
+ * See docs/ARCHITECTURE_DECISION_MATRIX.md for the full decision guide.
+ */
+
 import { prisma } from "@/app/_lib/prisma";
 
 // ============================================
@@ -35,8 +57,11 @@ export type DiaryEntryWithRelations = {
 };
 
 // ============================================
-// Characters
+// Characters - SIMPLE PATTERN
 // ============================================
+// 🎓 WHY SIMPLE: Characters are public reference data.
+// No business rules, no user ownership, just data retrieval.
+// A ListCharactersUseCase would just be a pass-through wrapper.
 
 export async function findAllCharacters(limit = 50) {
   return prisma.character.findMany({
@@ -80,8 +105,14 @@ export async function findCharacterNames() {
 }
 
 // ============================================
-// Episodes
+// Episodes - SIMPLE PATTERN (Read Operations)
 // ============================================
+// 🎓 WHY SIMPLE: Episode listing is public catalog data.
+// No business rules for reading episodes.
+//
+// ⚠️ NOTE: Writing to user_episode_progress uses FULL DDD pattern!
+// See app/_actions/episodes.ts → TrackEpisodeUseCase
+// The UseCase validates ratings (1-5), checks episode exists, manages state.
 
 export async function findAllEpisodes(limit = 50) {
   return prisma.episode.findMany({
@@ -97,8 +128,9 @@ export async function findEpisodeById(id: number) {
 }
 
 // ============================================
-// Locations
+// Locations - SIMPLE PATTERN
 // ============================================
+// 🎓 WHY SIMPLE: Static reference data with no business rules.
 
 export async function findAllLocations() {
   return prisma.location.findMany({
@@ -107,11 +139,14 @@ export async function findAllLocations() {
 }
 
 // ============================================
-// Comments
+// Comments - HYBRID PATTERN
 // ============================================
+// 🎓 READ (SIMPLE): Anyone can view comments on characters.
+// 🎓 WRITE (DDD): Posting comments requires auth + validation.
+// See app/_actions/social.ts → PostCommentUseCase
 
 export async function findCommentsByCharacter(
-  characterId: number
+  characterId: number,
 ): Promise<CommentWithUser[]> {
   const comments = await prisma.characterComment.findMany({
     where: { characterId },
@@ -137,12 +172,15 @@ export async function findCommentsByCharacter(
 }
 
 // ============================================
-// Trivia
+// Trivia - HYBRID PATTERN
 // ============================================
+// 🎓 READ (SIMPLE): Anyone can view trivia facts.
+// 🎓 WRITE (DDD): Submitting trivia requires validation + auth.
+// See app/_actions/trivia.ts → SubmitTriviaUseCase
 
 export async function findTriviaByEntity(
   entityType: "CHARACTER" | "EPISODE",
-  entityId: number
+  entityId: number,
 ): Promise<TriviaWithUser[]> {
   const trivia = await prisma.triviaFact.findMany({
     where: {
@@ -201,7 +239,7 @@ export async function findLatestTrivia(limit = 3): Promise<TriviaWithUser[]> {
 // ============================================
 
 export async function findDiaryEntriesByUser(
-  userId: string
+  userId: string,
 ): Promise<DiaryEntryWithRelations[]> {
   const entries = await prisma.diaryEntry.findMany({
     where: { userId },
@@ -234,7 +272,7 @@ export async function findDiaryEntriesByUser(
 
 export async function findEpisodeProgressByUser(
   userId: string,
-  episodeId: number
+  episodeId: number,
 ) {
   return prisma.userEpisodeProgress.findUnique({
     where: {
@@ -270,7 +308,7 @@ export async function findQuotesByCollection(collectionId: number) {
 
 export async function isUserFollowingCharacter(
   userId: string,
-  characterId: number
+  characterId: number,
 ): Promise<boolean> {
   const follow = await prisma.characterFollow.findUnique({
     where: {

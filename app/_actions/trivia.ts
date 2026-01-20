@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentUser } from "@/app/_lib/auth";
 import { prisma } from "@/app/_lib/prisma";
 import { withAuthenticatedRLS, withoutRLS } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";
@@ -55,7 +54,7 @@ export async function submitTrivia(
       console.error("[submitTrivia] Error:", error);
 
       if (error instanceof ValidationException) {
-        throw new Error(error.message);
+        throw new TypeError(error.message);
       }
 
       throw new Error("Failed to submit trivia");

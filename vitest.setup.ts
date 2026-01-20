@@ -42,7 +42,7 @@ vi.mock("next/navigation", () => ({
 
 // Mock Next.js image component
 vi.mock("next/image", () => ({
-  default: (props: any) => props,
+  default: (props: Record<string, unknown>) => props,
 }));
 
 // Mock Next.js cache functions
@@ -50,6 +50,12 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
   revalidateTag: vi.fn(),
 }));
+
+// Mock Prisma client
+vi.mock("@/app/_lib/prisma", async () => {
+  const actual = await import("./__mocks__/prisma");
+  return actual;
+});
 
 // Mock Prisma RLS helpers
 vi.mock("@/app/_lib/prisma-rls", async () => {
@@ -65,7 +71,7 @@ vi.mock("@/infrastructure/factories", async () => {
 });
 
 // Suppress console errors in tests (optional)
-global.console = {
+globalThis.console = {
   ...console,
   error: vi.fn(),
   warn: vi.fn(),

@@ -112,8 +112,13 @@ describe("Trivia Server Actions", () => {
     it("should validate entity type enum", async () => {
       mockGetCurrentUser.mockResolvedValue(mockUser);
 
+      // Test: Invalid entity type should be caught by Zod validation
       await expect(
-        submitTrivia("INVALID" as any, 1, "Some trivia content here"),
+        submitTrivia(
+          "INVALID" as "CHARACTER" | "EPISODE",
+          1,
+          "Some trivia content here",
+        ),
       ).rejects.toThrow();
     });
 

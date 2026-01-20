@@ -14,8 +14,8 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   // Efecto para cargar desde localStorage después de montaje en cliente
   useEffect(() => {
     try {
-      if (typeof window !== "undefined") {
-        const item = window.localStorage.getItem(key);
+      if (globalThis.window !== undefined) {
+        const item = globalThis.window.localStorage.getItem(key);
         const value = item ? JSON.parse(item) : initialValue;
         setStoredValue(value);
       }
@@ -29,9 +29,13 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     (value: T | ((val: T) => T)) => {
       try {
         setStoredValue((prev) => {
-          const valueToStore = value instanceof Function ? value(prev) : value;
-          if (typeof window !== "undefined") {
-            window.localStorage.setItem(key, JSON.stringify(valueToStore));
+          const valueToStore =
+            typeof value === "function" ? value(prev) : value;
+          if (globalThis.window !== undefined) {
+            globalThis.window.localStorage.setItem(
+              key,
+              JSON.stringify(valueToStore),
+            );
           }
           return valueToStore;
         });

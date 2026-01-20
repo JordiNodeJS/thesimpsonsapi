@@ -1,13 +1,45 @@
+/**
+ * Diary Server Actions - FULL DDD PATTERN
+ *
+ * 🎓 EDUCATIONAL NOTE: Why Full DDD Here?
+ * =======================================
+ * The Diary domain is a perfect example of where DDD adds real value:
+ *
+ * 1. BUSINESS RULES
+ *    - Character must exist (referential integrity)
+ *    - Location must exist (referential integrity)
+ *    - Description has min/max length rules
+ *
+ * 2. USER OWNERSHIP
+ *    - All entries belong to a specific user
+ *    - Users can only see/modify their own entries
+ *    - RLS enforcement at database level
+ *
+ * 3. AUTHORIZATION
+ *    - All operations require authentication
+ *    - Delete checks ownership via RLS
+ *
+ * 4. TESTABILITY
+ *    - UseCase layer can be unit tested with mocked repos
+ *    - Domain entity validates data independently
+ *
+ * CONTRAST WITH SIMPLE PATTERN:
+ * - Characters list → No business rules, public data
+ * - Episode list → No business rules, public data
+ *
+ * See docs/ARCHITECTURE_DECISION_MATRIX.md for the decision guide.
+ */
+
 "use server";
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentUser } from "@/app/_lib/auth";
 import { prisma } from "@/app/_lib/prisma";
 import { withAuthenticatedRLS } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";
 import {
   AuthorizationException,
+  DomainException,
   NotFoundException,
   ValidationException,
 } from "@/core/domain/exceptions";
@@ -55,11 +87,15 @@ export async function createDiaryEntry(
     } catch (error) {
       console.error("[createDiaryEntry] Error:", error);
 
-      if (error instanceof NotFoundException) {
-        throw new Error(error.message);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ValidationException ||
+        error instanceof DomainException
+      ) {
+        throw error;
       }
-      if (error instanceof ValidationException) {
-        throw new Error(error.message);
+      if (error instanceof Error) {
+        throw error;
       }
 
       throw new Error("Failed to create diary entry");
@@ -106,18 +142,15 @@ export async function deleteDiaryEntry(id: number) {
     } catch (error) {
       console.error("[deleteDiaryEntry] Error:", error);
 
-      // Check by error code (more reliable than instanceof in test environments)
+      if (
+        error instanceof NotFoundException ||
+        error instanceof AuthorizationException ||
+        error instanceof DomainException
+      ) {
+        throw error;
+      }
       if (error instanceof Error) {
-        const errorCode = (error as { code?: string }).code;
-        if (errorCode === "NOT_FOUND" || error instanceof NotFoundException) {
-          throw new Error("Entry not found");
-        }
-        if (
-          errorCode === "UNAUTHORIZED" ||
-          error instanceof AuthorizationException
-        ) {
-          throw new Error("You don't have permission to delete this entry");
-        }
+        throw error;
       }
 
       throw new Error("Failed to delete diary entry");
