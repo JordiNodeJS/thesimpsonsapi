@@ -891,6 +891,177 @@ export async function deleteItem(id: number) {
 
 ---
 
+## Error Handling Best Practices (SonarLint Validated)
+
+### ✅ DO: Preserve Domain Exception Types
+
+**Critical Pattern:** When using DDD architecture, preserve domain exceptions instead of wrapping them in generic `Error`.
+
+```typescript
+// app/_actions/episodes.ts
+"use server";
+import { withAuthenticatedRLS } from "@/app/_lib/prisma-rls";
+import { UseCaseFactory } from "@/infrastructure/factories";
+import { ValidationException, NotFoundException, DomainException } from "@/core/domain/exceptions";
+import { revalidatePath } from "next/cache";
+
+export async function trackEpisode(episodeId: number, rating: number) {
+  return withAuthenticatedRLS(prisma, async (tx, user) => {
+    try {
+      const useCase = UseCaseFactory.createTrackEpisodeUseCase();
+      await useCase.execute({ episodeId, rating }, user.id);
+      
+      revalidatePath(`/episodes/${episodeId}`);
+      return { success: true };
+    } catch (error) {
+      // ✅ CORRECT: Preserve domain exceptions
+      if (error instanceof ValidationException) {
+        throw error; // Client can catch specific type + access field, code
+      }
+      if (error instanceof NotFoundException) {
+        throw error; // Client can access entityType, entityId
+      }
+      if (error instanceof DomainException) {
+        throw error; // All domain exceptions preserved
+      }
+      if (error instanceof Error) {
+        throw error; // Preserve stack trace
+      }
+      
+      throw new Error("Failed to track episode");
+    }
+  });
+}
+```
+
+### ❌ DON'T: Wrap Domain Exceptions
+
+**Anti-Pattern:**
+```typescript
+// ❌ BAD - Loses exception type and metadata
+catch (error) {
+  if (error instanceof ValidationException) {
+    throw new Error(error.message); // Lost field, code, metadata!
+  }
+  throw new Error("Failed");
+}
+
+// Client cannot catch specific types
+try {
+  await trackEpisode(123, 5);
+} catch (error) {
+  // ❌ Can only check error.message (string matching = fragile)
+  if (error.message.includes("validation")) {
+    // No access to error.field, error.code
+  }
+}
+```
+
+### Why This Matters
+
+**1. Type-Safe Error Handling**
+```typescript
+// Client code with preserved exceptions
+try {
+  await trackEpisode(episodeId, rating);
+  toast.success("Episode tracked!");
+} catch (error) {
+  if (error instanceof ValidationException) {
+    // ✅ Access to field-specific data
+    toast.error(`${error.field}: ${error.message}`);
+  } else if (error instanceof NotFoundException) {
+    // ✅ Access to entity information
+    toast.error(`${error.entityType} not found`);
+  } else {
+    toast.error("Something went wrong");
+  }
+}
+```
+
+**2. Better Debugging**
+- Full stack traces preserved
+- Exception metadata available in error logs
+- Clearer error origins in production monitoring
+
+**3. Consistent Error API**
+```typescript
+// All domain exceptions have consistent structure
+interface DomainException {
+  message: string;
+  code: string;
+  timestamp: Date;
+  // Specific exceptions add more fields
+}
+
+interface ValidationException extends DomainException {
+  field: string;
+  value?: unknown;
+}
+
+interface NotFoundException extends DomainException {
+  entityType: string;
+  entityId: string | number;
+}
+```
+
+### Pattern: Error Handling in DDD Server Actions
+
+```typescript
+"use server";
+import { 
+  ValidationException, 
+  NotFoundException, 
+  DomainException 
+} from "@/core/domain/exceptions";
+
+export async function complexMutation(...) {
+  return withAuthenticatedRLS(prisma, async (tx, user) => {
+    try {
+      const useCase = UseCaseFactory.createUseCase();
+      await useCase.execute(input, user.id);
+      
+      revalidatePath("/path");
+      return { success: true };
+    } catch (error) {
+      // ✅ Order matters: Most specific first
+      if (error instanceof ValidationException) {
+        throw error;
+      }
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      if (error instanceof DomainException) {
+        throw error; // Catches any other domain exceptions
+      }
+      if (error instanceof Error) {
+        throw error; // Preserve standard errors
+      }
+      
+      // Truly unexpected errors
+      throw new Error("An unexpected error occurred");
+    }
+  });
+}
+```
+
+### Lessons Learned (PR #14 SonarLint Analysis)
+
+**Fixed Files:**
+- [app/_actions/collections.ts](../../../app/_actions/collections.ts) - 2 error handling fixes
+- [app/_actions/episodes.ts](../../../app/_actions/episodes.ts) - 1 fix
+- [app/_actions/diary.ts](../../../app/_actions/diary.ts) - 2 fixes
+- [app/_actions/social.ts](../../../app/_actions/social.ts) - 1 fix
+
+**Impact:**
+- Zero SonarLint blockers/critical issues
+- Type-safe error handling throughout app
+- Improved client-side error UX
+- Better debugging in production
+
+**Reference:** See [.traces/05-sonarlint-pr14-cleanup.md](../../../.traces/05-sonarlint-pr14-cleanup.md) for complete analysis.
+
+---
+
 ## Server Actions with Row Level Security
 
 Row Level Security (RLS) provides database-level data isolation. Server Actions are the ideal place to enforce RLS in Next.js applications.

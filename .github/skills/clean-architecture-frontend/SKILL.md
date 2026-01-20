@@ -593,6 +593,222 @@ export async function incrementViews(episodeId: number) {
 
 ---
 
+## Exception Handling in Clean Architecture
+
+### Preserve Domain Exception Types Across Layers
+
+**Critical Pattern:** Domain exceptions are part of your domain model. Never wrap them in generic `Error` as they flow through layers.
+
+#### Domain Layer: Define Exceptions
+
+```typescript
+// core/domain/exceptions/DomainException.ts
+export abstract class DomainException extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly timestamp: Date = new Date()
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+// core/domain/exceptions/ValidationException.ts
+export class ValidationException extends DomainException {
+  constructor(
+    message: string,
+    public readonly field?: string,
+    public readonly value?: unknown
+  ) {
+    super(message, "VALIDATION_ERROR");
+  }
+}
+
+// core/domain/exceptions/NotFoundException.ts
+export class NotFoundException extends DomainException {
+  constructor(
+    public readonly entityType: string,
+    public readonly entityId: string | number
+  ) {
+    super(
+      `${entityType} with id ${entityId} not found`,
+      "NOT_FOUND"
+    );
+  }
+}
+```
+
+#### Application Layer: Throw Domain Exceptions
+
+```typescript
+// core/application/use-cases/TrackEpisodeUseCase.ts
+import { ValidationException, NotFoundException } from "@/core/domain/exceptions";
+
+export class TrackEpisodeUseCase {
+  constructor(private episodeRepository: EpisodeRepository) {}
+
+  async execute(input: { episodeId: number; rating: number }, userId: string) {
+    // ✅ Throw domain exceptions for business rule violations
+    if (!input.rating || input.rating < 1 || input.rating > 5) {
+      throw new ValidationException("Rating must be between 1 and 5", "rating", input.rating);
+    }
+
+    const episode = await this.episodeRepository.findById(input.episodeId);
+    if (!episode) {
+      throw new NotFoundException("Episode", input.episodeId);
+    }
+
+    // ... business logic
+  }
+}
+```
+
+#### Delivery Layer: Preserve Exceptions (DO NOT WRAP)
+
+```typescript
+// app/_actions/episodes.ts
+"use server";
+import { withAuthenticatedRLS } from "@/app/_lib/prisma-rls";
+import { UseCaseFactory } from "@/infrastructure/factories";
+import { ValidationException, NotFoundException, DomainException } from "@/core/domain/exceptions";
+import { revalidatePath } from "next/cache";
+
+export async function trackEpisode(episodeId: number, rating: number) {
+  return withAuthenticatedRLS(prisma, async (tx, user) => {
+    try {
+      const useCase = UseCaseFactory.createTrackEpisodeUseCase();
+      await useCase.execute({ episodeId, rating }, user.id);
+      
+      revalidatePath(`/episodes/${episodeId}`);
+      return { success: true };
+    } catch (error) {
+      // ✅ CORRECT: Preserve domain exception types
+      if (error instanceof ValidationException) {
+        throw error; // Client gets field, value, code
+      }
+      if (error instanceof NotFoundException) {
+        throw error; // Client gets entityType, entityId
+      }
+      if (error instanceof DomainException) {
+        throw error; // Catch-all for domain exceptions
+      }
+      if (error instanceof Error) {
+        throw error; // Preserve standard errors
+      }
+      
+      // Only truly unexpected errors get wrapped
+      throw new Error("Failed to track episode");
+    }
+  });
+}
+```
+
+#### ❌ Anti-Pattern: Wrapping Domain Exceptions
+
+```typescript
+// ❌ WRONG - Loses type information and metadata
+catch (error) {
+  if (error instanceof ValidationException) {
+    throw new Error(error.message); // Lost field, value, code!
+  }
+  throw new Error("Failed");
+}
+```
+
+**Why This is Wrong:**
+- Loses exception type (client can't catch `ValidationException`)
+- Loses metadata (field, value, code)
+- Breaks type-safe error handling
+- Makes debugging harder
+
+#### ✅ Correct Pattern: Type-Safe Error Handling
+
+```typescript
+// Client component can now handle specific types
+"use client";
+
+export function EpisodeTracker({ episodeId }: Props) {
+  const handleTrack = async (rating: number) => {
+    try {
+      await trackEpisode(episodeId, rating);
+      toast.success("Episode tracked!");
+    } catch (error) {
+      // ✅ Type-safe error handling
+      if (error instanceof ValidationException) {
+        toast.error(`${error.field}: ${error.message}`);
+      } else if (error instanceof NotFoundException) {
+        toast.error(`${error.entityType} not found`);
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  };
+
+  return <button onClick={() => handleTrack(5)}>Track</button>;
+}
+```
+
+### Exception Flow Through Layers
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ CLIENT (Presentation)                                       │
+│ ✅ Catch specific exception types                           │
+│ ✅ Access exception metadata (field, code, entityType)      │
+└─────────────────────────────────────────────────────────────┘
+                            ▲
+                            │ throw ValidationException
+                            │ (preserved, not wrapped)
+┌─────────────────────────────────────────────────────────────┐
+│ DELIVERY LAYER (Server Actions)                            │
+│ ✅ Preserve domain exceptions (DO NOT WRAP)                 │
+│ ✅ Only wrap truly unexpected errors                        │
+└─────────────────────────────────────────────────────────────┘
+                            ▲
+                            │ throw ValidationException
+                            │ (from use case)
+┌─────────────────────────────────────────────────────────────┐
+│ APPLICATION LAYER (Use Cases)                               │
+│ ✅ Throw domain exceptions for business rules               │
+│ ✅ Use specific exception types                             │
+└─────────────────────────────────────────────────────────────┘
+                            ▲
+                            │ uses
+┌─────────────────────────────────────────────────────────────┐
+│ DOMAIN LAYER (Entities, Value Objects, Exceptions)         │
+│ ✅ Define domain exceptions                                 │
+│ ✅ Encode business rules as exceptions                      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Benefits of Preserving Exception Types
+
+1. **Type Safety** - Client code can catch specific types
+2. **Rich Error Information** - Metadata preserved (field, code, entityId)
+3. **Better UX** - Field-specific error messages
+4. **Debugging** - Full stack traces maintained
+5. **Testability** - Tests can verify specific exception types
+
+### Lessons Learned (SonarLint PR #14)
+
+**Files Fixed:**
+- [app/_actions/collections.ts](../../../app/_actions/collections.ts) - Preserved `ValidationException`, `DomainException`
+- [app/_actions/episodes.ts](../../../app/_actions/episodes.ts) - Preserved all domain exceptions
+- [app/_actions/diary.ts](../../../app/_actions/diary.ts) - Improved exception flow
+- [app/_actions/social.ts](../../../app/_actions/social.ts) - Unified error handling
+
+**Impact:**
+- Type-safe error handling across entire stack
+- Better client-side error messages
+- Zero SonarLint warnings
+- Improved debugging in production
+
+**Reference:** See [.traces/05-sonarlint-pr14-cleanup.md](../../../.traces/05-sonarlint-pr14-cleanup.md) for complete analysis.
+
+---
+
 ## Value Objects and Entities
 
 ### Value Objects (Immutable, Identity-less)
