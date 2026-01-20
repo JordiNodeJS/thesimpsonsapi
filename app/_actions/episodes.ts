@@ -29,7 +29,6 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentUserOptional } from "@/app/_lib/auth";
 import { prisma } from "@/app/_lib/prisma";
 import { withAuthenticatedRLS, withOptionalRLS } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";
@@ -78,6 +77,7 @@ export async function trackEpisode(
     } catch (error) {
       console.error("[trackEpisode] Error:", error);
 
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       if (error instanceof NotFoundException) {
         throw new Error("Episode not found");
       }

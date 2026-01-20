@@ -31,7 +31,6 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentUserOptional } from "@/app/_lib/auth";
 import { prisma } from "@/app/_lib/prisma";
 import {
   withAuthenticatedRLS,

@@ -34,7 +34,6 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getCurrentUser } from "@/app/_lib/auth";
 import { prisma } from "@/app/_lib/prisma";
 import { withAuthenticatedRLS } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";

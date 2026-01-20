@@ -1,29 +1,29 @@
 /**
  * 🎓 RLS Isolation Tests (Unit Tests with Mocks)
  * ===============================================
- * 
+ *
  * EDUCATIONAL NOTE: Unit vs Integration Testing
  * ----------------------------------------------
  * These unit tests use mocks to verify RLS logic WITHOUT a database.
- * 
+ *
  * Key Differences:
  * - Unit Tests: Fast, use mocks, no database required
  * - Integration Tests: Slower, real database, end-to-end validation
- * 
+ *
  * What We're Testing:
  * -------------------
  * - Application-level data isolation logic
  * - Ownership verification patterns
  * - Query filtering behavior
- * 
+ *
  * SERVERLESS COMPATIBILITY:
  * ------------------------
  * These tests verify that RLS works without PostgreSQL transactions,
  * making them compatible with Neon serverless (HTTP mode).
- * 
+ *
  * Per-query filtering (WHERE userId = X) replaces transaction-based
  * session variables, which is the recommended approach for serverless.
- * 
+ *
  * For real database tests, see: __tests__/rls-isolation.integration.test.ts
  */
 
@@ -46,7 +46,7 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
        * Without transactions, we use WHERE clauses for data isolation.
        * This pattern works perfectly with Neon HTTP mode.
        */
-      
+
       const entry1 = {
         id: 1,
         userId: userId1,
@@ -103,7 +103,7 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
        * ---------------------------------------------
        * Combine id + userId in WHERE clause to verify ownership.
        */
-      
+
       const entry = {
         id: 1,
         userId: userId1,
@@ -118,7 +118,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
       // @ts-expect-error - Mock implementation simplified for testing
       prismaMock.diaryEntry.findFirst.mockImplementation((args?: any) => {
         const where = args?.where;
-        if (where?.id === 1 && where?.userId === userId1) return Promise.resolve(entry);
+        if (where?.id === 1 && where?.userId === userId1)
+          return Promise.resolve(entry);
         return Promise.resolve(null); // User 2 trying to access User 1's entry
       });
 
@@ -137,7 +138,7 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
        * -------------------------------------------
        * Verify ownership before allowing delete operations.
        */
-      
+
       const entry = {
         id: 1,
         userId: userId1,
@@ -152,7 +153,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
       // @ts-expect-error - Mock implementation simplified for testing
       prismaMock.diaryEntry.findFirst.mockImplementation((args?: any) => {
         const where = args?.where;
-        if (where?.id === 1 && where?.userId === userId1) return Promise.resolve(entry);
+        if (where?.id === 1 && where?.userId === userId1)
+          return Promise.resolve(entry);
         return Promise.resolve(null);
       });
 
@@ -180,7 +182,7 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
        * -------------------------------------------
        * Each user's collections are isolated via WHERE filtering.
        */
-      
+
       const collection1 = {
         id: 1,
         userId: userId1,
@@ -232,7 +234,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
       // @ts-expect-error - Mock implementation simplified for testing
       prismaMock.quoteCollection.findFirst.mockImplementation((args?: any) => {
         const where = args?.where;
-        if (where?.id === 1 && where?.userId === userId1) return Promise.resolve(collection);
+        if (where?.id === 1 && where?.userId === userId1)
+          return Promise.resolve(collection);
         return Promise.resolve(null);
       });
 
@@ -251,7 +254,7 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
        * ----------------------------------------
        * Users can follow the same character independently.
        */
-      
+
       const follow1 = {
         userId: userId1,
         characterId: 1,
@@ -297,7 +300,8 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
       // @ts-expect-error - Mock implementation simplified for testing
       prismaMock.characterFollow.findFirst.mockImplementation((args?: any) => {
         const where = args?.where;
-        if (where?.userId === userId1 && where?.characterId === 2) return Promise.resolve(follow);
+        if (where?.userId === userId1 && where?.characterId === 2)
+          return Promise.resolve(follow);
         return Promise.resolve(null);
       });
 
@@ -325,7 +329,7 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
        * ----------------------------------------
        * Comments are publicly readable but only modifiable by owner.
        */
-      
+
       const comment1 = {
         id: 1,
         userId: userId1,
@@ -343,14 +347,19 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
       };
 
       // Public read: return all comments
-      prismaMock.characterComment.findMany.mockResolvedValue([comment1, comment2]);
+      prismaMock.characterComment.findMany.mockResolvedValue([
+        comment1,
+        comment2,
+      ]);
 
       // Ownership check for updates
       // @ts-expect-error - Mock implementation simplified for testing
       prismaMock.characterComment.findFirst.mockImplementation((args?: any) => {
         const where = args?.where;
-        if (where?.id === 1 && where?.userId === userId1) return Promise.resolve(comment1);
-        if (where?.id === 2 && where?.userId === userId2) return Promise.resolve(comment2);
+        if (where?.id === 1 && where?.userId === userId1)
+          return Promise.resolve(comment1);
+        if (where?.id === 2 && where?.userId === userId2)
+          return Promise.resolve(comment2);
         return Promise.resolve(null); // Cross-user access denied
       });
 
@@ -360,7 +369,10 @@ describe("RLS Isolation Tests (Unit Tests - Serverless Compatible)", () => {
         const { where, data } = args;
         // In real app, this would be wrapped in ownership check
         if (where.id === 1) {
-          return Promise.resolve({ ...comment1, content: data.content as string });
+          return Promise.resolve({
+            ...comment1,
+            content: data.content as string,
+          });
         }
         throw new Error("Not authorized");
       });

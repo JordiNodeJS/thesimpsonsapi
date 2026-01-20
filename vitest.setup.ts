@@ -71,7 +71,7 @@ vi.mock("@/infrastructure/factories", async () => {
 });
 
 // Suppress console errors in tests (optional)
-global.console = {
+globalThis.console = {
   ...console,
   error: vi.fn(),
   warn: vi.fn(),

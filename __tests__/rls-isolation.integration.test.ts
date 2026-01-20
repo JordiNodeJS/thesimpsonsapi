@@ -1,23 +1,23 @@
 /**
  * 🎓 RLS Isolation Tests (Serverless Mode - No Transactions)
  * ===========================================================
- * 
+ *
  * EDUCATIONAL NOTE: Why No Transactions Here?
  * --------------------------------------------
  * Neon serverless (HTTP mode) doesn't support PostgreSQL transactions.
  * This is INTENTIONAL and follows serverless best practices:
- * 
+ *
  * 1. RLS policies are enforced PER QUERY (transactions not needed)
  * 2. Each query verifies RLS independently via WHERE clauses
  * 3. Serverless functions should be stateless
  * 4. Cleanup handled explicitly in afterEach/afterAll
- * 
+ *
  * This approach:
  * ✅ Tests RLS correctly
  * ✅ Works with Neon serverless (HTTP mode compatible)
  * ✅ Teaches serverless patterns
  * ✅ Simpler and faster
- * 
+ *
  * What We're Testing:
  * -------------------
  * - User data isolation through application-level filtering
@@ -30,7 +30,7 @@ import { prisma } from "@/app/_lib/prisma";
 
 describe("RLS Isolation Tests (Serverless Mode)", () => {
   // Tests verify RLS policies work per-query without transaction wrapper
-  
+
   // Usar IDs únicos para evitar colisiones en tests paralelos
   const testRunId = Date.now();
   const userId1 = `test-user-1-${testRunId}`;
@@ -130,10 +130,10 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
        * --------------------------------------------------
        * Instead of using transactions (not supported in HTTP mode),
        * we create data directly and verify isolation via WHERE clauses.
-       * 
+       *
        * RLS is enforced application-side through userId filtering.
        */
-      
+
       // User 1 crea una entrada (no transaction needed)
       const entry1 = await prisma.diaryEntry.create({
         data: {
@@ -190,7 +190,7 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
        * Without transaction support, we rely on WHERE clause filtering.
        * This simulates RLS by ensuring queries always include userId.
        */
-      
+
       // User 1 crea una entrada
       const entry = await prisma.diaryEntry.create({
         data: {
@@ -221,7 +221,7 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
        * ----------------------------------------------
        * Before deleting, verify userId matches to prevent cross-user deletion.
        */
-      
+
       // User 1 crea una entrada
       const entry = await prisma.diaryEntry.create({
         data: {
@@ -270,7 +270,7 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
        * ----------------------------------------------------------
        * No transaction wrapper needed. Each query filters by userId.
        */
-      
+
       // User 1 crea una colección
       const collection1 = await prisma.quoteCollection.create({
         data: {
@@ -318,7 +318,7 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
        * ----------------------------------------------------
        * Use WHERE clause to combine id + userId for ownership verification.
        */
-      
+
       // User 1 crea una colección
       const collection = await prisma.quoteCollection.create({
         data: {
@@ -349,9 +349,9 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
        * ------------------------------------------------
        * Each user's follows are isolated via WHERE userId filtering.
        */
-      
+
       // User 1 sigue a un personaje
-      const follow1 = await prisma.characterFollow.create({
+      await prisma.characterFollow.create({
         data: {
           userId: userId1,
           characterId: 1, // Homer
@@ -360,7 +360,7 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
       createdIds.characterFollows.push(`${userId1}-1`);
 
       // User 2 sigue al mismo personaje
-      const follow2 = await prisma.characterFollow.create({
+      await prisma.characterFollow.create({
         data: {
           userId: userId2,
           characterId: 1, // Homer
@@ -395,7 +395,7 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
        * ---------------------------------------------
        * Verify ownership before allowing delete operations.
        */
-      
+
       // User 1 sigue a un personaje
       await prisma.characterFollow.create({
         data: {
@@ -451,7 +451,7 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
        * Comments are publicly readable but only modifiable by owner.
        * This demonstrates mixed RLS policies (public read, private write).
        */
-      
+
       // User 1 crea un comentario
       const comment1 = await prisma.characterComment.create({
         data: {
@@ -500,7 +500,7 @@ describe("RLS Isolation Tests (Serverless Mode)", () => {
       });
 
       expect(updated.content).toBe("Updated by owner");
-      
+
       // Verify comment1 wasn't hacked
       const comment1Final = await prisma.characterComment.findUnique({
         where: { id: comment1.id },
