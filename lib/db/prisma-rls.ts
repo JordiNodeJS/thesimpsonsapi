@@ -59,8 +59,8 @@ export async function withRLS<T>(
 ): Promise<T> {
   return prisma.$transaction(async (tx) => {
     // Establecer el userId en la sesión PostgreSQL
-    // Usa parámetros para prevenir SQL injection
-    await tx.$executeRaw`SET LOCAL app.current_user_id = ${userId}`;
+    // Usa set_config para manejar correctamente los parámetros
+    await tx.$executeRaw`SELECT set_config('app.current_user_id', ${userId}, true)`;
 
     // Ejecutar la callback con el contexto RLS establecido
     return callback(tx);

@@ -70,8 +70,8 @@ export default function CharactersPage() {
       <Suspense
         fallback={
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {Array.from({ length: 12 }).map(() => (
-              <CharacterCardSkeleton key={crypto.randomUUID()} />
+            {Array.from({ length: 12 }).map((_, i) => (
+              <CharacterCardSkeleton key={`skeleton-${i}`} />
             ))}
           </div>
         }

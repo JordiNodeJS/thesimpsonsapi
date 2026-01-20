@@ -263,11 +263,8 @@ export default function SimpsonsHeader() {
     >
       {/* Background Pattern / Clouds */}
       <div className="absolute inset-0" aria-hidden="true">
-        {Array.from({ length: CLOUDS_COUNT }).map(() => (
-          <BackgroundCloud
-            key={crypto.randomUUID()}
-            index={Math.random() * CLOUDS_COUNT}
-          />
+        {Array.from({ length: CLOUDS_COUNT }).map((_, i) => (
+          <BackgroundCloud key={`header-cloud-${i}`} index={i} />
         ))}
       </div>
 
