@@ -957,6 +957,7 @@ vi.mock("@/infrastructure/factories", () => ({
 ```
 
 **When this is acceptable:**
+
 - Mock needs to work with multiple use case variations
 - Full interface implementation would bloat test code
 - You document WHY with `@ts-expect-error` comment
@@ -980,6 +981,7 @@ vi.mock("@/infrastructure/factories", () => ({
 ```
 
 **Benefits:**
+
 - TypeScript validates property names
 - Auto-complete works
 - Refactoring catches breaking changes
@@ -1003,12 +1005,14 @@ export function processData(input: InputDTO): OutputDTO {
 ### Type Safety Checklist
 
 **Production Code:**
+
 - [ ] Zero `any` types
 - [ ] Use `unknown` for truly dynamic data, then narrow
 - [ ] Use `Partial<T>` for optional fields
 - [ ] Use generics `<T>` for reusable types
 
 **Test Code:**
+
 - [ ] Prefer `Partial<Interface>` for mocks
 - [ ] Use `@ts-expect-error` only when necessary
 - [ ] Document WHY `any` is used
@@ -1019,6 +1023,7 @@ export function processData(input: InputDTO): OutputDTO {
 #### Vitest Setup File Fix
 
 **Before:**
+
 ```typescript
 // vitest.setup.ts
 vi.mock("next/image", () => ({
@@ -1027,6 +1032,7 @@ vi.mock("next/image", () => ({
 ```
 
 **After:**
+
 ```typescript
 // vitest.setup.ts
 vi.mock("next/image", () => ({
@@ -1062,12 +1068,13 @@ const mockPrisma: Partial<PrismaClient> = {
 ### Type-Safe Mock Factories
 
 **Create reusable mock factories:**
+
 ```typescript
 // __tests__/factories.ts
 import { Character } from "@prisma/client";
 
 export function createMockCharacter(
-  overrides: Partial<Character> = {}
+  overrides: Partial<Character> = {},
 ): Character {
   return {
     id: 1,
@@ -1086,6 +1093,7 @@ const marge = createMockCharacter({ id: 2, name: "Marge" });
 ```
 
 **Benefits:**
+
 - Type-safe by default
 - Easy to override specific fields
 - Consistent test data
@@ -1094,11 +1102,13 @@ const marge = createMockCharacter({ id: 2, name: "Marge" });
 ### Lessons Learned (SonarLint PR #14)
 
 **Files Validated:**
+
 - [vitest.setup.ts](../../../vitest.setup.ts) - Fixed `any` in Next.js Image mock
-- [__tests__/rls-isolation.test.ts](../../../__tests__/rls-isolation.test.ts) - Documented test mock `any` usage
-- [__tests__/rls-isolation.integration.test.ts](../../../__tests__/rls-isolation.integration.test.ts) - Validated test patterns
+- [**tests**/rls-isolation.test.ts](../../../__tests__/rls-isolation.test.ts) - Documented test mock `any` usage
+- [**tests**/rls-isolation.integration.test.ts](../../../__tests__/rls-isolation.integration.test.ts) - Validated test patterns
 
 **Impact:**
+
 - Zero SonarLint warnings in test files
 - Better type safety in mocks
 - Clearer intent with `@ts-expect-error` comments

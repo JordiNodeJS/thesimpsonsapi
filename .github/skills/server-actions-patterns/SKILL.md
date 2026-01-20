@@ -902,7 +902,11 @@ export async function deleteItem(id: number) {
 "use server";
 import { withAuthenticatedRLS } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";
-import { ValidationException, NotFoundException, DomainException } from "@/core/domain/exceptions";
+import {
+  ValidationException,
+  NotFoundException,
+  DomainException,
+} from "@/core/domain/exceptions";
 import { revalidatePath } from "next/cache";
 
 export async function trackEpisode(episodeId: number, rating: number) {
@@ -910,7 +914,7 @@ export async function trackEpisode(episodeId: number, rating: number) {
     try {
       const useCase = UseCaseFactory.createTrackEpisodeUseCase();
       await useCase.execute({ episodeId, rating }, user.id);
-      
+
       revalidatePath(`/episodes/${episodeId}`);
       return { success: true };
     } catch (error) {
@@ -927,7 +931,7 @@ export async function trackEpisode(episodeId: number, rating: number) {
       if (error instanceof Error) {
         throw error; // Preserve stack trace
       }
-      
+
       throw new Error("Failed to track episode");
     }
   });
@@ -937,6 +941,7 @@ export async function trackEpisode(episodeId: number, rating: number) {
 ### ❌ DON'T: Wrap Domain Exceptions
 
 **Anti-Pattern:**
+
 ```typescript
 // ❌ BAD - Loses exception type and metadata
 catch (error) {
@@ -960,6 +965,7 @@ try {
 ### Why This Matters
 
 **1. Type-Safe Error Handling**
+
 ```typescript
 // Client code with preserved exceptions
 try {
@@ -979,11 +985,13 @@ try {
 ```
 
 **2. Better Debugging**
+
 - Full stack traces preserved
 - Exception metadata available in error logs
 - Clearer error origins in production monitoring
 
 **3. Consistent Error API**
+
 ```typescript
 // All domain exceptions have consistent structure
 interface DomainException {
@@ -1008,10 +1016,10 @@ interface NotFoundException extends DomainException {
 
 ```typescript
 "use server";
-import { 
-  ValidationException, 
-  NotFoundException, 
-  DomainException 
+import {
+  ValidationException,
+  NotFoundException,
+  DomainException
 } from "@/core/domain/exceptions";
 
 export async function complexMutation(...) {
@@ -1019,7 +1027,7 @@ export async function complexMutation(...) {
     try {
       const useCase = UseCaseFactory.createUseCase();
       await useCase.execute(input, user.id);
-      
+
       revalidatePath("/path");
       return { success: true };
     } catch (error) {
@@ -1036,7 +1044,7 @@ export async function complexMutation(...) {
       if (error instanceof Error) {
         throw error; // Preserve standard errors
       }
-      
+
       // Truly unexpected errors
       throw new Error("An unexpected error occurred");
     }
@@ -1047,12 +1055,14 @@ export async function complexMutation(...) {
 ### Lessons Learned (PR #14 SonarLint Analysis)
 
 **Fixed Files:**
-- [app/_actions/collections.ts](../../../app/_actions/collections.ts) - 2 error handling fixes
-- [app/_actions/episodes.ts](../../../app/_actions/episodes.ts) - 1 fix
-- [app/_actions/diary.ts](../../../app/_actions/diary.ts) - 2 fixes
-- [app/_actions/social.ts](../../../app/_actions/social.ts) - 1 fix
+
+- [app/\_actions/collections.ts](../../../app/_actions/collections.ts) - 2 error handling fixes
+- [app/\_actions/episodes.ts](../../../app/_actions/episodes.ts) - 1 fix
+- [app/\_actions/diary.ts](../../../app/_actions/diary.ts) - 2 fixes
+- [app/\_actions/social.ts](../../../app/_actions/social.ts) - 1 fix
 
 **Impact:**
+
 - Zero SonarLint blockers/critical issues
 - Type-safe error handling throughout app
 - Improved client-side error UX

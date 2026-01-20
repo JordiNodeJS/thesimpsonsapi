@@ -10,6 +10,7 @@ Best practices for using SonarLint to maintain code quality in The Simpsons API 
 ## When to Use This Skill
 
 Use this skill when:
+
 - Creating a new PR and need pre-merge quality check
 - Fixing code quality issues flagged by SonarLint
 - Setting up quality gates for CI/CD
@@ -18,6 +19,7 @@ Use this skill when:
 ## Pre-Merge SonarLint Workflow
 
 ### 1. Analyze Modified Files
+
 ```bash
 # Get all TypeScript files modified in PR
 git diff --name-only main...your-branch | grep -E "\.(ts|tsx)$"
@@ -28,19 +30,21 @@ git diff --name-only main...your-branch | grep -E "\.(ts|tsx)$"
 
 ### 2. Categorize Issues by Severity
 
-| Severity | Action | Timeline |
-|----------|--------|----------|
-| 🔴 BLOCKER | **Must fix** | Before merge |
-| 🟠 CRITICAL | **Must fix** | Before merge |
-| 🟡 MAJOR | **Should fix** | Before merge |
-| 🔵 MINOR | **Can defer** | With justification |
-| ⚪ INFO | **Optional** | Per team standards |
+| Severity    | Action         | Timeline           |
+| ----------- | -------------- | ------------------ |
+| 🔴 BLOCKER  | **Must fix**   | Before merge       |
+| 🟠 CRITICAL | **Must fix**   | Before merge       |
+| 🟡 MAJOR    | **Should fix** | Before merge       |
+| 🔵 MINOR    | **Can defer**  | With justification |
+| ⚪ INFO     | **Optional**   | Per team standards |
 
 ### 3. Common Issues and Fixes
 
 #### Issue: "Replace Error with TypeError"
+
 **When:** Type validation errors
 **Fix:**
+
 ```typescript
 // ❌ Before
 if (typeof input !== "number") {
@@ -54,6 +58,7 @@ if (typeof input !== "number") {
 ```
 
 **Exception:** Domain validation should use domain exceptions
+
 ```typescript
 // ✅ Correct for business rules
 if (rating < 1 || rating > 5) {
@@ -62,7 +67,9 @@ if (rating < 1 || rating > 5) {
 ```
 
 #### Issue: "Avoid using 'any' type"
+
 **Production Code:**
+
 ```typescript
 // ❌ Wrong
 function process(data: any): any {
@@ -84,6 +91,7 @@ function process(data: unknown): ProcessedData {
 ```
 
 **Test Mocks:**
+
 ```typescript
 // ✅ Acceptable with comment
 // @ts-expect-error - Test mock intentionally incomplete for flexibility
@@ -96,7 +104,9 @@ const mockRepo: Partial<EpisodeRepository> = {
 ```
 
 #### Issue: "Preserve Exception Types"
+
 **Critical Pattern from PR #14:**
+
 ```typescript
 // ❌ Wrong - Loses type information
 catch (error) {
@@ -118,6 +128,7 @@ catch (error) {
 ```
 
 **Why This Matters:**
+
 - Client code can catch specific exception types
 - Domain exception metadata (field, code) is preserved
 - Better debugging with full stack traces
@@ -130,11 +141,13 @@ catch (error) {
 ### When to Defer Minor Issues
 
 **Acceptable deferrals:**
+
 1. **Test mock `any` types** - If mock needs flexibility
 2. **Generic Error in infrastructure** - If wrapping external libraries
 3. **Console.log in dev utilities** - If for debugging only
 
 **Document deferrals:**
+
 ```typescript
 // @ts-expect-error - SonarLint: Using 'any' for test flexibility
 // Justification: Mock needs to work with multiple use case types
@@ -144,6 +157,7 @@ const mockFactory: any = { create: vi.fn() };
 ### Quality Gates
 
 **Before PR Creation:**
+
 ```bash
 pnpm test           # All tests pass
 pnpm build          # Build succeeds
@@ -152,6 +166,7 @@ pnpm tsc --noEmit   # Type check clean
 ```
 
 **During Code Review:**
+
 - All blockers fixed
 - All critical fixed
 - Major issues addressed or justified
@@ -172,7 +187,7 @@ export async function trackEpisode(episodeId: number, rating: number) {
     try {
       const useCase = UseCaseFactory.createTrackEpisodeUseCase();
       await useCase.execute({ episodeId, rating }, user.id);
-      
+
       revalidatePath(`/episodes/${episodeId}`);
       return { success: true };
     } catch (error) {
@@ -196,6 +211,7 @@ export async function trackEpisode(episodeId: number, rating: number) {
 ```
 
 **Client can now handle specific types:**
+
 ```typescript
 // app/_components/EpisodeTracker.tsx
 try {
@@ -218,6 +234,7 @@ try {
 ## Type Safety Rules
 
 ### Production Code
+
 - ✅ Zero `any` types allowed
 - ✅ Use `unknown` for truly dynamic data, then narrow
 - ✅ Use `Partial<T>` for optional fields
@@ -225,12 +242,14 @@ try {
 - ❌ No implicit `any` from missing types
 
 ### Test Code
+
 - ✅ Prefer `Partial<Interface>` for mocks
 - ✅ Use `@ts-expect-error` only when necessary
 - ✅ Document WHY `any` is used
 - ❌ Don't use `any` without comment
 
 **Examples:**
+
 ```typescript
 // ✅ Production - Use Partial<T>
 function updateUser(id: string, updates: Partial<User>) {
@@ -262,6 +281,7 @@ const mockUseCase: Partial<TrackEpisodeUseCase> = {
 ## Integration with CI/CD
 
 ### GitHub Actions (Future)
+
 ```yaml
 # .github/workflows/quality-check.yml
 name: Code Quality
@@ -286,6 +306,7 @@ jobs:
 ```
 
 ### Local Pre-Push Hook
+
 ```bash
 # .git/hooks/pre-push
 #!/bin/bash
@@ -299,14 +320,17 @@ echo "Running SonarLint analysis..."
 ## Common Patterns from PR #14
 
 ### Files Fixed
-1. [app/_actions/collections.ts](../../../app/_actions/collections.ts) - 2 fixes
-2. [app/_actions/episodes.ts](../../../app/_actions/episodes.ts) - 1 fix  
-3. [app/_actions/diary.ts](../../../app/_actions/diary.ts) - 2 fixes
-4. [app/_actions/social.ts](../../../app/_actions/social.ts) - 1 fix
+
+1. [app/\_actions/collections.ts](../../../app/_actions/collections.ts) - 2 fixes
+2. [app/\_actions/episodes.ts](../../../app/_actions/episodes.ts) - 1 fix
+3. [app/\_actions/diary.ts](../../../app/_actions/diary.ts) - 2 fixes
+4. [app/\_actions/social.ts](../../../app/_actions/social.ts) - 1 fix
 5. [vitest.setup.ts](../../../vitest.setup.ts) - 1 fix
 
 ### Pattern: Server Action Error Handling
+
 **Before (loses type):**
+
 ```typescript
 catch (error) {
   if (error instanceof ValidationException) {
@@ -317,6 +341,7 @@ catch (error) {
 ```
 
 **After (preserves type):**
+
 ```typescript
 catch (error) {
   if (error instanceof ValidationException || error instanceof DomainException) {
@@ -330,13 +355,15 @@ catch (error) {
 ```
 
 ### Pattern: Test Mock Flexibility
+
 **Vitest Setup:**
+
 ```typescript
 // vitest.setup.ts
 vi.mock("next/image", () => ({
   // ❌ Before: any type
   default: (props: any) => props,
-  
+
   // ✅ After: explicit type
   default: (props: Record<string, unknown>) => props,
 }));

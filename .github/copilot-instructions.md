@@ -198,13 +198,14 @@ pnpm tsx scripts/verify-db.ts
 
 > **Critical:** Not everything needs full DDD. Choose the right pattern for the job.
 
-| Pattern Type | Use When | Examples |
-|--------------|----------|----------|
-| **🟢 Simple** | Read-only public data, no business rules | Characters list, Episodes list, Locations |
-| **🟡 Hybrid** | Read operations simple, write operations with rules | Episodes (read simple, track with DDD), Social (view simple, post with DDD) |
-| **🔴 Full DDD** | Mutations with business rules, user ownership, RLS | Diary entries, Collections, User progress |
+| Pattern Type    | Use When                                            | Examples                                                                    |
+| --------------- | --------------------------------------------------- | --------------------------------------------------------------------------- |
+| **🟢 Simple**   | Read-only public data, no business rules            | Characters list, Episodes list, Locations                                   |
+| **🟡 Hybrid**   | Read operations simple, write operations with rules | Episodes (read simple, track with DDD), Social (view simple, post with DDD) |
+| **🔴 Full DDD** | Mutations with business rules, user ownership, RLS  | Diary entries, Collections, User progress                                   |
 
 **Quick Decision:**
+
 1. **Is it read-only?** → Use simple repository ([app/\_lib/repositories.ts](app/_lib/repositories.ts))
 2. **Has business rules?** → Use DDD with UseCase ([core/application/](core/application/))
 3. **Requires auth?** → Add RLS wrapper ([app/\_lib/prisma-rls.ts](app/_lib/prisma-rls.ts))
@@ -369,8 +370,9 @@ git diff --name-only main...feature-branch | grep -E "\.(ts|tsx)$"
 ```
 
 **Fix Priority:**
+
 - 🔴 **BLOCKER**: Must fix before merge
-- 🟠 **CRITICAL**: Must fix before merge  
+- 🟠 **CRITICAL**: Must fix before merge
 - 🟡 **MAJOR**: Should fix before merge
 - 🔵 **MINOR**: Can defer with justification
 - ⚪ **INFO**: Optional
@@ -378,6 +380,7 @@ git diff --name-only main...feature-branch | grep -E "\.(ts|tsx)$"
 ### Error Handling Standards
 
 **✅ DO: Preserve Domain Exception Types**
+
 ```typescript
 // app/_actions/episodes.ts
 catch (error) {
@@ -392,6 +395,7 @@ catch (error) {
 ```
 
 **❌ DON'T: Wrap Domain Exceptions**
+
 ```typescript
 catch (error) {
   if (error instanceof ValidationException) {
@@ -401,6 +405,7 @@ catch (error) {
 ```
 
 **Why This Matters:**
+
 - Client code can catch specific exception types
 - Error metadata (field, code, entityType) is preserved
 - Better debugging with full stack traces
@@ -409,6 +414,7 @@ catch (error) {
 ### Type Safety Rules
 
 **Production Code:**
+
 - ✅ Zero `any` types allowed
 - ✅ Use `unknown` for truly dynamic data, then narrow
 - ✅ Use `Partial<T>` for optional fields
@@ -416,12 +422,14 @@ catch (error) {
 - ❌ No implicit `any` from missing types
 
 **Test Code:**
+
 - ✅ Prefer `Partial<Interface>` for mocks
 - ✅ Use `@ts-expect-error` only when necessary
 - ✅ Document WHY `any` is used
 - ❌ Don't use `any` without comment
 
 **Examples:**
+
 ```typescript
 // ✅ Production - Use Partial<T>
 function updateUser(id: string, updates: Partial<User>) {
@@ -451,6 +459,7 @@ const mockUseCase: Partial<TrackEpisodeUseCase> = {
 ### Quality Checklist (Pre-PR)
 
 Before creating a PR:
+
 - [ ] Run `pnpm test` (all tests pass)
 - [ ] Run `pnpm build` (no errors)
 - [ ] Run `pnpm tsc --noEmit` (type check)
