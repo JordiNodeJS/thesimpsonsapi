@@ -42,7 +42,7 @@ vi.mock("next/navigation", () => ({
 
 // Mock Next.js image component
 vi.mock("next/image", () => ({
-  default: (props: any) => props,
+  default: (props: Record<string, unknown>) => props,
 }));
 
 // Mock Next.js cache functions

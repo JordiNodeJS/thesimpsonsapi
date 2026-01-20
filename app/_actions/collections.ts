@@ -5,7 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/app/_lib/prisma";
 import { withAuthenticatedRLS } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";
-import { ValidationException } from "@/core/domain/exceptions";
+import { DomainException, ValidationException } from "@/core/domain/exceptions";
 
 // Zod schemas for input validation
 const CreateCollectionSchema = z.object({
@@ -43,8 +43,11 @@ export async function createCollection(name: string, description: string) {
     } catch (error) {
       console.error("[createCollection] Error:", error);
 
-      if (error instanceof ValidationException) {
-        throw new Error(error.message);
+      if (error instanceof ValidationException || error instanceof DomainException) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw error;
       }
 
       throw new Error("Failed to create collection");
@@ -100,8 +103,11 @@ export async function addQuote(
     } catch (error) {
       console.error("[addQuote] Error:", error);
 
-      if (error instanceof ValidationException) {
-        throw new Error(error.message);
+      if (error instanceof ValidationException || error instanceof DomainException) {
+        throw error;
+      }
+      if (error instanceof Error) {
+        throw error;
       }
 
       throw new Error("Failed to add quote to collection");

@@ -39,6 +39,7 @@ import {
 } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";
 import {
+  DomainException,
   NotFoundException,
   ValidationException,
 } from "@/core/domain/exceptions";
@@ -72,17 +73,14 @@ export async function toggleFollow(characterId: number) {
     } catch (error) {
       console.error("[toggleFollow] Error:", error);
 
-      if (error instanceof NotFoundException) {
-        return { success: false, error: "Character not found" };
+      if (error instanceof DomainException) {
+        return { success: false, error: error.message };
+      }
+      if (error instanceof Error) {
+        return { success: false, error: error.message };
       }
 
-      return {
-        success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to update follow status",
-      };
+      return { success: false, error: "Failed to update follow status" };
     }
   }).catch((authError) => {
     // Handle auth error from withAuthenticatedRLS

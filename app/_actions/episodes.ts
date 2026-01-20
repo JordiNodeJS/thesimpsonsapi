@@ -33,6 +33,7 @@ import { prisma } from "@/app/_lib/prisma";
 import { withAuthenticatedRLS, withOptionalRLS } from "@/app/_lib/prisma-rls";
 import { UseCaseFactory } from "@/infrastructure/factories";
 import {
+  DomainException,
   NotFoundException,
   ValidationException,
 } from "@/core/domain/exceptions";
@@ -77,12 +78,11 @@ export async function trackEpisode(
     } catch (error) {
       console.error("[trackEpisode] Error:", error);
 
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
-      if (error instanceof NotFoundException) {
-        throw new Error("Episode not found");
+      if (error instanceof NotFoundException || error instanceof ValidationException || error instanceof DomainException) {
+        throw error;
       }
-      if (error instanceof ValidationException) {
-        throw new Error(error.message);
+      if (error instanceof Error) {
+        throw error;
       }
 
       throw new Error("Failed to track episode");
