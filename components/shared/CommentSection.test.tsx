@@ -126,7 +126,10 @@ describe("CommentSection", () => {
 
     it("should call postComment with correct data", async () => {
       const { postComment } = await import("@/actions/social");
-      vi.mocked(postComment).mockResolvedValue({ success: true });
+      vi.mocked(postComment).mockResolvedValue({
+        success: true,
+        comment: { id: 1, content: "test", username: "user", createdAt: null },
+      } as any);
 
       const user = userEvent.setup();
       render(<CommentSection characterId={42} comments={[]} />);
@@ -154,7 +157,10 @@ describe("CommentSection", () => {
 
     it("should clear textarea after successful post", async () => {
       const { postComment } = await import("@/actions/social");
-      vi.mocked(postComment).mockResolvedValue({ success: true });
+      vi.mocked(postComment).mockResolvedValue({
+        success: true,
+        comment: { id: 1, content: "test", username: "user", createdAt: null },
+      } as any);
 
       const user = userEvent.setup();
       render(<CommentSection characterId={1} comments={[]} />);

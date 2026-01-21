@@ -9,6 +9,8 @@ import { AlertCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+const SKELETON_IDS = Array.from({ length: 9 }, (_, i) => `ep-skeleton-${i}`);
+
 async function EpisodeList() {
   let episodes: Awaited<ReturnType<typeof findAllEpisodes>> = [];
   let error = null;
@@ -79,8 +81,8 @@ export default function EpisodesPage() {
       <Suspense
         fallback={
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <EpisodeCardSkeleton key={`ep-skeleton-${i}`} />
+            {SKELETON_IDS.map((id) => (
+              <EpisodeCardSkeleton key={id} />
             ))}
           </div>
         }

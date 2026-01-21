@@ -5,6 +5,10 @@ import { usePathname } from "next/navigation";
 import { UserNav } from "./UserNav";
 
 const CLOUDS_COUNT = 4;
+const CLOUD_IDS = Array.from(
+  { length: CLOUDS_COUNT },
+  (_, i) => `header-cloud-${i}`,
+);
 
 function BackgroundCloud({ index }: Readonly<{ index: number }>) {
   const style = {
@@ -263,8 +267,8 @@ export default function SimpsonsHeader() {
     >
       {/* Background Pattern / Clouds */}
       <div className="absolute inset-0" aria-hidden="true">
-        {Array.from({ length: CLOUDS_COUNT }).map((_, i) => (
-          <BackgroundCloud key={`header-cloud-${i}`} index={i} />
+        {CLOUD_IDS.map((id, i) => (
+          <BackgroundCloud key={id} index={i} />
         ))}
       </div>
 

@@ -11,6 +11,11 @@ import { AlertCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+const CHARACTER_SKELETON_IDS = Array.from(
+  { length: 12 },
+  (_, i) => `char-skeleton-${i}`,
+);
+
 async function CharacterList() {
   let characters: Awaited<ReturnType<typeof findAllCharacters>> = [];
   let error = null;
@@ -70,8 +75,8 @@ export default function CharactersPage() {
       <Suspense
         fallback={
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <CharacterCardSkeleton key={`skeleton-${i}`} />
+            {CHARACTER_SKELETON_IDS.map((id) => (
+              <CharacterCardSkeleton key={id} />
             ))}
           </div>
         }
