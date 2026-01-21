@@ -5,7 +5,7 @@
  * Run after db push to verify index performance
  */
 
-import { prisma } from "../app/_lib/prisma";
+import { prisma } from "../lib/db/prisma";
 
 type QueryTest = {
   name: string;
@@ -112,10 +112,10 @@ async function runPerformanceTests() {
 
   console.log(`   Average query time: ${avgTime.toFixed(2)}ms`);
   console.log(
-    `   Fastest: ${Math.min(...results.map((r) => r.time)).toFixed(2)}ms`
+    `   Fastest: ${Math.min(...results.map((r) => r.time)).toFixed(2)}ms`,
   );
   console.log(
-    `   Slowest: ${Math.max(...results.map((r) => r.time)).toFixed(2)}ms`
+    `   Slowest: ${Math.max(...results.map((r) => r.time)).toFixed(2)}ms`,
   );
   console.log(`   Slow queries (>500ms): ${slowQueries.length}`);
 
@@ -132,7 +132,7 @@ async function runPerformanceTests() {
   await prisma.$disconnect();
 }
 
-runPerformanceTests().catch((error) => {
+await runPerformanceTests().catch((error) => {
   console.error("Test failed:", error);
   process.exit(1);
 });

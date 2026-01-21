@@ -152,7 +152,7 @@ export const createMockEpisodeProgress = (
 });
 
 // Comment Factory (with user join) - for repository results
-export const createMockCommentWithUser = (overrides?: Partial<any>) => ({
+export const createMockCommentWithUser = (overrides?: Record<string, unknown>) => ({
   id: 1,
   userId: "test-user-id",
   characterId: 1,
@@ -166,7 +166,7 @@ export const createMockCommentWithUser = (overrides?: Partial<any>) => ({
 });
 
 // Trivia with User Factory - for repository results
-export const createMockTriviaWithUser = (overrides?: Partial<any>) => ({
+export const createMockTriviaWithUser = (overrides?: Record<string, unknown>) => ({
   id: 1,
   relatedEntityType: "CHARACTER",
   relatedEntityId: 1,
@@ -182,7 +182,7 @@ export const createMockTriviaWithUser = (overrides?: Partial<any>) => ({
 
 // Diary Entry with Relations Factory - for repository results
 export const createMockDiaryEntryWithRelations = (
-  overrides?: Partial<any>,
+  overrides?: Record<string, unknown>,
 ) => ({
   id: 1,
   userId: "test-user-id",

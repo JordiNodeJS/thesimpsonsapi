@@ -1,5 +1,15 @@
 # System Architecture
 
+## 🎯 Architecture Philosophy: Pragmatic DDD
+
+This project applies the **YAGNI (You Ain't Gonna Need It)** principle to architecture decisions:
+
+- **Simple operations** (read-only, public data) use direct repository patterns
+- **Complex operations** (mutations with business rules, user ownership) use full DDD
+- **Hybrid domains** mix both patterns based on operation type
+
+**See [ARCHITECTURE_DECISION_MATRIX.md](./ARCHITECTURE_DECISION_MATRIX.md)** for the complete decision guide.
+
 ## 1. High-Level Overview
 
 The application is built on a **Next.js 16** framework using the **App Router**. It connects to an external **Simpsons API** for static data (synced periodically) and a **Neon PostgreSQL** database for dynamic user data.

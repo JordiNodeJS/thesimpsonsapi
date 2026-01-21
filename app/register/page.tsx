@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,7 +67,7 @@ export default function RegisterPage() {
           onError: (ctx) => {
             setError(ctx.error.message || "Failed to create account");
           },
-        }
+        },
       );
     } finally {
       setLoading(false);

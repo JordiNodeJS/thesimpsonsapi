@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createDiaryEntry } from "@/app/_actions/diary";
+import { createDiaryEntry } from "@/actions/diary";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -12,9 +12,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { useLocalStorage, useFormAction } from "@/app/_lib/hooks";
+import { useLocalStorage, useFormAction } from "@/lib/hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, User, Loader2 } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
 
 interface DiaryFormProps {
   characters: Array<{ id: number; name: string; imageUrl: string | null }>;
@@ -29,7 +29,10 @@ interface Draft {
 
 const EMPTY_DRAFT: Draft = { charId: "", locId: "", desc: "" };
 
-export default function DiaryForm({ characters, locations }: DiaryFormProps) {
+export default function DiaryForm({
+  characters,
+  locations,
+}: Readonly<DiaryFormProps>) {
   const [draft, setDraft] = useLocalStorage<Draft>("diary-draft", EMPTY_DRAFT);
   const [formState, setFormState] = useState<Draft>(() => draft);
   const [error, setError] = useState<string | null>(null);
@@ -46,8 +49,8 @@ export default function DiaryForm({ characters, locations }: DiaryFormProps) {
     }
     try {
       await createDiaryEntry(
-        parseInt(formState.charId),
-        parseInt(formState.locId),
+        Number.parseInt(formState.charId),
+        Number.parseInt(formState.locId),
         formState.desc,
       );
       setFormState(EMPTY_DRAFT);

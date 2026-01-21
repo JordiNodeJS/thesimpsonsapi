@@ -1,8 +1,8 @@
-import { getCollections } from "@/app/_actions/collections";
+import { getCollections } from "@/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import CreateCollectionForm from "@/app/_components/CreateCollectionForm";
-import { getCurrentUserOptional } from "@/app/_lib/auth";
+import { CreateCollectionForm } from "@/components/shared";
+import { getCurrentUserOptional } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";

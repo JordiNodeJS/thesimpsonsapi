@@ -42,7 +42,7 @@ vi.mock("next/navigation", () => ({
 
 // Mock Next.js image component
 vi.mock("next/image", () => ({
-  default: (props: any) => props,
+  default: (props: Record<string, unknown>) => props,
 }));
 
 // Mock Next.js cache functions
@@ -51,21 +51,35 @@ vi.mock("next/cache", () => ({
   revalidateTag: vi.fn(),
 }));
 
+// Mock auth module
+vi.mock("@/lib/auth", async () => {
+  const actual = await import("./__mocks__/auth");
+  return {
+    ...actual,
+    getCurrentUser: actual.mockGetCurrentUser,
+    getCurrentUserOptional: actual.mockGetCurrentUserOptional,
+    auth: {
+      api: {
+        getSession: vi.fn(),
+      },
+    },
+  };
+});
+
+// Mock Prisma client
+vi.mock("@/lib/db/prisma", async () => {
+  const actual = await import("./__mocks__/prisma");
+  return actual;
+});
+
 // Mock Prisma RLS helpers
-vi.mock("@/app/_lib/prisma-rls", async () => {
+vi.mock("@/lib/db/prisma-rls", async () => {
   const actual = await import("./__mocks__/prisma-rls");
   return actual;
 });
 
-// Mock UseCaseFactory for Clean Architecture
-vi.mock("@/infrastructure/factories", async () => {
-  const actual =
-    await import("./__mocks__/infrastructure/factories/UseCaseFactory");
-  return actual;
-});
-
 // Suppress console errors in tests (optional)
-global.console = {
+globalThis.console = {
   ...console,
   error: vi.fn(),
   warn: vi.fn(),

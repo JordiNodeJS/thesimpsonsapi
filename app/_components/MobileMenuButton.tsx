@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -8,15 +8,13 @@ import { Button } from "@/components/ui/button";
 export function MobileMenuButton() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
-  const previousPathname = useRef(pathname);
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
-  // Cerrar el menú cuando cambia la ruta
-  useEffect(() => {
-    if (pathname !== previousPathname.current) {
-      setIsMenuOpen(false);
-      previousPathname.current = pathname;
-    }
-  }, [pathname]);
+  // Cerrar el menú cuando cambia la ruta (patrón recomendado en React para ajustar estado basado en props/hooks)
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setIsMenuOpen(false);
+  }
 
   // Prevenir scroll del body cuando el menú está abierto
   useEffect(() => {
@@ -71,10 +69,9 @@ export function MobileMenuButton() {
           />
 
           {/* Drawer */}
-          <div
+          <dialog
             className="fixed top-0 right-0 bottom-0 w-64 bg-white dark:bg-zinc-950 border-l-2 border-zinc-300 dark:border-zinc-700 shadow-[0_0_60px_rgba(0,0,0,0.8)] z-50 md:hidden animate-slideInRight"
-            role="dialog"
-            aria-modal="true"
+            open={isMenuOpen}
             aria-label="Menú de navegación móvil"
           >
             <div className="flex flex-col h-full">
@@ -123,7 +120,7 @@ export function MobileMenuButton() {
                 </MobileNavLink>
               </nav>
             </div>
-          </div>
+          </dialog>
         </>
       )}
     </>
@@ -136,7 +133,11 @@ interface MobileNavLinkProps {
   children: React.ReactNode;
 }
 
-function MobileNavLink({ href, currentPath, children }: MobileNavLinkProps) {
+function MobileNavLink({
+  href,
+  currentPath,
+  children,
+}: Readonly<MobileNavLinkProps>) {
   const isActive = currentPath.startsWith(href);
 
   return (

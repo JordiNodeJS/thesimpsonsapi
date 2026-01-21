@@ -1,0 +1,81 @@
+"use client";
+
+import { useState } from "react";
+import { submitTrivia } from "@/actions/trivia";
+import { useFormAction } from "@/lib/hooks";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+
+interface TriviaFact {
+  id: number;
+  content: string;
+  username: string;
+}
+
+interface TriviaSectionProps {
+  entityType: "character" | "episode";
+  entityId: number;
+  facts: TriviaFact[];
+}
+
+export default function TriviaSection({
+  entityType,
+  entityId,
+  facts,
+}: Readonly<TriviaSectionProps>) {
+  const [content, setContent] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const { execute, isPending } = useFormAction(async () => {
+    if (!content.trim()) {
+      setError("Trivia cannot be empty");
+      return;
+    }
+    try {
+      await submitTrivia(entityType, entityId, content);
+      setContent("");
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to submit trivia");
+    }
+  });
+
+  return (
+    <div className="space-y-6 mt-8 pt-8 border-t">
+      <h3 className="text-xl font-semibold">Did You Know?</h3>
+
+      <div className="grid gap-4">
+        {facts.map((fact) => (
+          <div
+            key={fact.id}
+            className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900 rounded-lg"
+          >
+            <p className="italic text-lg">&quot;{fact.content}&quot;</p>
+            <div className="mt-2 flex justify-end">
+              <Badge variant="outline" className="text-xs">
+                Submitted by {fact.username}
+              </Badge>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-sm font-medium">Add a fun fact:</p>
+        <div className="flex gap-2">
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Type a trivia fact..."
+            className="min-h-[80px]"
+          />
+        </div>
+        {error && <p className="text-sm text-red-500">{error}</p>}
+        <Button onClick={() => execute()} disabled={isPending} size="sm">
+          {isPending ? "Submitting..." : "Submit Fact"}
+        </Button>
+      </div>
+    </div>
+  );
+}
