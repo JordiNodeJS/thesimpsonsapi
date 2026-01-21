@@ -485,7 +485,7 @@ import { TrackEpisodeUseCase } from "@/core/application/use-cases/episodes";
 import { UseCaseFactory } from "@/infrastructure/factories";
 
 // 5. App layer
-import { getCurrentUser } from "@/app/_lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 ```
 
 ---
