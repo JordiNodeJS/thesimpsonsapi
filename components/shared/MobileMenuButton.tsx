@@ -69,9 +69,10 @@ export function MobileMenuButton() {
           />
 
           {/* Drawer */}
-          <dialog
+          <div
             className="fixed top-0 right-0 bottom-0 w-64 bg-white dark:bg-zinc-950 border-l-2 border-zinc-300 dark:border-zinc-700 shadow-[0_0_60px_rgba(0,0,0,0.8)] z-50 md:hidden animate-slideInRight"
-            open={isMenuOpen}
+            role="dialog"
+            aria-modal="true"
             aria-label="Menú de navegación móvil"
           >
             <div className="flex flex-col h-full">
@@ -120,7 +121,7 @@ export function MobileMenuButton() {
                 </MobileNavLink>
               </nav>
             </div>
-          </dialog>
+          </div>
         </>
       )}
     </>
@@ -133,11 +134,7 @@ interface MobileNavLinkProps {
   children: React.ReactNode;
 }
 
-function MobileNavLink({
-  href,
-  currentPath,
-  children,
-}: Readonly<MobileNavLinkProps>) {
+function MobileNavLink({ href, currentPath, children }: MobileNavLinkProps) {
   const isActive = currentPath.startsWith(href);
 
   return (

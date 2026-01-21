@@ -29,10 +29,7 @@ interface Draft {
 
 const EMPTY_DRAFT: Draft = { charId: "", locId: "", desc: "" };
 
-export default function DiaryForm({
-  characters,
-  locations,
-}: Readonly<DiaryFormProps>) {
+export default function DiaryForm({ characters, locations }: DiaryFormProps) {
   const [draft, setDraft] = useLocalStorage<Draft>("diary-draft", EMPTY_DRAFT);
   const [formState, setFormState] = useState<Draft>(() => draft);
   const [error, setError] = useState<string | null>(null);
@@ -49,8 +46,8 @@ export default function DiaryForm({
     }
     try {
       await createDiaryEntry(
-        Number.parseInt(formState.charId),
-        Number.parseInt(formState.locId),
+        parseInt(formState.charId),
+        parseInt(formState.locId),
         formState.desc,
       );
       setFormState(EMPTY_DRAFT);
