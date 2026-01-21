@@ -39,7 +39,7 @@ export default function HelpButton() {
         <button
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          className="group relative w-14 h-14 bg-gradient-to-br from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center ring-4 ring-yellow-400/20 hover:ring-yellow-400/40"
+          className="group relative w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center ring-2 ring-yellow-400/20 hover:ring-yellow-400/40"
           aria-label="Abrir guía de usuario"
         >
           {/* Question Mark Icon */}
@@ -49,7 +49,7 @@ export default function HelpButton() {
             viewBox="0 0 24 24"
             strokeWidth={3}
             stroke="currentColor"
-            className="w-7 h-7 text-zinc-900 group-hover:rotate-12 transition-transform duration-300"
+            className="w-5 h-5 text-zinc-900 group-hover:rotate-12 transition-transform duration-300"
           >
             <path
               strokeLinecap="round"
@@ -59,7 +59,7 @@ export default function HelpButton() {
           </svg>
 
           {/* Pulse Animation */}
-          <span className="absolute inset-0 rounded-full bg-yellow-400 opacity-75 animate-ping" />
+          <span className="absolute inset-0 rounded-full bg-yellow-400 opacity-0 group-hover:opacity-75 group-hover:animate-ping transition-opacity duration-300 pointer-events-none" />
         </button>
       </Link>
     </div>
